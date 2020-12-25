@@ -1,4 +1,4 @@
-﻿namespace OfdSharp.Core.Signatures
+﻿namespace OfdSharp.Core.Signs
 {
     /// <summary>
     /// 签名节点的类型

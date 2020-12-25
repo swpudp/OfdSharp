@@ -2,6 +2,7 @@
 using OfdSharp.Reader;
 using System;
 using System.Collections.Generic;
+using OfdSharp.Core.Signs;
 
 namespace OfdSharp.Sign.Stamp
 {
@@ -43,7 +44,7 @@ namespace OfdSharp.Sign.Stamp
             this.Height = height;
         }
 
-        public List<StampAnnotation> GetAppearance(OfdReader ctx, AtomicSignId idProvider)
+        public List<StampAnnot> GetAppearance(OfdReader ctx, AtomicSignId idProvider)
         {
             throw new NotImplementedException();
             //// 总页码数

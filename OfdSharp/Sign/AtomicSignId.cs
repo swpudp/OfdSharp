@@ -47,10 +47,10 @@ namespace OfdSharp.Sign
         /// <returns></returns>
         public static int Parse(string id)
         {
-            var m = IdPattern.Match(id);
+            Match m = IdPattern.Match(id);
             if (m.Success)
             {
-                var idNumStr = m.Groups[1].Value;
+                string idNumStr = m.Groups[1].Value;
                 return int.Parse(idNumStr);
             }
             return int.Parse(id);

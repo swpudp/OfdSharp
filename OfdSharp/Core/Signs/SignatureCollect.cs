@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
-using System.Xml;
 
-namespace OfdSharp.Core.Signatures
+namespace OfdSharp.Core.Signs
 {
     /// <summary>
     /// 签名列表根节点
@@ -9,12 +8,8 @@ namespace OfdSharp.Core.Signatures
     /// 签名列表文件中可以包含多个签名（例如联合发文等情况），见图 85。
     /// 当允许下次继续添加签名时，该文件不会被包含到本次签名的保护文件列表（References）中。
     /// </summary>
-    public class SignatureCollect : OfdElement
+    public class SignatureCollect
     {
-        public SignatureCollect(XmlDocument xmlDocument) : base(xmlDocument, "Signatures")
-        {
-        }
-
         /// <summary>
         /// 安全标识的最大值
         /// 作用与文档入口文件 Document.xml 中的 MaxID相同，为了避免在签名时影响文档入口文件，采用了与ST_ID不一样的ID编码方式

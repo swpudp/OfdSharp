@@ -8,12 +8,12 @@ namespace OfdSharp.Container
     /// <summary>
     /// OFD文档对象
     /// </summary>
-    public class OfdDir:VirtualContainer
+    public class OfdDir : VirtualContainer
     {
         /// <summary>
         /// OFD文档主入口文件名称
         /// </summary>
-        public static  string OfdFileName = "OFD.xml";
+        public static string OfdFileName = "OFD.xml";
 
         public OfdDir(DirectoryInfo fullDir) : base(fullDir)
         {
@@ -52,7 +52,8 @@ namespace OfdSharp.Container
         /// 文档主入口文件对象
         /// </summary>
         /// <returns></returns>
-        public Ofd GetOfd() {
+        public Ofd GetOfd()
+        {
             XmlDocument obj = GetDocument(OfdFileName);
             return new Ofd(obj);
         }

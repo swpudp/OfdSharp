@@ -1,6 +1,6 @@
 ﻿using System;
 using System.IO;
-using OfdSharp.Core.Signatures;
+using OfdSharp.Core.Signs;
 using OfdSharp.Extensions;
 using OfdSharp.Ses.V1;
 using Org.BouncyCastle.Asn1;
@@ -10,7 +10,7 @@ using Org.BouncyCastle.Crypto.Digests;
 using Org.BouncyCastle.Security;
 using Org.BouncyCastle.X509;
 
-namespace OfdSharp.Sign.SignContainer
+namespace OfdSharp.Sign.Container
 {
     /// <summary>
     /// 《GM/T 0031-2014 安全电子签章密码技术规范》 电子签章数据生成扩展容器

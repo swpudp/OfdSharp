@@ -1,4 +1,5 @@
-﻿using OfdSharp.Extensions;
+﻿using System.Collections;
+using OfdSharp.Extensions;
 using Org.BouncyCastle.Asn1;
 
 namespace OfdSharp.Ses.V4
@@ -39,7 +40,7 @@ namespace OfdSharp.Ses.V4
 
         public SeSeal(Asn1Sequence seq)
         {
-            var e = seq.GetEnumerator();
+            IEnumerator e = seq.GetEnumerator();
             SealInfo = SealInfo.GetInstance(e.Next());
             Cert = Asn1OctetString.GetInstance(e.Next());
             SignAlgId = DerObjectIdentifier.GetInstance(e.Next());

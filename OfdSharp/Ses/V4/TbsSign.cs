@@ -1,4 +1,5 @@
-﻿using OfdSharp.Extensions;
+﻿using System.Collections;
+using OfdSharp.Extensions;
 using OfdSharp.Ses.V1;
 using Org.BouncyCastle.Asn1;
 
@@ -35,23 +36,13 @@ namespace OfdSharp.Ses.V4
         public DerIA5String PropertyInfo { get; set; }
 
         /// <summary>
-        /// 签章人对应的签名证书
-        /// </summary>
-        public DerOctetString Cert { get; set; }
-
-        /// <summary>
-        /// 签名算法标识符
-        /// </summary>
-        public DerObjectIdentifier SignatureAlgorithm { get; set; }
-
-        /// <summary>
         /// 自定义数据
         /// </summary>
         public ExtensionData ExtensionData { get; set; }
 
         public TbsSign() { }
 
-        public TbsSign(DerInteger version, SeSeal eSeal, DerGeneralizedTime timeInfo, DerBitString dataHash, DerIA5String propertyInfo, DerObjectIdentifier signatureAlgorithm, ExtensionData extData)
+        public TbsSign(DerInteger version, SeSeal eSeal, DerGeneralizedTime timeInfo, DerBitString dataHash, DerIA5String propertyInfo, ExtensionData extData)
         {
             Version = version;
             EsSeal = eSeal;
@@ -59,13 +50,12 @@ namespace OfdSharp.Ses.V4
             DataHash = dataHash;
             PropertyInfo = propertyInfo;
             ExtensionData = extData;
-            SignatureAlgorithm = signatureAlgorithm;
         }
 
 
         public TbsSign(Asn1Sequence seq)
         {
-            var e = seq.GetEnumerator();
+            IEnumerator e = seq.GetEnumerator();
             Version = DerInteger.GetInstance(e.Next());
             EsSeal = SeSeal.GetInstance(e.Next());
             TimeInfo = DerGeneralizedTime.GetInstance(e.Next());
@@ -94,8 +84,7 @@ namespace OfdSharp.Ses.V4
                 EsSeal,
                 TimeInfo,
                 DataHash,
-                PropertyInfo,
-                SignatureAlgorithm
+                PropertyInfo
             };
             if (ExtensionData != null)
             {

@@ -1,16 +1,10 @@
-﻿using System.Xml;
-
-namespace OfdSharp.Core.Signatures
+﻿namespace OfdSharp.Core.Signs
 {
     /// <summary>
     /// 数字签名或安全签章在类表中的注册信息，依次签名或签章对应一个节点
     /// </summary>
-    public class Signature : OfdElement
+    public class Signatures
     {
-        public Signature(XmlDocument xmlDocument) : base(xmlDocument, "Signature")
-        {
-        }
-
         /// <summary>
         /// 签名或签章的标识
         /// 推荐使用“sNNN”的编码方式，NNN从1开始

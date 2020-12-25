@@ -1,6 +1,7 @@
-﻿using System.IO;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+using OfdSharp.Core.Invoice;
 using OfdSharp.Reader;
+using System.IO;
 
 namespace OfdSharpUnitTest.Reader
 {
@@ -11,9 +12,9 @@ namespace OfdSharpUnitTest.Reader
         public void OfdReaderFileTest()
         {
             string filePath = Path.Combine(Directory.GetCurrentDirectory(), "Files", "test.ofd");
-            OfdReader reader = new OfdReader(filePath);
+            FileStream fileStream = File.OpenRead(filePath);
+            OfdReader reader = new OfdReader(fileStream);
             Assert.IsNotNull(reader);
-            Assert.AreEqual(reader.FileInfo.FullName, filePath);
         }
 
         [TestMethod]
@@ -30,7 +31,6 @@ namespace OfdSharpUnitTest.Reader
             FileInfo fileInfo = new FileInfo(filePath);
             OfdReader reader = new OfdReader(fileInfo);
             Assert.IsNotNull(reader);
-            Assert.AreEqual(reader.FileInfo.FullName, fileInfo.FullName);
         }
 
         [TestMethod]
@@ -61,6 +61,22 @@ namespace OfdSharpUnitTest.Reader
 
             string signatures = reader.GetSignatures();
             Assert.IsNotNull(signatures);
+
+            reader.Close();
+        }
+
+        [TestMethod]
+        public void GetSignaturesByStreamTest()
+        {
+            string filePath = Path.Combine(Directory.GetCurrentDirectory(), "Files", "test.ofd");
+            FileStream stream = File.OpenRead(filePath);
+            OfdReader reader = new OfdReader(stream);
+            Assert.IsNotNull(reader);
+
+            string signatures = reader.GetSignatures();
+            Assert.IsNotNull(signatures);
+
+            reader.Close();
         }
 
         [TestMethod]
@@ -73,6 +89,16 @@ namespace OfdSharpUnitTest.Reader
         public void DisposeTest()
         {
             Assert.Fail();
+        }
+
+        [TestMethod]
+        public void GetInvoiceInfoTest()
+        {
+            string filePath = Path.Combine(Directory.GetCurrentDirectory(), "Files", "test.ofd");
+            OfdReader reader = new OfdReader(filePath);
+            Assert.IsNotNull(reader);
+            InvoiceInfo invoiceInfo = reader.GetInvoiceInfo();
+            Assert.IsNotNull(invoiceInfo);
         }
     }
 }

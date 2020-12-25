@@ -1,4 +1,5 @@
-﻿using OfdSharp.Extensions;
+﻿using System.Collections;
+using OfdSharp.Extensions;
 using Org.BouncyCastle.Asn1;
 
 namespace OfdSharp.Ses.V1
@@ -37,7 +38,7 @@ namespace OfdSharp.Ses.V1
 
         public SesSignInfo(Asn1Sequence seq)
         {
-            var e = seq.GetEnumerator();
+            IEnumerator e = seq.GetEnumerator();
             Cert = Asn1OctetString.GetInstance(e.Next());
             SignatureAlgorithm = DerObjectIdentifier.GetInstance(e.Next());
             SignData = DerBitString.GetInstance(e.Next());

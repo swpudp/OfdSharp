@@ -1,27 +1,26 @@
 ﻿using System.Collections.Generic;
-using System.Xml;
+using System.Xml.Serialization;
+using OfdSharp.Core.Signatures;
 
-namespace OfdSharp.Core.Signatures
+namespace OfdSharp.Core.Signs
 {
     /// <summary>
     /// 签名的范围
     /// </summary>
-    public class ReferenceCollect : OfdElement
+    public class ReferenceCollect
     {
-        public ReferenceCollect(XmlDocument xmlDocument) : base(xmlDocument, "References")
-        {
-        }
-
         /// <summary>
         /// 摘要方法
         /// 视应用场景的不同使用不同的摘要方法。
         /// 用于各行业应用时，应使用符合行业安全规范的算法。
         /// </summary>
-        public CheckMethod CheckMethod { get; set; }
+        [XmlAttribute]
+        public string CheckMethod { get; set; }
 
         /// <summary>
         /// 针对一个文件的摘要节点列表
         /// </summary>
-        public IList<Reference> References { get; set; }
+        [XmlElement("Reference")]
+        public List<Reference> Items { get; set; }
     }
 }

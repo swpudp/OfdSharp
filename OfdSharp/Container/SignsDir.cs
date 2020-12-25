@@ -2,6 +2,7 @@
 using System;
 using System.IO;
 using System.Xml;
+using OfdSharp.Core.Signs;
 
 namespace OfdSharp.Container
 {
@@ -57,7 +58,7 @@ namespace OfdSharp.Container
         public SignatureCollect GetSignatures()
         {
             XmlDocument element = GetDocument(SignaturesFileName);
-            return new SignatureCollect(element);
+            return new SignatureCollect();
         }
 
         /// <summary>

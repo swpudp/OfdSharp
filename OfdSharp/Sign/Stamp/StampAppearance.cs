@@ -1,6 +1,7 @@
 ﻿using OfdSharp.Core.Signatures;
 using OfdSharp.Reader;
 using System.Collections.Generic;
+using OfdSharp.Core.Signs;
 
 namespace OfdSharp.Sign.Stamp
 {
@@ -15,6 +16,6 @@ namespace OfdSharp.Sign.Stamp
         /// <param name="ctx"></param>
         /// <param name="idProvider"></param>
         /// <returns></returns>
-        List<StampAnnotation> GetAppearance(OfdReader ctx, AtomicSignId idProvider);
+        List<StampAnnot> GetAppearance(OfdReader ctx, AtomicSignId idProvider);
     }
 }

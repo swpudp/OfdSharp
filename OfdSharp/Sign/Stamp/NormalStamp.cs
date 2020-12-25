@@ -2,6 +2,7 @@
 using OfdSharp.Core.Signatures;
 using OfdSharp.Reader;
 using System.Collections.Generic;
+using OfdSharp.Core.Signs;
 
 namespace OfdSharp.Sign.Stamp
 {
@@ -48,17 +49,17 @@ namespace OfdSharp.Sign.Stamp
             this.Height = height;
         }
 
-        public List<StampAnnotation> GetAppearance(OfdReader ctx, AtomicSignId idProvider)
+        public List<StampAnnot> GetAppearance(OfdReader ctx, AtomicSignId idProvider)
         {
             // 解析OFD页码获取页面对应的ID
             string id = string.Empty; //ctx.getPageObjectId(page).ref ();
-            StampAnnotation annotation = new StampAnnotation(null)
+            StampAnnot annotation = new StampAnnot()
             {
                 Id = idProvider.IncrementAndGet(),
-                Boundary = (new StBox(Tlx, Tly, Width, Height)),
+                Boundary = $"{Tlx} {Tly} {Width} {Height}",
                 PageRef = string.Empty
             };
-            List<StampAnnotation> res = new List<StampAnnotation>(1) { annotation };
+            List<StampAnnot> res = new List<StampAnnot>(1) { annotation };
             return res;
         }
     }

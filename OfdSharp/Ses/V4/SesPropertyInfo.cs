@@ -80,8 +80,8 @@ namespace OfdSharp.Ses.V4
             CertListType = DerInteger.GetInstance(e.Next());
             CertList = SesCertCollect.GetInstance(CertListType, e.Next());
             CreateDate = DerGeneralizedTime.GetInstance(e.Next());
-            ValidEnd = DerGeneralizedTime.GetInstance(e.Next());
             ValidStart = DerGeneralizedTime.GetInstance(e.Next());
+            ValidEnd = DerGeneralizedTime.GetInstance(e.Next());
         }
 
         public static SesPropertyInfo GetInstance(object o)

@@ -1,6 +1,6 @@
 ﻿using System.Xml;
 
-namespace OfdSharp.Core.Signatures
+namespace OfdSharp.Core.Signs
 {
     /// <summary>
     /// 签名描述文件的根节点

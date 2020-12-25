@@ -1,4 +1,5 @@
-﻿using OfdSharp.Extensions;
+﻿using System.Collections;
+using OfdSharp.Extensions;
 using Org.BouncyCastle.Asn1;
 
 namespace OfdSharp.Ses.V1
@@ -64,7 +65,7 @@ namespace OfdSharp.Ses.V1
 
         public TbsSign(Asn1Sequence seq)
         {
-            var e = seq.GetEnumerator();
+            IEnumerator e = seq.GetEnumerator();
             Version = DerInteger.GetInstance(e.Next());
             EsSeal = SesSealInfo.GetInstance(e.Next());
             TimeInfo = DerBitString.GetInstance(e.Next());

@@ -1,5 +1,5 @@
 ﻿using System.IO;
-using OfdSharp.Core.Signatures;
+using OfdSharp.Core.Signs;
 using OfdSharp.Extensions;
 using Org.BouncyCastle.Asn1;
 using Org.BouncyCastle.Asn1.GM;
@@ -7,7 +7,7 @@ using Org.BouncyCastle.Crypto;
 using Org.BouncyCastle.Crypto.Digests;
 using Org.BouncyCastle.Security;
 
-namespace OfdSharp.Sign.SignContainer
+namespace OfdSharp.Sign.Container
 {
     /// <summary>
     /// 国密SM2withSM3数字签名实现容器

@@ -1,6 +1,7 @@
 ﻿using OfdSharp.Core.Signatures;
 using System.IO;
 using System.Xml;
+using OfdSharp.Core.Signs;
 
 namespace OfdSharp.Container
 {

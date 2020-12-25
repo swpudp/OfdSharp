@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using OfdSharp.Extensions;
 using OfdSharp.Ses.V1;
 using Org.BouncyCastle.Asn1;
@@ -48,7 +49,7 @@ namespace OfdSharp.Ses.V4
 
         public SealInfo(Asn1Sequence seq)
         {
-            var e = seq.GetEnumerator();
+            IEnumerator e = seq.GetEnumerator();
             Header = SesHeader.GetInstance(e.Next());
             EsId = DerIA5String.GetInstance(e.Next());
             Property = SesPropertyInfo.GetInstance(e.Next());

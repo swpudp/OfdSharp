@@ -1,8 +1,10 @@
-﻿using System.IO;
+﻿using OfdSharp.Core.Invoice;
+using OfdSharp.Core.Signs;
+using System.IO;
 using System.IO.Compression;
 using System.Linq;
 using System.Xml;
-using OfdSharp.Container;
+using System.Xml.Serialization;
 
 namespace OfdSharp.Reader
 {
@@ -12,14 +14,14 @@ namespace OfdSharp.Reader
     public class OfdReader
     {
         /// <summary>
-        /// ofd文件信息
-        /// </summary>
-        public FileInfo FileInfo { get; }
-
-        /// <summary>
         /// 文档概述
         /// </summary>
         public DocSummary Summary { get; set; }
+
+        /// <summary>
+        /// ofd入口文件名称
+        /// </summary>
+        private const string OfdFileName = "OFD.xml";
 
         /// <summary>
         /// 压缩文件
@@ -27,51 +29,96 @@ namespace OfdSharp.Reader
         private ZipArchive _archive;
 
         /// <summary>
-        /// OFD虚拟容器对象
-        /// </summary>
-        private OfdDir ofdDir;
-
-        /// <summary>
         /// 构造函数
         /// </summary>
         /// <param name="filePath"></param>
         public OfdReader(string filePath)
         {
-            FileInfo = new FileInfo(filePath);
-            UnZip();
+            UnZip(new FileInfo(filePath));
         }
 
         /// <summary>
         /// 构造函数
         /// </summary>
         /// <param name="fileInfo"></param>
-        public OfdReader(FileInfo fileInfo)
+        public OfdReader(FileSystemInfo fileInfo)
         {
-            FileInfo = fileInfo;
-            UnZip();
+            UnZip(fileInfo);
+        }
+
+        /// <summary>
+        /// 构造函数
+        /// </summary>
+        /// <param name="stream"></param>
+        public OfdReader(Stream stream)
+        {
+            UnZip(stream);
         }
 
         /// <summary>
         /// 确保文件存在
         /// </summary>
-        private void EnsureFileExist()
+        private static void EnsureFileExist(FileSystemInfo fileInfo)
         {
-            if (!FileInfo.Exists)
+            if (!fileInfo.Exists)
             {
-                throw new FileNotFoundException($"文件{FileInfo.Name}未找到");
+                throw new FileNotFoundException($"文件{fileInfo.Name}未找到");
             }
+        }
+
+
+        /// <summary>
+        /// 解压文件
+        /// </summary>
+        private void UnZip(FileSystemInfo fileInfo)
+        {
+            EnsureFileExist(fileInfo);
+            FileStream fileStream = File.OpenRead(fileInfo.FullName);
+            UnZip(fileStream);
         }
 
         /// <summary>
         /// 解压文件
         /// </summary>
-        private void UnZip()
+        private void UnZip(Stream stream)
         {
-            EnsureFileExist();
-            FileStream fileStream = File.OpenRead(FileInfo.FullName);
-            fileStream.Position = 0;
-            _archive = new ZipArchive(fileStream, ZipArchiveMode.Read, true);
-            ofdDir = new OfdDir(new DirectoryInfo(FileInfo.FullName));
+            stream.Seek(0, SeekOrigin.Begin);
+            _archive = new ZipArchive(stream, ZipArchiveMode.Read, true);
+        }
+
+        /// <summary>
+        /// 读取zip项内容
+        /// </summary>
+        /// <param name="entry"></param>
+        /// <returns></returns>
+        private static MemoryStream ReadEntry(ZipArchiveEntry entry)
+        {
+            MemoryStream memory = new MemoryStream();
+            using (Stream entryStream = entry.Open())
+            {
+                entryStream.CopyTo(memory);
+                memory.Position = 0;
+            }
+            return memory;
+        }
+
+        /// <summary>
+        /// 读取zip项内容
+        /// </summary>
+        /// <param name="entryFile"></param>
+        /// <returns></returns>
+        public byte[] ReadContent(string entryFile)
+        {
+            ZipArchiveEntry entry = _archive.Entries.First(f => f.FullName == entryFile.TrimStart('/'));
+            using (Stream entryStream = entry.Open())
+            {
+                using (MemoryStream memory = new MemoryStream())
+                {
+                    entryStream.CopyTo(memory);
+                    memory.Seek(0, SeekOrigin.Begin);
+                    return memory.ToArray();
+                }
+            }
         }
 
         /// <summary>
@@ -80,19 +127,15 @@ namespace OfdSharp.Reader
         /// <returns></returns>
         public string GetBody()
         {
-            ZipArchiveEntry entry = _archive.Entries.FirstOrDefault(f => f.Name == "OFD.xml");
+            ZipArchiveEntry entry = _archive.Entries.First(f => f.FullName == OfdFileName);
             if (entry == null)
             {
                 return default;
             }
-            MemoryStream memory = new MemoryStream();
-            Stream entryStream = entry.Open();
-            entryStream.CopyToAsync(memory);
-            memory.Position = 0;
+            MemoryStream memory = ReadEntry(entry);
 
             XmlDocument body = new XmlDocument();
             body.Load(memory);
-
 
             XmlNamespaceManager ns = new XmlNamespaceManager(body.NameTable);
             ns.AddNamespace("fp", "http://www.edrm.org.cn/schema/e-invoice/2019");
@@ -100,7 +143,6 @@ namespace OfdSharp.Reader
             XmlNode node = body.SelectSingleNode("DocBody/Signatures", ns);
 
             memory.Dispose();
-            entryStream.Dispose();
 
             return node?.Value;
         }
@@ -111,11 +153,30 @@ namespace OfdSharp.Reader
             {
                 using (MemoryStream memory = new MemoryStream())
                 {
-                    entryStream.CopyToAsync(memory);
-                    memory.Position = 0;
+                    entryStream.CopyTo(memory);
+                    memory.Seek(0, SeekOrigin.Begin);
                     XmlDocument body = new XmlDocument();
                     body.Load(memory);
                     return body;
+                }
+            }
+        }
+
+
+        private static T Deserialize<T>(ZipArchiveEntry entry)
+        {
+            using (Stream entryStream = entry.Open())
+            {
+                using (MemoryStream memory = new MemoryStream())
+                {
+                    entryStream.CopyTo(memory);
+                    memory.Seek(0, SeekOrigin.Begin);
+                    XmlSerializer serializer = new XmlSerializer(typeof(T));
+                    using (XmlReader xmlReader = XmlReader.Create(memory))
+                    {
+                        T signature = (T)serializer.Deserialize(xmlReader);
+                        return signature;
+                    }
                 }
             }
         }
@@ -126,32 +187,40 @@ namespace OfdSharp.Reader
         /// <returns></returns>
         public string GetSignatures()
         {
-            ZipArchiveEntry entry = _archive.Entries.FirstOrDefault(f => f.FullName == "OFD.xml");
+            ZipArchiveEntry entry = _archive.Entries.First(f => f.FullName == "OFD.xml");
             XmlDocument body = LoadXml(entry);
 
-            XmlNamespaceManager ns = new XmlNamespaceManager(body.NameTable);
-            ns.AddNamespace("ofd", "http://www.ofdspec.org/2016");
-
             XmlNode node = body.LastChild.LastChild.LastChild.LastChild;
-            return node?.Value;
+            string signaturesFile = node.Value;
+
+            ZipArchiveEntry signaturesBaseLoc = _archive.Entries.First(f => f.FullName == signaturesFile);
+            XmlDocument signaturesBaseLocContent = LoadXml(signaturesBaseLoc);
+            string signaturesBaseLocFile = signaturesBaseLocContent.LastChild.LastChild.Attributes.GetNamedItem("BaseLoc").Value;
+
+
+            return signaturesBaseLocFile;
+
+
         }
 
+        public Signature GetSignature()
+        {
+            string signaturesBaseLocFile = GetSignatures();
+            ZipArchiveEntry signatureFile = _archive.Entries.First(f => f.FullName == signaturesBaseLocFile.TrimStart('/'));
+            return Deserialize<Signature>(signatureFile);
+        }
 
         public string GetSignedList()
         {
             string signatures = GetSignatures();
-            ZipArchiveEntry entry = _archive.Entries.FirstOrDefault(f => f.FullName == signatures);
-            if (entry == null)
-            {
-                return string.Empty;
-            }
+            ZipArchiveEntry entry = _archive.Entries.First(f => f.FullName == signatures);
             XmlDocument document = LoadXml(entry);
             XmlNode node = document.LastChild.LastChild;
             if (node == null)
             {
                 return string.Empty;
             }
-            ZipArchiveEntry signedEntry = _archive.Entries.FirstOrDefault(f => f.FullName == node.Value);
+            ZipArchiveEntry signedEntry = _archive.Entries.First(f => f.FullName == node.Value);
             XmlDocument signedXml = LoadXml(signedEntry);
             XmlNode signedNode = signedXml.LastChild.LastChild;
             if (signedNode == null)
@@ -166,6 +235,17 @@ namespace OfdSharp.Reader
         }
 
         /// <summary>
+        /// 获取发票信息
+        /// </summary>
+        /// <returns></returns>
+        public InvoiceInfo GetInvoiceInfo()
+        {
+            const string invoiceEntryName = "original_invoice.xml";
+            ZipArchiveEntry invoiceEntry = _archive.Entries.First(f => f.Name == invoiceEntryName);
+            return Deserialize<InvoiceInfo>(invoiceEntry);
+        }
+
+        /// <summary>
         /// 获取文档
         /// </summary>
         /// <param name="index"></param>
@@ -173,6 +253,14 @@ namespace OfdSharp.Reader
         public string GetDoc(int index)
         {
             return $"Doc_{index}";
+        }
+
+        /// <summary>
+        /// 关闭文档
+        /// </summary>
+        public void Close()
+        {
+            _archive.Dispose();
         }
     }
 }

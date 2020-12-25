@@ -1,4 +1,4 @@
-﻿using OfdSharp.Core.Signatures;
+﻿using OfdSharp.Core.Signs;
 using OfdSharp.Crypto;
 using Org.BouncyCastle.Crypto.Parameters;
 using Org.BouncyCastle.Utilities.Encoders;
@@ -29,7 +29,7 @@ namespace OfdSharp.Verify.Container
         //}
 
 
-        public override void Validate(SigType type, string signAlgName, byte[] tbsContent, byte[] signedValue)
+        public override VerifyResult Validate(SigType type, byte[] tbsContent, byte[] signedValue)
         {
             if (type != SigType.Sign)
             {
@@ -45,6 +45,8 @@ namespace OfdSharp.Verify.Container
             //{
             //    throw new InvalidSignedValueException("签名值不一致");
             //}
+
+            return VerifyResult.Success;
         }
     }
 }

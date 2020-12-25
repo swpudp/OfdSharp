@@ -35,7 +35,7 @@ namespace OfdSharp.Ses.Parse
         public static SesVersionHolder ParseSignatureVersion(object o)
         {
             Asn1Sequence sequence = Asn1Sequence.GetInstance(o);
-            if (sequence.Count >= 4 && sequence.Count <= 5)
+            if (sequence.Count == 4 || sequence.Count == 5)
             {
                 return new SesVersionHolder(SesVersion.V4, sequence);
             }
