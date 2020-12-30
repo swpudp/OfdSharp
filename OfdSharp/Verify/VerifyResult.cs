@@ -1,38 +1,53 @@
-﻿namespace OfdSharp.Verify
+﻿using System.ComponentModel;
+
+namespace OfdSharp.Verify
 {
     /// <summary>
     /// 验证结果
     /// </summary>
+    [Description("验证结果")]
     public enum VerifyResult
     {
         /// <summary>
         /// 成功
         /// </summary>
+        [Description("成功")]
         Success,
 
         /// <summary>
         /// 文件数据被篡改
         /// </summary>
+        [Description("文件数据被篡改")]
         FileTampered,
 
         /// <summary>
         /// 印章数据被篡改
         /// </summary>
+        [Description("印章数据被篡改")]
         SealTampered,
-
-        /// <summary>
-        /// 签章数据被篡改
-        /// </summary>
-        SignedTampered,
 
         /// <summary>
         /// 印章不匹配
         /// </summary>
+        [Description("印章不匹配")]
         SealNotMatch,
 
         /// <summary>
-        /// 电子签章不匹配
+        /// 印章不存在
         /// </summary>
-        SignedNotMatch
+        [Description("印章不存在")]
+        SealNotFound,
+
+        /// <summary>
+        /// 签章数据被篡改
+        /// </summary>
+        [Description("签章数据被篡改")]
+        SignedTampered,
+
+        /// <summary>
+        /// 签章数据不匹配
+        /// </summary>
+        [Description("签章数据不匹配")]
+        SignedNotMatch,
     }
 }

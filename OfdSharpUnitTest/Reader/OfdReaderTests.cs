@@ -1,7 +1,9 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+﻿using System;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using OfdSharp.Core.Invoice;
 using OfdSharp.Reader;
 using System.IO;
+using System.Linq;
 
 namespace OfdSharpUnitTest.Reader
 {
@@ -99,6 +101,16 @@ namespace OfdSharpUnitTest.Reader
             Assert.IsNotNull(reader);
             InvoiceInfo invoiceInfo = reader.GetInvoiceInfo();
             Assert.IsNotNull(invoiceInfo);
+            Console.WriteLine(DateTime.Parse(invoiceInfo.IssueDate));
+            Assert.AreEqual(9709m, decimal.Parse(invoiceInfo.TaxExclusiveTotalAmount));
+        }
+
+        [TestMethod]
+        public void ReadHeadTest()
+        {
+            string filePath = Path.Combine(Directory.GetCurrentDirectory(), "Files", "test.ofd");
+            byte[] content = File.ReadAllBytes(filePath);
+            Console.WriteLine(string.Join(string.Empty, content.Take(2)));
         }
     }
 }

@@ -18,11 +18,23 @@ namespace OfdSharpUnitTest.Verify
         public void ExeValidateTest()
         {
             string filePath = Path.Combine(Directory.GetCurrentDirectory(), "Files", "test.ofd");
-            OfdValidator validator = new OfdValidator();
             OfdReader reader = new OfdReader(filePath);
-            VerifyResult verifyResult = validator.Validate(reader);
+            VerifyResult verifyResult = OfdValidator.Validate(reader);
             Assert.IsNotNull(verifyResult);
             Assert.AreEqual(VerifyResult.Success, verifyResult);
+        }
+
+        /// <summary>
+        /// OFD电子签名验证
+        /// </summary>
+        [TestMethod]
+        public void ExeValidateInvalidFileTest()
+        {
+            string filePath = Path.Combine(Directory.GetCurrentDirectory(), "Files", "test1.ofd");
+            OfdReader reader = new OfdReader(filePath);
+            VerifyResult verifyResult = OfdValidator.Validate(reader);
+            Assert.IsNotNull(verifyResult);
+            Assert.AreEqual(VerifyResult.SealNotFound, verifyResult);
         }
     }
 }

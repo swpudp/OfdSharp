@@ -14,7 +14,7 @@ namespace OfdSharp.Verify
     /// <summary>
     /// OFD电子签名验证引擎
     /// </summary>
-    public class OfdValidator
+    public static class OfdValidator
     {
         /// <summary>
         /// 执行OFD电子签名验证
@@ -33,7 +33,7 @@ namespace OfdSharp.Verify
         /// 4）获取SignatureMethod节点，获取签名算法名称：1.2.156.10197.1.501，获取签名算法：IDigest digest = DigestUtilities.GetDigest(GMObjectIdentifiers.sm2sign_with_sm3);//1.2.156.10197.1.401
         /// 5）使用签章数据检验签名信息是否匹配
         /// </summary>
-        public VerifyResult Validate(OfdReader reader)
+        public static VerifyResult Validate(OfdReader reader)
         {
             //1、读取OFD.xml文件的ofd:Signatures节点
             //2、读取Doc_0\Signs\Signatures.xml文件的ofd:Signature节点，从BaseLoc特性获取签名文件路径，如/Doc_0/Signs/Sign_0/Signature.xml
@@ -56,7 +56,7 @@ namespace OfdSharp.Verify
         /// <summary>
         /// 验证文件完整性
         /// </summary>
-        private VerifyResult CheckFileIntegrity(OfdReader reader, Signature signature, IDigest digest)
+        private static VerifyResult CheckFileIntegrity(OfdReader reader, Signature signature, IDigest digest)
         {
             foreach (Reference referenceItem in signature.SignedInfo.ReferenceCollect.Items)
             {
@@ -92,16 +92,20 @@ namespace OfdSharp.Verify
         /// </summary>
         private static VerifyResult CheckSealMatch(OfdReader reader, Signature signature)
         {
+            if (signature.SignedInfo.Seal == null)
+            {
+                return VerifyResult.SealNotFound;
+            }
             byte[] sesSignatureBin = reader.ReadContent(signature.SignedValue);
             SesVersionHolder holder = VersionParser.ParseSignatureVersion(sesSignatureBin);
             if (holder.Version == SesVersion.V4)
             {
                 SesSignature v4Signature = SesSignature.GetInstance(holder.Sequence);
                 SeSeal seal = v4Signature.TbsSign.EsSeal;
-                byte[] except = seal.GetDerEncoded();
+                byte[] expect = seal.GetDerEncoded();
 
                 byte[] sealBytes = reader.ReadContent(signature.SignedInfo.Seal.BaseLoc.Value);
-                if (!Arrays.AreEqual(except, sealBytes))
+                if (!Arrays.AreEqual(expect, sealBytes))
                 {
                     return VerifyResult.SealNotMatch;
                 }

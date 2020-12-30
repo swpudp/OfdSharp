@@ -5,7 +5,7 @@ namespace OfdSharp.Verify
     /// <summary>
     /// 签名数据验证容器
     /// </summary>
-    public abstract class SignedDataValidateContainer
+    internal abstract class SignedDataValidateContainer
     {
         /// <summary>
         /// 签名数据验证

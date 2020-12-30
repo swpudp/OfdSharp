@@ -13,7 +13,7 @@ namespace OfdSharp.Verify.Container
     /// 《GB/T 38540-2020 信息安全技术 安全电子签章密码技术规范》 电子印章数据验证
     /// 注意：仅用于测试，电子签章验证请使用符合国家规范的流程进行！
     /// </summary>
-    public class SesV4ValidateContainer : SignedDataValidateContainer
+    internal class SesV4ValidateContainer : SignedDataValidateContainer
     {
         /// <summary>
         /// 签名数据验证
@@ -39,7 +39,7 @@ namespace OfdSharp.Verify.Container
             byte[] exceptHash = toSign.DataHash.GetOctets();
             if (!Arrays.AreEqual(output, exceptHash))
             {
-                return VerifyResult.SealTampered;
+                return VerifyResult.SignedNotMatch;
             }
             // 预期的电子签章数据，签章值
             byte[] expSigVal = sesSignature.Signature.GetOctets();

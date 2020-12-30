@@ -10,7 +10,7 @@ namespace OfdSharp.Verify.Container
     /// 《《GM/T 0031-2014 安全电子签章密码技术规范》 电子印章数据验证
     /// 注意：仅用于测试，电子签章验证请使用符合国家规范的流程进行！
     /// </summary>
-    public class DigitalValidateContainer : SignedDataValidateContainer
+    internal class DigitalValidateContainer : SignedDataValidateContainer
     {
         /// <summary>
         /// 验证使用的公钥
