@@ -3,6 +3,7 @@ using OfdSharp.Extensions;
 using OfdSharp.Ses.V1;
 using Org.BouncyCastle.Asn1;
 
+
 namespace OfdSharp.Ses.V4
 {
     /// <summary>
@@ -38,7 +39,7 @@ namespace OfdSharp.Ses.V4
         /// <summary>
         /// 自定义数据
         /// </summary>
-        public ExtensionData ExtensionData { get; set; }
+        public ExtensionData ExtData { get; set; }
 
         public TbsSign() { }
 
@@ -49,7 +50,7 @@ namespace OfdSharp.Ses.V4
             TimeInfo = timeInfo;
             DataHash = dataHash;
             PropertyInfo = propertyInfo;
-            ExtensionData = extData;
+            ExtData = extData;
         }
 
 
@@ -63,7 +64,7 @@ namespace OfdSharp.Ses.V4
             PropertyInfo = DerIA5String.GetInstance(e.Next());
             if (e.MoveNext())
             {
-                ExtensionData = ExtensionData.GetInstance(e.Next());
+                ExtData = ExtensionData.GetInstance(e.Current);
             }
         }
 
@@ -86,9 +87,9 @@ namespace OfdSharp.Ses.V4
                 DataHash,
                 PropertyInfo
             };
-            if (ExtensionData != null)
+            if (ExtData != null)
             {
-                v.Add(ExtensionData);
+                v.Add(ExtData);
             }
             return new DerSequence(v);
         }

@@ -41,21 +41,28 @@ namespace OfdSharp.Verify.Container
             {
                 return VerifyResult.SignedNotMatch;
             }
-            // 预期的电子签章数据，签章值
-            byte[] expSigVal = sesSignature.Signature.GetOctets();
-            //获取电子签章证书
-            ISigner sg = SignerUtilities.GetSigner(sesSignature.SignatureAlgId);
+            //加载证书
             byte[] certDer = sesSignature.Cert.GetOctets();
-            //构造证书
-            X509Certificate x509Certificate = new X509CertificateParser().ReadCertificate(certDer);
-            //获取公钥
-            AsymmetricKeyParameter p = x509Certificate.GetPublicKey();
-            sg.Init(false, p);
+            X509CertificateParser parser = new X509CertificateParser();
+            X509Certificate cert = parser.ReadCertificate(certDer);
+            //判断证书是否过期
+            if (!cert.IsValid(DateTime.Now))
+            {
+                return VerifyResult.SealOutdated;
+            }
+            //获取签名验证对象
+            ISigner signer = SignerUtilities.GetSigner(sesSignature.SignatureAlgId);
+            AsymmetricKeyParameter p = cert.GetPublicKey();
+            signer.Init(false, p);
+            byte[] buf = toSign.GetDerEncoded();
+            signer.BlockUpdate(buf, 0, buf.Length);
 
-            byte[] toSignBytes = toSign.GetDerEncoded();
-            sg.BlockUpdate(toSignBytes, 0, toSignBytes.Length);
+            //预期的电子签章数据，签章值
+            byte[] expect = sesSignature.Signature.GetOctets();
 
-            return !sg.VerifySignature(expSigVal) ? VerifyResult.SignedTampered : VerifyResult.Success;
+            //验证签名
+            bool result = signer.VerifySignature(expect);
+            return result ? VerifyResult.Success : VerifyResult.SealTampered;
         }
     }
 }

@@ -23,7 +23,7 @@ namespace OfdSharp.Ses.V1
         /// </summary>
         public Asn1OctetString ExtValue { get; }
 
-        public ExtraData(DerObjectIdentifier extId, DerBoolean critical, Asn1OctetString extValue) : base()
+        public ExtraData(DerObjectIdentifier extId, DerBoolean critical, Asn1OctetString extValue)
         {
             ExtId = extId;
             Critical = critical;
@@ -54,7 +54,7 @@ namespace OfdSharp.Ses.V1
         }
         public override Asn1Object ToAsn1Object()
         {
-            Asn1EncodableVector vector = new Asn1EncodableVector { ExtId, ExtValue, Critical };
+            Asn1EncodableVector vector = new Asn1EncodableVector { ExtId, Critical, ExtValue };
             return new DerSequence(vector);
         }
     }

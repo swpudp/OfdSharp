@@ -1,5 +1,4 @@
 ﻿using OfdSharp.Core.Basic.Ofd;
-using System;
 using System.IO;
 using System.Xml;
 

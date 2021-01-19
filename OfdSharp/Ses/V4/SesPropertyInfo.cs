@@ -12,12 +12,12 @@ namespace OfdSharp.Ses.V4
         /// <summary>
         /// 签章者证书信息类型： 1 - 数字证书类型
         /// </summary>
-        public static DerInteger CertType = new DerInteger(1);
+        public static readonly DerInteger CertType = new DerInteger(1);
 
         /// <summary>
         /// 签章者证书信息类型： 2 - 数字证书杂凑值
         /// </summary>
-        public static DerInteger CertDigestType = new DerInteger(2);
+        public static readonly DerInteger CertDigestType = new DerInteger(2);
 
         /// <summary>
         /// 印章类型

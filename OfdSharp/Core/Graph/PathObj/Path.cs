@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using System.Xml;
+﻿using System.Xml;
 using OfdSharp.Core.Basic.PageObj.Layer.Block;
 
 namespace OfdSharp.Core.Graph.PathObj

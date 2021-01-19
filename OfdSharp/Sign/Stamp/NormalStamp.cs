@@ -1,6 +1,4 @@
-﻿using OfdSharp.Core.BaseType;
-using OfdSharp.Core.Signatures;
-using OfdSharp.Reader;
+﻿using OfdSharp.Reader;
 using System.Collections.Generic;
 using OfdSharp.Core.Signs;
 

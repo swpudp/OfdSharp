@@ -39,6 +39,12 @@ namespace OfdSharp.Verify
         SealNotFound,
 
         /// <summary>
+        /// 印章已过期
+        /// </summary>
+        [Description("印章已过期")]
+        SealOutdated,
+
+        /// <summary>
         /// 签章数据被篡改
         /// </summary>
         [Description("签章数据被篡改")]
@@ -48,6 +54,6 @@ namespace OfdSharp.Verify
         /// 签章数据不匹配
         /// </summary>
         [Description("签章数据不匹配")]
-        SignedNotMatch,
+        SignedNotMatch
     }
 }

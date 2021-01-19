@@ -54,7 +54,7 @@ namespace OfdSharp.Ses.V1
             Picture = SesPictureInfo.GetInstance(e.Next());
             if (e.MoveNext())
             {
-                ExtData = ExtensionData.GetInstance(e.Next());
+                ExtData = ExtensionData.GetInstance(e.Current);
             }
         }
 

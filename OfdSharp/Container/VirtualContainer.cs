@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Text;
 using System.Xml;
-using OfdSharp.Core.Basic.Doc;
 
 namespace OfdSharp.Container
 {

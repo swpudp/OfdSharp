@@ -8,7 +8,6 @@ namespace OfdSharp.Ses.V4
 {
     public class SealInfo : Asn1Encodable
     {
-
         /// <summary>
         /// 头信息
         /// </summary>

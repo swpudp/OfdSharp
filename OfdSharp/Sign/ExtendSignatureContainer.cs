@@ -1,5 +1,4 @@
-﻿using OfdSharp.Core.Signatures;
-using Org.BouncyCastle.Asn1;
+﻿using Org.BouncyCastle.Asn1;
 using Org.BouncyCastle.Crypto.Digests;
 using System.IO;
 using OfdSharp.Core.Signs;

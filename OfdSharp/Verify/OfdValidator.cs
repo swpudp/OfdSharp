@@ -49,6 +49,7 @@ namespace OfdSharp.Verify
             }
             //电子印章与电子签章数据的匹配性检查
             result = CheckSealMatch(reader, signature);
+
             //检查电子签章数据
             return result == VerifyResult.Success ? CheckSignedValue(reader, signature) : result;
         }
@@ -87,14 +88,14 @@ namespace OfdSharp.Verify
         }
 
         /// <summary>
-        /// 检查印章匹配
+        /// 检查印章匹配[可选-存在Seal.esl则验证，不存在不验证]
         /// 验证文件：Doc_0\Signs\Sign_0\Seal.esl、Doc_0\Signs\Sign_0\SignedValue.dat
         /// </summary>
         private static VerifyResult CheckSealMatch(OfdReader reader, Signature signature)
         {
             if (signature.SignedInfo.Seal == null)
             {
-                return VerifyResult.SealNotFound;
+                return VerifyResult.Success;
             }
             byte[] sesSignatureBin = reader.ReadContent(signature.SignedValue);
             SesVersionHolder holder = VersionParser.ParseSignatureVersion(sesSignatureBin);
@@ -125,6 +126,7 @@ namespace OfdSharp.Verify
             byte[] signedValue = reader.ReadContent(signature.SignedValue);
 
             SesV4ValidateContainer validateContainer = new SesV4ValidateContainer();
+            //SesV1ValidateContainer validateContainer = new SesV1ValidateContainer();
             return validateContainer.Validate(SigType.Seal, tbsContent, signedValue);
         }
     }

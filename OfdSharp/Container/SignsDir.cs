@@ -1,5 +1,4 @@
-﻿using OfdSharp.Core.Signatures;
-using System;
+﻿using System;
 using System.IO;
 using System.Xml;
 using OfdSharp.Core.Signs;

@@ -1,6 +1,6 @@
-﻿using System.Collections;
-using OfdSharp.Extensions;
+﻿using OfdSharp.Extensions;
 using Org.BouncyCastle.Asn1;
+using System.Collections;
 
 namespace OfdSharp.Ses.V1
 {
@@ -37,28 +37,22 @@ namespace OfdSharp.Ses.V1
         /// <summary>
         /// 签章人对应的签名证书
         /// </summary>
-        public DerOctetString Cert { get; set; }
+        public Asn1OctetString Cert { get; set; }
 
         /// <summary>
         /// 签名算法标识符
         /// </summary>
         public DerObjectIdentifier SignatureAlgorithm { get; set; }
 
-        /// <summary>
-        /// 自定义数据
-        /// </summary>
-        public ExtensionData ExtensionData { get; set; }
-
         public TbsSign() { }
 
-        public TbsSign(DerInteger version, SesSealInfo eSeal, DerBitString timeInfo, DerBitString dataHash, DerIA5String propertyInfo, DerObjectIdentifier signatureAlgorithm, ExtensionData extData)
+        public TbsSign(DerInteger version, SesSealInfo eSeal, DerBitString timeInfo, DerBitString dataHash, DerIA5String propertyInfo, DerObjectIdentifier signatureAlgorithm)
         {
             Version = version;
             EsSeal = eSeal;
             TimeInfo = timeInfo;
             DataHash = dataHash;
             PropertyInfo = propertyInfo;
-            ExtensionData = extData;
             SignatureAlgorithm = signatureAlgorithm;
         }
 
@@ -71,10 +65,8 @@ namespace OfdSharp.Ses.V1
             TimeInfo = DerBitString.GetInstance(e.Next());
             DataHash = DerBitString.GetInstance(e.Next());
             PropertyInfo = DerIA5String.GetInstance(e.Next());
-            if (e.MoveNext())
-            {
-                ExtensionData = ExtensionData.GetInstance(e.Next());
-            }
+            Cert = Asn1OctetString.GetInstance(e.Next());
+            SignatureAlgorithm = DerObjectIdentifier.GetInstance(e.Next());
         }
 
         public static TbsSign GetInstance(object o)
@@ -88,19 +80,16 @@ namespace OfdSharp.Ses.V1
 
         public override Asn1Object ToAsn1Object()
         {
-            Asn1EncodableVector v = new Asn1EncodableVector(6)
+            Asn1EncodableVector v = new Asn1EncodableVector(7)
             {
                 Version,
                 EsSeal,
                 TimeInfo,
                 DataHash,
                 PropertyInfo,
+                Cert,
                 SignatureAlgorithm
             };
-            if (ExtensionData != null)
-            {
-                v.Add(ExtensionData);
-            }
             return new DerSequence(v);
         }
     }

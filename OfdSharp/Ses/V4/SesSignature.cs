@@ -60,7 +60,7 @@ namespace OfdSharp.Ses.V4
             Signature = DerBitString.GetInstance(e.Next());
             if (e.MoveNext())
             {
-                TimeStamp = DerBitString.GetInstance(e.Next());
+                TimeStamp = DerBitString.GetInstance(e.Current);
             }
         }
 
@@ -81,7 +81,7 @@ namespace OfdSharp.Ses.V4
 
         public override Asn1Object ToAsn1Object()
         {
-            Asn1EncodableVector v = new Asn1EncodableVector(3) { TbsSign, Signature };
+            Asn1EncodableVector v = new Asn1EncodableVector(5) { TbsSign, Cert, SignatureAlgId, Signature };
             if (TimeStamp != null)
             {
                 v.Add(TimeStamp);
