@@ -27,6 +27,11 @@ namespace OfdSharp.Reader
         /// 压缩文件
         /// </summary>
         private ZipArchive _archive;
+        
+        /// <summary>
+        /// 原始文件流
+        /// </summary>
+        private FileStream fileStream;
 
         /// <summary>
         /// 构造函数
@@ -73,7 +78,7 @@ namespace OfdSharp.Reader
         private void UnZip(FileSystemInfo fileInfo)
         {
             EnsureFileExist(fileInfo);
-            FileStream fileStream = File.OpenRead(fileInfo.FullName);
+            fileStream = File.OpenRead(fileInfo.FullName);
             UnZip(fileStream);
         }
 
@@ -261,6 +266,7 @@ namespace OfdSharp.Reader
         public void Close()
         {
             _archive.Dispose();
+           fileStream.Dispose();
         }
     }
 }
