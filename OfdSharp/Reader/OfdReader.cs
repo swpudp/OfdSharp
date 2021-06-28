@@ -73,8 +73,12 @@ namespace OfdSharp.Reader
         private void UnZip(FileSystemInfo fileInfo)
         {
             EnsureFileExist(fileInfo);
-            FileStream fileStream = File.OpenRead(fileInfo.FullName);
-            UnZip(fileStream);
+            using (FileStream fileStream = File.OpenRead(fileInfo.FullName))
+            {
+                MemoryStream memory = new MemoryStream();
+                fileStream.CopyTo(memory);
+                UnZip(memory);
+            }
         }
 
         /// <summary>
