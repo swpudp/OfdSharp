@@ -109,6 +109,7 @@ namespace OfdSharp.Crypto
             ECPrivateKeyParameters privateKeyParameters = new ECPrivateKeyParameters(privateKeyD, domainParameters);
 
             SM2Engine sm2Engine = new SM2Engine();
+
             sm2Engine.Init(false, privateKeyParameters);
 
             byte[] arrayOfBytes = sm2Engine.ProcessBlock(cipherDataByte, 0, cipherDataByte.Length);
