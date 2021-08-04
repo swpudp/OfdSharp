@@ -33,6 +33,8 @@ namespace OfdSharpUnitTest.Reader
             FileInfo fileInfo = new FileInfo(filePath);
             OfdReader reader = new OfdReader(fileInfo);
             Assert.IsNotNull(reader);
+            FileStream fileStream = System.IO.File.OpenWrite(filePath);
+            Assert.IsTrue(fileStream.Length > 0);
         }
 
         [TestMethod]
