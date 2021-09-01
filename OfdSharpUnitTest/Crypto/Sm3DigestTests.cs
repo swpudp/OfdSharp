@@ -13,6 +13,8 @@ using Org.BouncyCastle.Security;
 using Org.BouncyCastle.Utilities.Encoders;
 using System;
 using System.Globalization;
+using System.IO;
+using System.Net;
 using System.Security.Cryptography;
 using System.Text;
 
@@ -266,7 +268,7 @@ namespace OfdSharpUnitTest.Crypto
             //将16进制密钥转化为字节数组
             byte[] keyBytes = Hex.Decode(secretKey);
             KeyParameter key = ParameterUtilities.CreateKeyParameter("SM4", keyBytes);
-            IBufferedCipher cipher = CipherUtilities.GetCipher("SM4/ECB/PKCS5Padding ");
+            IBufferedCipher cipher = CipherUtilities.GetCipher("SM4/ECB/PKCS5Padding");
             cipher.Init(true, key);
             byte[] buf = new byte[cipher.GetOutputSize(msg.Length)];
             cipher.DoFinal(msg, 0, msg.Length, buf, 0);
@@ -292,10 +294,16 @@ namespace OfdSharpUnitTest.Crypto
             //将16进制密钥转化为字节数组
             byte[] keyBytes = Hex.Decode(secret);
             KeyParameter key = ParameterUtilities.CreateKeyParameter("SM4", keyBytes);
-            IBufferedCipher cipher = CipherUtilities.GetCipher("SM4/ECB/PKCS5Padding ");
+            IBufferedCipher cipher = CipherUtilities.GetCipher("SM4/ECB/PKCS5Padding");
             cipher.Init(false, key);
-            byte[] buf = new byte[cipher.GetUpdateOutputSize(cipherBytes.Length)];
-            cipher.DoFinal(cipherBytes, 0, cipherBytes.Length, buf, 0);
+
+            //byte[] buf = cipher.ProcessBytes(cipherBytes);
+
+            //todo 解密结果不全
+            //byte[] buf = new byte[cipher.GetUpdateOutputSize(cipherBytes.Length)];
+            //cipher.DoFinal(cipherBytes, 0, cipherBytes.Length, buf, 0);
+
+            byte[] buf = cipher.DoFinal(cipherBytes);
             return Encoding.UTF8.GetString(buf);
         }
 

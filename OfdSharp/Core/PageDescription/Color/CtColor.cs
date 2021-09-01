@@ -1,5 +1,4 @@
-﻿using OfdSharp.Core.BaseType;
-using System;
+﻿using System;
 using System.Xml;
 
 namespace OfdSharp.Core.PageDescription.Color
@@ -31,7 +30,7 @@ namespace OfdSharp.Core.PageDescription.Color
 
         public static CtColor Rgb(int r, int g, int b)
         {
-            return new CtColor().SetValue(new StArray(r.ToString(), g.ToString(), b.ToString()));
+            return new CtColor().SetValue(new Primitives.Array(r.ToString(), g.ToString(), b.ToString()));
         }
 
         /// <summary>
@@ -50,7 +49,7 @@ namespace OfdSharp.Core.PageDescription.Color
         /// </summary>
         /// <param name="value"></param>
         /// <returns></returns>
-        public CtColor SetValue(StArray value)
+        public CtColor SetValue(Primitives.Array value)
         {
             if (value == null)
             {

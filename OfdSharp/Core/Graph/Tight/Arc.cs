@@ -1,4 +1,4 @@
-﻿using OfdSharp.Core.BaseType;
+﻿using OfdSharp.Primitives;
 using System.Xml;
 
 namespace OfdSharp.Core.Graph.Tight
@@ -46,12 +46,12 @@ namespace OfdSharp.Core.Graph.Tight
         /// [异常处理]如果数组长度为 1，则认为这是一个园，该数值为圆的半径
         /// [异常处理]如果数组前两个数值中有一个为 0，或者数组为空，则圆弧退化为一条从当前点到EndPoint的线段
         /// </summary>
-        public StArray EllipseSize { get; set; }
+        public Array EllipseSize { get; set; }
 
         /// <summary>
         /// 圆弧结束点，下一个路径起点
         /// 不能与当前的绘制点为同一位置
         /// </summary>
-        public StPosition EndPoint { get; set; }
+        public Position EndPoint { get; set; }
     }
 }

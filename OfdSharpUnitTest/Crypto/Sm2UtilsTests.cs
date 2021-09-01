@@ -1,5 +1,6 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using OfdSharp.Crypto;
+using Org.BouncyCastle.Utilities.Encoders;
 using System;
 using System.Linq;
 
@@ -30,9 +31,13 @@ namespace OfdSharpUnitTest.Crypto
         [TestMethod]
         public void GenerateKeyPairTest()
         {
-            Tuple<string, string> keyPair = Sm2Utils.CreateKeyPair();
+            Tuple<string, string> keyPair = Sm2Utils.CreateKeyPair(false);
             Console.WriteLine("公钥是：{0}", keyPair.Item1);
             Console.WriteLine("密钥是：{0}", keyPair.Item2);
+            Assert.IsNotNull(keyPair.Item1);
+            Assert.IsNotNull(keyPair.Item2);
+            Assert.AreEqual(65, Hex.Decode(keyPair.Item1).Length);
+            Assert.AreEqual(32, Hex.Decode(keyPair.Item2).Length);
         }
 
         /// <summary>
@@ -41,9 +46,10 @@ namespace OfdSharpUnitTest.Crypto
         [TestMethod]
         public void Sm2TestUtilKeyTest()
         {
-            Tuple<string, string> key = Sm2TestUtil.CreateKeyPair();
+            Tuple<string, string> key = Sm2Utils.CreateKeyPair();
             Console.WriteLine("公钥是：{0}", key.Item1);
             Console.WriteLine("密钥是：{0}", key.Item2);
+            Assert.IsTrue(new[] { "03", "02" }.Contains(key.Item1.Substring(0, 2)));
         }
 
         /// <summary>
@@ -52,7 +58,7 @@ namespace OfdSharpUnitTest.Crypto
         [TestMethod]
         public void Sm2TestUtilKeyNoCompressTest()
         {
-            Tuple<string, string> key = Sm2TestUtil.CreateKeyPair(false);
+            Tuple<string, string> key = Sm2Utils.CreateKeyPair(false);
             Console.WriteLine("公钥是：{0}", key.Item1);
             Console.WriteLine("密钥是：{0}", key.Item2);
             Assert.AreEqual("04", key.Item1.Substring(0, 2));
@@ -63,16 +69,45 @@ namespace OfdSharpUnitTest.Crypto
         {
             string publicKey = "02a02cee0eabf72d073b00f3685e120058ce983ad482d85f659e30779ce26b6dcb";
             string plainText = string.Join(",", Enumerable.Repeat(Guid.NewGuid(), 10000));
-            string cipher = Sm2TestUtil.Encrypt(publicKey, plainText);
+            string cipher = Sm2Utils.Encrypt(publicKey, plainText);
             Console.WriteLine(cipher);
 
             string primaryKey = "008125e15f2961d94876c1e8bccf0b14de6c2e8eda390a50d00e4999d25cdcdee2";
-            string content = Sm2TestUtil.Decrypt(primaryKey, cipher);
+            string content = Sm2Utils.Decrypt(primaryKey, cipher);
             Console.WriteLine(content);
 
             Assert.AreEqual(content, plainText);
         }
 
 
+        [TestMethod]
+        public void CreateKeyPairAndEncryptTest()
+        {
+            Tuple<string, string> key = Sm2Utils.CreateKeyPair(false);
+
+            //加密
+            string publicKey = key.Item1;
+            string plainText = string.Join(",", Enumerable.Repeat(Guid.NewGuid(), 10000));
+            string cipher = Sm2Utils.Encrypt(publicKey, plainText);
+
+            //解密
+            string primaryKey = key.Item2;
+            string content = Sm2Utils.Decrypt(primaryKey, cipher);
+            Assert.AreEqual(content, plainText);
+        }
+
+
+        [TestMethod]
+        public void SignAndVerifyTest()
+        {
+            string publicKey = "02a02cee0eabf72d073b00f3685e120058ce983ad482d85f659e30779ce26b6dcb";
+            string privateKey = "008125e15f2961d94876c1e8bccf0b14de6c2e8eda390a50d00e4999d25cdcdee2";
+            string plainText = string.Join(",", Enumerable.Repeat(Guid.NewGuid(), 10000));
+            //加签
+            string sign = Sm2Utils.Sign(privateKey, plainText);
+            //验签
+            bool isVerify = Sm2Utils.Verify(publicKey, plainText, sign);
+            Assert.IsTrue(isVerify);
+        }
     }
 }

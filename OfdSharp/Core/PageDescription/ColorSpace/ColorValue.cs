@@ -1,5 +1,5 @@
 ﻿using System.Xml;
-using OfdSharp.Core.BaseType;
+using OfdSharp.Primitives;
 
 namespace OfdSharp.Core.PageDescription.ColorSpace
 {
@@ -20,10 +20,10 @@ namespace OfdSharp.Core.PageDescription.ColorSpace
         /// </summary>
         /// <param name="xmlDocument"></param>
         /// <param name="color"></param>
-        public ColorValue(XmlDocument xmlDocument, StArray color) : base(xmlDocument, "CV")
+        public ColorValue(XmlDocument xmlDocument, Array color) : base(xmlDocument, "CV")
         {
         }
 
-        public StArray Color { get; set; }
+        public Array Color { get; set; }
     }
 }

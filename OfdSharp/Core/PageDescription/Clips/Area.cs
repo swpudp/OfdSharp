@@ -1,5 +1,5 @@
 ﻿using System.Xml;
-using OfdSharp.Core.BaseType;
+using OfdSharp.Primitives;
 
 namespace OfdSharp.Core.PageDescription.Clips
 {
@@ -22,6 +22,6 @@ namespace OfdSharp.Core.PageDescription.Clips
         /// <summary>
         /// 变换矩阵
         /// </summary>
-        public StArray Ctm { get; set; }
+        public Array Ctm { get; set; }
     }
 }

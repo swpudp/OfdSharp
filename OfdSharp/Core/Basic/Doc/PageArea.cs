@@ -1,4 +1,4 @@
-﻿using OfdSharp.Core.BaseType;
+﻿using OfdSharp.Primitives;
 using System.Xml;
 
 namespace OfdSharp.Core.Basic.Doc
@@ -8,15 +8,15 @@ namespace OfdSharp.Core.Basic.Doc
     /// </summary>
     public class PageArea : OfdElement
     {
-        public PageArea(XmlDocument xmlDocument, double topLeftX, double topLeftY, double width, double height) : base(xmlDocument, "PageArea")
+        public PageArea(XmlDocument xmlDocument, Position topLeft, double width, double height) : base(xmlDocument, "PageArea")
         {
-            Box = new StBox(topLeftX, topLeftY, width, height);
+            Box = new Box(topLeft, width, height);
         }
 
         /// <summary>
         /// 页面物理区域
         /// </summary>
-        public StBox Box { get; }
+        public Box Box { get; }
 
     }
 }

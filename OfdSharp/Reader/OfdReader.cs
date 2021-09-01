@@ -41,7 +41,7 @@ namespace OfdSharp.Reader
         /// 构造函数
         /// </summary>
         /// <param name="fileInfo"></param>
-        public OfdReader(FileSystemInfo fileInfo)
+        public OfdReader(FileInfo fileInfo)
         {
             UnZip(fileInfo);
         }
@@ -66,18 +66,17 @@ namespace OfdSharp.Reader
             }
         }
 
-
         /// <summary>
         /// 解压文件
         /// </summary>
-        private void UnZip(FileSystemInfo fileInfo)
+        private void UnZip(FileInfo fileInfo)
         {
             EnsureFileExist(fileInfo);
-            using (FileStream fileStream = File.OpenRead(fileInfo.FullName))
+            using (FileStream originalFileStream = fileInfo.OpenRead())
             {
-                MemoryStream memory = new MemoryStream();
-                fileStream.CopyTo(memory);
-                UnZip(memory);
+                MemoryStream decompressedStream = new MemoryStream();
+                originalFileStream.CopyTo(decompressedStream);
+                UnZip(decompressedStream);
             }
         }
 
@@ -116,6 +115,7 @@ namespace OfdSharp.Reader
             ZipArchiveEntry entry = _archive.Entries.First(f => f.FullName == entryFile.TrimStart('/'));
             using (Stream entryStream = entry.Open())
             {
+                System.Console.WriteLine(entryStream.GetType().FullName);
                 using (MemoryStream memory = new MemoryStream())
                 {
                     entryStream.CopyTo(memory);

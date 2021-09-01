@@ -21,16 +21,23 @@ namespace OfdSharp.Crypto
     public static class Sm2Utils
     {
         /// <summary>
+        /// 获取一条SM2曲线参数
+        /// </summary>
+        private static readonly X9ECParameters Sm2EcParameters = GMNamedCurves.GetByName("sm2p256v1");
+
+        /// <summary>
+        /// 默认Id
+        /// </summary>
+        private static readonly byte[] DefaultParamId = Strings.ToByteArray("1234567812345678");
+
+        /// <summary>
         /// 生成SM2公私钥对
         /// </summary>
         /// <returns></returns>
         private static AsymmetricCipherKeyPair CreateKeyPairInternal()
         {
-            //获取一条SM2曲线参数
-            X9ECParameters sm2EcParameters = GMNamedCurves.GetByName("sm2p256v1");
-
             //构造domain参数
-            ECDomainParameters domainParameters = new ECDomainParameters(sm2EcParameters.Curve, sm2EcParameters.G, sm2EcParameters.N);
+            ECDomainParameters domainParameters = new ECDomainParameters(Sm2EcParameters.Curve, Sm2EcParameters.G, Sm2EcParameters.N);
 
             //1.创建密钥生成器
             ECKeyPairGenerator keyPairGenerator = new ECKeyPairGenerator();
@@ -47,7 +54,7 @@ namespace OfdSharp.Crypto
         /// 生成公私钥对
         /// </summary>
         /// <param name="compressedPubKey">是否压缩公钥 默认压缩</param>
-        /// <returns></returns>
+        /// <returns>Item1-公钥 Item2-私钥</returns>
         public static Tuple<string, string> CreateKeyPair(bool compressedPubKey = true)
         {
             AsymmetricCipherKeyPair asymmetricCipherKeyPair = CreateKeyPairInternal();
@@ -72,12 +79,10 @@ namespace OfdSharp.Crypto
         /// <returns>密文</returns>
         public static string Encrypt(string publicKey, string data)
         {
-            // 获取一条SM2曲线参数
-            X9ECParameters sm2EcParameters = GMNamedCurves.GetByName("sm2p256v1");
             // 构造domain参数
-            ECDomainParameters domainParameters = new ECDomainParameters(sm2EcParameters.Curve, sm2EcParameters.G, sm2EcParameters.N);
+            ECDomainParameters domainParameters = new ECDomainParameters(Sm2EcParameters.Curve, Sm2EcParameters.G, Sm2EcParameters.N);
             //提取公钥点
-            ECPoint pukPoint = sm2EcParameters.Curve.DecodePoint(Hex.Decode(publicKey));
+            ECPoint pukPoint = Sm2EcParameters.Curve.DecodePoint(Hex.Decode(publicKey));
             // 公钥前面的02或者03表示是压缩公钥，04表示未压缩公钥, 04的时候，可以去掉前面的04
             ECPublicKeyParameters publicKeyParameters = new ECPublicKeyParameters(pukPoint, domainParameters);
 
@@ -100,10 +105,8 @@ namespace OfdSharp.Crypto
         {
             byte[] cipherDataByte = Hex.Decode(cipherData);
 
-            //获取一条SM2曲线参数
-            X9ECParameters sm2EcParameters = GMNamedCurves.GetByName("sm2p256v1");
             //构造domain参数
-            ECDomainParameters domainParameters = new ECDomainParameters(sm2EcParameters.Curve, sm2EcParameters.G, sm2EcParameters.N);
+            ECDomainParameters domainParameters = new ECDomainParameters(Sm2EcParameters.Curve, Sm2EcParameters.G, Sm2EcParameters.N);
 
             BigInteger privateKeyD = new BigInteger(privateKey, 16);
             ECPrivateKeyParameters privateKeyParameters = new ECPrivateKeyParameters(privateKeyD, domainParameters);
@@ -117,6 +120,34 @@ namespace OfdSharp.Crypto
         }
 
         /// <summary>
+        /// 签名
+        /// </summary>
+        /// <param name="privateKey">私钥</param>
+        /// <param name="content">待签名内容</param>
+        /// <returns>签名值</returns>
+        public static string Sign(string privateKey, string content)
+        {
+            //待签名内容转为字节数组
+            byte[] message = Encoding.UTF8.GetBytes(content);
+
+            //构造domain参数
+            ECDomainParameters domainParameters = new ECDomainParameters(Sm2EcParameters.Curve, Sm2EcParameters.G, Sm2EcParameters.N);
+
+            BigInteger privateKeyD = new BigInteger(privateKey, 16);
+            ECPrivateKeyParameters privateKeyParameters = new ECPrivateKeyParameters(privateKeyD, domainParameters);
+
+            //创建签名实例
+            SM2Signer sm2Signer = new SM2Signer();
+
+            //初始化签名实例,带上ID,国密的要求,ID默认值:1234567812345678
+            sm2Signer.Init(true, new ParametersWithID(new ParametersWithRandom(privateKeyParameters, SecureRandom.GetInstance("SHA1PRNG")), DefaultParamId));
+            sm2Signer.BlockUpdate(message, 0, message.Length);
+            byte[] signBytes = sm2Signer.GenerateSignature();
+
+            return Hex.ToHexString(signBytes);
+        }
+
+        /// <summary>
         /// 验证签名
         /// </summary>
         /// <param name="publicKey">公钥</param>
@@ -126,27 +157,22 @@ namespace OfdSharp.Crypto
         public static bool Verify(string publicKey, string content, string sign)
         {
             //待签名内容
-            byte[] message = Hex.Decode(content);
+            byte[] message = Encoding.UTF8.GetBytes(content);
             byte[] signData = Hex.Decode(sign);
-
-            // 获取一条SM2曲线参数
-            X9ECParameters sm2EcParameters = GMNamedCurves.GetByName("sm2p256v1");
             // 构造domain参数
-            ECDomainParameters domainParameters = new ECDomainParameters(sm2EcParameters.Curve, sm2EcParameters.G, sm2EcParameters.N);
+            ECDomainParameters domainParameters = new ECDomainParameters(Sm2EcParameters.Curve, Sm2EcParameters.G, Sm2EcParameters.N);
             //提取公钥点
-            ECPoint pukPoint = sm2EcParameters.Curve.DecodePoint(Hex.Decode(publicKey));
+            ECPoint pukPoint = Sm2EcParameters.Curve.DecodePoint(Hex.Decode(publicKey));
             // 公钥前面的02或者03表示是压缩公钥，04表示未压缩公钥, 04的时候，可以去掉前面的04
             ECPublicKeyParameters publicKeyParameters = new ECPublicKeyParameters(pukPoint, domainParameters);
-
             //创建签名实例
             SM2Signer sm2Signer = new SM2Signer();
-            ParametersWithID parametersWithId = new ParametersWithID(publicKeyParameters, Strings.ToByteArray("1234567812345678"));
+            //初始化签名实例,带上ID,国密的要求,ID默认值:1234567812345678
+            ParametersWithID parametersWithId = new ParametersWithID(publicKeyParameters, DefaultParamId);
             sm2Signer.Init(false, parametersWithId);
-            //sm2Signer.BlockUpdate();
-
-
+            sm2Signer.BlockUpdate(message, 0, message.Length);
             //验证签名结果
-            bool verify = sm2Signer.VerifySignature(message);
+            bool verify = sm2Signer.VerifySignature(signData);
             return verify;
         }
     }

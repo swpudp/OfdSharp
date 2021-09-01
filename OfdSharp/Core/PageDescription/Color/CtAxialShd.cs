@@ -1,4 +1,4 @@
-﻿using OfdSharp.Core.BaseType;
+﻿using OfdSharp.Primitives;
 using System.Xml;
 
 namespace OfdSharp.Core.PageDescription.Color
@@ -36,12 +36,12 @@ namespace OfdSharp.Core.PageDescription.Color
         /// <summary>
         /// 轴线起始点
         /// </summary>
-        public StPosition StartPoint { get; set; }
+        public Position StartPoint { get; set; }
 
         /// <summary>
         /// 轴线结束点
         /// </summary>
-        public StPosition EndPoint { get; set; }
+        public Position EndPoint { get; set; }
 
         /// <summary>
         /// 段

@@ -1,4 +1,4 @@
-﻿using OfdSharp.Core.BaseType;
+﻿using OfdSharp.Primitives;
 using System.Xml;
 
 namespace OfdSharp.Core.PageDescription.Pattern
@@ -46,7 +46,7 @@ namespace OfdSharp.Core.PageDescription.Pattern
         /// 默认为单位矩阵；底纹呈现时先做 XStep、YStep 排列，
         /// 然后一起做 CTM 处理
         /// </summary>
-        public StArray Ctm { get; set; }
+        public Array Ctm { get; set; }
 
         /// <summary>
         /// 底纹单元

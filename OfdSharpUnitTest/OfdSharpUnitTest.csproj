@@ -21,6 +21,9 @@
   </ItemGroup>
 
   <ItemGroup>
+    <None Update="Files\032001900311_25577301.ofd">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Update="Files\Doc_0\Signs\Sign_0\Seal.esl">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>

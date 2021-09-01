@@ -1,4 +1,4 @@
-﻿using OfdSharp.Core.BaseType;
+﻿using OfdSharp.Primitives;
 using System.Xml;
 
 namespace OfdSharp.Core.Graph.Tight
@@ -15,6 +15,6 @@ namespace OfdSharp.Core.Graph.Tight
         /// <summary>
         /// 线段的结束点
         /// </summary>
-        public StPosition Point1 { get; set; }
+        public Position Point1 { get; set; }
     }
 }

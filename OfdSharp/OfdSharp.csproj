@@ -28,6 +28,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <Folder Include="Core\BaseType\" />
     <Folder Include="Layout\Engine\" />
     <Folder Include="Layout\Element\" />
     <Folder Include="Layout\Edit\" />

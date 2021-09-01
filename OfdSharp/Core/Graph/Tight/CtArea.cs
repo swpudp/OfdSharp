@@ -1,4 +1,4 @@
-﻿using OfdSharp.Core.BaseType;
+﻿using OfdSharp.Primitives;
 using System.Xml;
 
 namespace OfdSharp.Core.Graph.Tight
@@ -15,6 +15,6 @@ namespace OfdSharp.Core.Graph.Tight
         /// <summary>
         /// 定义字图形的起始点坐标
         /// </summary>
-        public StPosition Start { get; set; }
+        public Position Start { get; set; }
     }
 }

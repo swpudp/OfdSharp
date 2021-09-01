@@ -1,4 +1,4 @@
-﻿using OfdSharp.Core.BaseType;
+﻿using OfdSharp.Primitives;
 using System.Xml;
 
 namespace OfdSharp.Core.Text
@@ -41,7 +41,7 @@ namespace OfdSharp.Core.Text
         /// 文字之间在 X 方向的偏移值
         /// DeltaX 不出现时，表示文字的绘制点在 X 方向不做偏移。
         /// </summary>
-        public StArray DeltaX { get; set; }
+        public Array DeltaX { get; set; }
 
         /// <summary>
         /// 字之间在 Y 方向上的偏移值
@@ -50,6 +50,6 @@ namespace OfdSharp.Core.Text
         /// 文字之间在 Y 方向的偏移值
         /// DeltaY 不出现时，表示文字的绘制点在 Y 方向不做偏移。
         /// </summary>
-        public StArray DeltaY { get; set; }
+        public Array DeltaY { get; set; }
     }
 }

@@ -1,4 +1,4 @@
-﻿using OfdSharp.Core.BaseType;
+﻿using OfdSharp.Primitives;
 using OfdSharp.Core.PageDescription.Color;
 using System.Xml;
 
@@ -42,7 +42,7 @@ namespace OfdSharp.Core.Image
         /// 边框虚线重复样式
         /// 边框的起点位置为左上角，绕行方向为顺时针
         /// </summary>
-        public StArray DashPattern { get; set; }
+        public Array DashPattern { get; set; }
 
         /// <summary>
         /// 边框颜色

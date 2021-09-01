@@ -1,4 +1,4 @@
-﻿using OfdSharp.Core.BaseType;
+﻿using OfdSharp.Primitives;
 using System.Xml;
 
 namespace OfdSharp.Core.Graph.Tight
@@ -19,11 +19,11 @@ namespace OfdSharp.Core.Graph.Tight
         /// <summary>
         /// 二次贝塞尔曲线的控制点
         /// </summary>
-        public StPosition Point1 { get; set; }
+        public Position Point1 { get; set; }
 
         /// <summary>
         /// 二次贝塞尔曲线的结束点
         /// </summary>
-        public StPosition Point2 { get; set; }
+        public Position Point2 { get; set; }
     }
 }

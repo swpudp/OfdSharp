@@ -1,4 +1,4 @@
-﻿using OfdSharp.Core.BaseType;
+﻿using OfdSharp.Primitives;
 using System.Xml;
 
 namespace OfdSharp.Core.Graph.Tight
@@ -19,16 +19,16 @@ namespace OfdSharp.Core.Graph.Tight
         /// <summary>
         /// 三次贝塞尔曲线的第一个控制点
         /// </summary>
-        public StPosition Point1 { get; set; }
+        public Position Point1 { get; set; }
 
         /// <summary>
         /// 三次贝塞尔曲线的第二个控制点
         /// </summary>
-        public StPosition Point2 { get; set; }
+        public Position Point2 { get; set; }
 
         /// <summary>
         /// 三次贝塞尔曲线的结束点，下一路径的起始点
         /// </summary>
-        public StPosition Point3 { get; set; }
+        public Position Point3 { get; set; }
     }
 }
