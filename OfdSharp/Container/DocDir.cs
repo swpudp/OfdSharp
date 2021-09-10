@@ -1,5 +1,5 @@
 ﻿using OfdSharp.Core.Annotation;
-using OfdSharp.Core.Basic.Res;
+using OfdSharp.Core.Basic.Resources;
 using System;
 using System.IO;
 using System.Xml;
@@ -67,20 +67,20 @@ namespace OfdSharp.Container
         /// 获取文档自身资源索引对象
         /// </summary>
         /// <returns></returns>
-        public Res GetDocumentRes()
+        public Resource GetDocumentRes()
         {
             XmlDocument obj = GetDocument(DocumentResFileName);
-            return new Res(obj);
+            return new Resource();
         }
 
         /// <summary>
         /// 获取文档公共资源索引
         /// </summary>
         /// <returns></returns>
-        public Res GetPublicRes()
+        public Resource GetPublicRes()
         {
             XmlDocument document = GetDocument(PublicResFileName);
-            return new Res(document);
+            return new Resource();
         }
 
         /// <summary>

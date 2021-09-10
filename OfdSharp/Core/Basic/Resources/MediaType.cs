@@ -1,4 +1,4 @@
-﻿namespace OfdSharp.Core.Basic.Res
+﻿namespace OfdSharp.Core.Basic.Resources
 {
     /// <summary>
     /// 多媒体格式

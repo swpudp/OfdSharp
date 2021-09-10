@@ -1,18 +1,13 @@
 ﻿using OfdSharp.Core.Action;
-using System.Xml;
+using System.Collections.Generic;
 
 namespace OfdSharp.Core.Basic.Outlines
 {
     /// <summary>
     /// 大纲节点标题
     /// </summary>
-    public class OutlineElem : OfdElement
+    public class OutlineElem
     {
-        public OutlineElem(XmlDocument xmlDocument, string title) : base(xmlDocument, "OutlineElem")
-        {
-            Title = title;
-        }
-
         /// <summary>
         /// 大纲节点标题
         /// </summary>
@@ -33,6 +28,11 @@ namespace OfdSharp.Core.Basic.Outlines
         /// <summary>
         /// 当此大纲节点被激活时执行的动作序列
         /// </summary>
-        public ActionCollect Actions { get; set; }
+        public IList<BaseAction> Actions { get; set; }
+
+        /// <summary>
+        /// OutlineElem：该节点的子大纲节点。层层嵌套,形成树状结构
+        /// </summary>
+        public OutlineElem Next { get; set; }
     }
 }

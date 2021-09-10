@@ -1,21 +1,12 @@
 ﻿using OfdSharp.Primitives;
-using System.Xml;
 
 namespace OfdSharp.Core.Graph.Tight
 {
     /// <summary>
     /// 圆弧
     /// </summary>
-    public class Arc : OfdElement
+    public class Arc
     {
-        public Arc(XmlDocument xmlDocument, string name) : base(xmlDocument, name)
-        {
-        }
-
-        public Arc(XmlDocument xmlDocument) : base(xmlDocument, "Arc")
-        {
-        }
-
         /// <summary>
         /// 弧线方向是否顺时针
         /// true 表示由圆弧起始点到结束点是顺时针，false 表示由圆弧起始点到结束点是逆时针

@@ -1,26 +1,19 @@
-﻿using System.Xml;
-using OfdSharp.Primitives;
+﻿using OfdSharp.Primitives;
 
 namespace OfdSharp.Core.PageDescription.Clips
 {
     /// <summary>
     /// 裁剪区域
     /// </summary>
-    public class Area : OfdElement
+    public class Area
     {
-        public Area(XmlDocument xmlDocument) : base(xmlDocument, "Area")
-        {
-        }
-
         /// <summary>
-        /// 引用资源文件中的绘制参数的标识
-        /// 线宽、结合点和端点样式等绘制特性对裁剪效果会产生影响，
-        /// 有关绘制参数的描述见 8.2
+        /// 引用资源文件中的绘制参数的标识,线宽、结合点和端点样式等绘制特性对裁剪效果会产生影响
         /// </summary>
-        public string DrawParam { get; set; }
+        public RefId DrawParam { get; set; }
 
         /// <summary>
-        /// 变换矩阵
+        /// 针对对象坐标系,对Area下包含的Path和Text进行进一步的变换
         /// </summary>
         public Array Ctm { get; set; }
     }

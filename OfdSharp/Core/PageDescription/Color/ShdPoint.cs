@@ -1,16 +1,10 @@
-﻿using System.Xml;
-
-namespace OfdSharp.Core.PageDescription.Color
+﻿namespace OfdSharp.Core.PageDescription.Color
 {
     /// <summary>
     /// 渐变控制点，至少出现三个
     /// </summary>
-    public class Point : OfdElement
+    public class ShdPoint 
     {
-        public Point(XmlDocument xmlDocument) : base(xmlDocument, "Point")
-        {
-        }
-
         /// <summary>
         /// 控制点水平位置
         /// </summary>

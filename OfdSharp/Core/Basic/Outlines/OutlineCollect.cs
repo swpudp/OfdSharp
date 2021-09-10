@@ -6,12 +6,8 @@ namespace OfdSharp.Core.Basic.Outlines
     /// <summary>
     /// 大纲按照树形结构进行组织
     /// </summary>
-    public class OutlineCollect : OfdElement
+    public class OutlineCollect
     {
-        public OutlineCollect(XmlDocument xmlDocument) : base(xmlDocument, "Outlines")
-        {
-        }
-
         /// <summary>
         /// 大纲节点集合
         /// </summary>

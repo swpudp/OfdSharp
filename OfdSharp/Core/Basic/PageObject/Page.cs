@@ -1,8 +1,10 @@
 ﻿using OfdSharp.Core.Action;
 using OfdSharp.Core.Basic.Doc;
+using OfdSharp.Primitives;
+using System.Collections.Generic;
 using System.Xml;
 
-namespace OfdSharp.Core.Basic.PageObj
+namespace OfdSharp.Core.Basic.PageObject
 {
     /// <summary>
     /// 页对象
@@ -10,12 +12,8 @@ namespace OfdSharp.Core.Basic.PageObj
     /// 文档可以包含多个模板页。通过使用模板页可以使重复显示的内容不必出现在
     /// 描述每一页的页面描述内容中，而只需通过 Template 节点进行应用。
     /// </summary>
-    public class Page : OfdElement
+    public class Page
     {
-        public Page(XmlDocument xmlDocument) : base(xmlDocument, "Page")
-        {
-        }
-
         /// <summary>
         /// 页面区域的大小和位置，仅对该页面有效。
         /// </summary>
@@ -29,7 +27,7 @@ namespace OfdSharp.Core.Basic.PageObj
         /// <summary>
         /// 指向该页使用的资源文件
         /// </summary>
-        public string PageRes { get; set; }
+        public Location PageRes { get; set; }
 
         /// <summary>
         /// 页面内容描述，该节点不存在时，标识空白页
@@ -41,6 +39,6 @@ namespace OfdSharp.Core.Basic.PageObj
         /// 当存在多个 Action对象时，所有动作依次执行。
         /// 动作列表的动作与页面关联，事件类型为 PO（页面打开，见表 52 事件类型）
         /// </summary>
-        public ActionCollect Actions { get; set; }
+        public IList<BaseAction> Actions { get; set; }
     }
 }

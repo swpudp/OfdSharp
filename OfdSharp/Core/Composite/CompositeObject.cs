@@ -1,4 +1,4 @@
-﻿using System.Xml;
+﻿using OfdSharp.Primitives;
 
 namespace OfdSharp.Core.CompositeObj
 {
@@ -9,12 +9,11 @@ namespace OfdSharp.Core.CompositeObj
     /// 一个资源可以被多个复合对象所引用。通过这种方式可实现对
     /// 文档内矢量图文内容的复用。
     /// </summary>
-    public class Composite : OfdElement
+    public class CompositeObject
     {
-        public Composite(XmlDocument xmlDocument, string name) : base(xmlDocument, name)
-        {
-        }
-
-        public string CompositeObject { get; set; }
+        /// <summary>
+        /// 引用资源文件中定义的矢量图像的标识
+        /// </summary>
+        public RefId ResourceId { get; set; }
     }
 }

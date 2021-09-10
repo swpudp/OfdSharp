@@ -20,7 +20,7 @@ namespace OfdSharp.Core.Basic.Ofd
         /// <summary>
         /// 文档元数据信息描述
         /// </summary>
-        public CtDocInfo DocInfo { get; set; }
+        public DocInfo DocInfo { get; set; }
 
         /// <summary>
         /// 包含多个版本描述序列

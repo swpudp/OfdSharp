@@ -1,4 +1,4 @@
-﻿namespace OfdSharp.Core.Basic.PageObj.Layer
+﻿namespace OfdSharp.Core.Basic.PageObject
 {
     /// <summary>
     /// 图层类型

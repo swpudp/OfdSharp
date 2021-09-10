@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
-using System.Xml;
 
 namespace OfdSharp.Core.Graph.PathObj
 {
@@ -9,17 +8,12 @@ namespace OfdSharp.Core.Graph.PathObj
     /// 图形轮廓数据
     /// 由一系列的紧缩的操作符和操作数构成
     /// </summary>
-    public class AbbreviatedData : OfdElement
+    public class AbbreviatedData 
     {
         /// <summary>
         /// 绘制数据队列
         /// </summary>
-        private readonly LinkedList<string[]> _dataQueue;
-
-        public AbbreviatedData(XmlDocument xmlDocument, string name) : base(xmlDocument, name)
-        {
-            _dataQueue = new LinkedList<string[]>();
-        }
+        private readonly LinkedList<string[]> _dataQueue= new LinkedList<string[]>();
 
         /// <summary>
         /// 从当前点连接到点（x，y）的圆弧，并将当前点移动到点（x，y）。

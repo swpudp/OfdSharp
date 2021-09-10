@@ -1,19 +1,12 @@
-﻿using System.Xml;
-using OfdSharp.Core.Basic.Doc.View.Zoom;
-
-namespace OfdSharp.Core.Basic.Doc.View
+﻿namespace OfdSharp.Core.Basic.Doc.View
 {
     /// <summary>
     /// 视图首选项
     /// 本标准支持设置文档视图首选项（VPreferences）节点，以达到限定文档初始化视图
     /// 便于阅读的目的。
     /// </summary>
-    public class ViewPreferences : OfdElement
+    public class ViewPreferences
     {
-        public ViewPreferences(XmlDocument xmlDocument) : base(xmlDocument, "VPreferences")
-        {
-        }
-
         /// <summary>
         /// 窗口模式
         /// </summary>
@@ -52,6 +45,6 @@ namespace OfdSharp.Core.Basic.Doc.View
         /// <summary>
         /// 文档的缩放率
         /// </summary>
-        public Zoom.Zoom Zoom { get; set; }
+        public double Zoom { get; set; }
     }
 }

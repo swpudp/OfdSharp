@@ -1,9 +1,9 @@
-﻿namespace OfdSharp.Core.Basic.Doc.View.Zoom
+﻿namespace OfdSharp.Core.Basic.Doc.View
 {
     /// <summary>
     /// 缩放类型
     /// </summary>
-    public enum ZoomType
+    public enum ZoomMode
     {
         /// <summary>
         /// 合适高度

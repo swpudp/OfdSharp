@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Xml;
 
 namespace OfdSharp.Core.Basic.Doc.Permission
 {
@@ -11,26 +10,16 @@ namespace OfdSharp.Core.Basic.Doc.Permission
     /// 当不设置结束日期时代表不限定结束日期；当此不设置此节点时，
     /// 表示开始和结束日期均不受限
     /// </summary>
-    public class ValidPeriod : OfdElement
+    public class ValidPeriod
     {
-        public ValidPeriod(XmlDocument xmlDocument, DateTime startDate, DateTime endDate) : base(xmlDocument, "ValidPeriod")
-        {
-            StartDate = startDate;
-            EndDate = endDate;
-
-            Element.SetAttribute("StartDate", startDate.ToString(Const.DatetimeFormatter));
-            Element.SetAttribute("EndDate", endDate.ToString(Const.DatetimeFormatter));
-
-        }
-
         /// <summary>
         /// 有效期开始日期
         /// </summary>
-        public DateTime StartDate { get; }
+        public DateTime? StartDate { get; }
 
         /// <summary>
         /// 有效期结束日期
         /// </summary>
-        public DateTime EndDate { get; }
+        public DateTime? EndDate { get; }
     }
 }

@@ -8,12 +8,11 @@ using OfdSharp.Core.Annotation;
 
 namespace OfdSharp.Core.Basic.Doc
 {
-    public class Document : OfdElement
+    /// <summary>
+    /// 文档根节点
+    /// </summary>
+    public class Document 
     {
-        public Document(XmlDocument xmlDocument) : base(xmlDocument, "Document")
-        {
-        }
-
         /// <summary>
         /// 文档公共数据
         /// </summary>

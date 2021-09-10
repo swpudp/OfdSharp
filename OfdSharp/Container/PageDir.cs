@@ -1,8 +1,8 @@
 ﻿using System.IO;
 using System.Xml;
 using OfdSharp.Core.Annotation;
-using OfdSharp.Core.Basic.PageObj;
-using OfdSharp.Core.Basic.Res;
+using OfdSharp.Core.Basic.PageObject;
+using OfdSharp.Core.Basic.Resources;
 
 namespace OfdSharp.Container
 {
@@ -47,10 +47,10 @@ namespace OfdSharp.Container
         /// 获取页面资源描述文件
         /// </summary>
         /// <returns></returns>
-        public Res GetPageRes()
+        public Resource GetPageRes()
         {
             XmlDocument obj = GetDocument(PageResFileName);
-            return new Res(obj);
+            return new Resource();
         }
 
         /// <summary>
@@ -80,8 +80,7 @@ namespace OfdSharp.Container
         public Page GetContent()
         {
             XmlDocument obj = GetDocument(ContentFileName);
-            return new Page(obj);
+            return new Page();
         }
-
     }
 }

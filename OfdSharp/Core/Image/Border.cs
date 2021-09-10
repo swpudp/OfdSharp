@@ -1,6 +1,5 @@
 ﻿using OfdSharp.Primitives;
 using OfdSharp.Core.PageDescription.Color;
-using System.Xml;
 
 namespace OfdSharp.Core.Image
 {
@@ -8,12 +7,8 @@ namespace OfdSharp.Core.Image
     /// 图像边框
     /// 10 表 43
     /// </summary>
-    public class Border : OfdElement
+    public class Border 
     {
-        public Border(XmlDocument xmlDocument) : base(xmlDocument, "Border")
-        {
-        }
-
         /// <summary>
         /// 边框线宽
         /// 如果为 0 则表示边框不进行绘制

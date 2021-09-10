@@ -1,21 +1,14 @@
-﻿using OfdSharp.Core.Basic.PageObj.Layer;
-using System.Xml;
+﻿using OfdSharp.Core.Basic.PageObject;
 
 namespace OfdSharp.Core.PageDescription.Pattern
 {
     /// <summary>
-    /// 底纹单元
-    /// 用底纹填充目标区域时，所使用的单元对象
-    /// CellContent 作为底纹对象的绘制单元，使用一种和外界没有
-    /// 任何关联的独立的坐标空间：坐上角（0,0）为原点，X 轴向右增长，
-    /// Y 轴向下增长，单位为毫米。
+    /// 底纹单元，用底纹填充目标区域时，所使用的单元对象。
+    /// CellContent 作为底纹对象的绘制单元，使用一种和外界没有任何关联的独立的坐标空间：
+    /// 坐上角（0,0）为原点，X 轴向右增长，Y 轴向下增长，单位为毫米。
     /// </summary>
-    public class CellContent : OfdElement
+    public class CellContent
     {
-        public CellContent(XmlDocument xmlDocument) : base(xmlDocument, "CellContent")
-        {
-        }
-
         /// <summary>
         /// 引用资源文件中缩略图图像的标识符
         /// </summary>
@@ -24,6 +17,6 @@ namespace OfdSharp.Core.PageDescription.Pattern
         /// <summary>
         /// 一个页块中可以嵌套其他页块，可含有0到多个页块
         /// </summary>
-        public PageBlockType PageBlock { get; set; }
+        public PageBlock PageBlock { get; set; }
     }
 }

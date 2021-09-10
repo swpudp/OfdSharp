@@ -1,19 +1,16 @@
 ﻿using System;
-using System.Xml;
+using System.Collections.Generic;
+using System.Xml.Serialization;
 
 namespace OfdSharp.Core.Basic.Ofd
 {
     /// <summary>
     /// 文档元数据信息描述
     /// </summary>
-    public class CtDocInfo : OfdElement
+    public class DocInfo
     {
-        public CtDocInfo(XmlDocument xmlDocument) : base(xmlDocument, "DocInfo")
-        {
-        }
-
         /// <summary>
-        /// 文件标识符
+        /// 文件标识符,采用UUID算法生成的32个字符组成的文件标识。每个DocID在文档创建或生成的时候分配
         /// </summary>
         public string DocId { get; set; }
 
@@ -61,7 +58,7 @@ namespace OfdSharp.Core.Basic.Ofd
         /// 关键词集合
         /// 每一个关键词用一个“Keyword”子节点来表达
         /// </summary>
-        public KeywordCollect Keywords { get; set; }
+        public IList<string> Keywords { get; set; }
 
         /// <summary>
         /// 创建文档的应用程序
@@ -76,6 +73,6 @@ namespace OfdSharp.Core.Basic.Ofd
         /// <summary>
         /// 用户自定义元数据集合
         /// </summary>
-        public CustomDataCollect CustomDataCollect { get; set; }
+        public IList<CustomData> CustomDatas { get; set; }
     }
 }
