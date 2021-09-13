@@ -1,33 +1,20 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <TargetFramework>netstandard2.0</TargetFramework>
-    <Version>1.0.0.4</Version>
-    <Company>CH</Company>
-    <Authors>Apin</Authors>
-    <Description>ofd读写类库</Description>
-    <Copyright>https://www.mit-license.org/</Copyright>
-    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
-    <PackageLicenseExpression>MIT</PackageLicenseExpression>
-    <PackageReleaseNotes>修复bug</PackageReleaseNotes>
-  </PropertyGroup>
+	<PropertyGroup>
+		<TargetFramework>netstandard2.0</TargetFramework>
+		<Version>1.0.0.4</Version>
+		<Company>CH</Company>
+		<Authors>Apin</Authors>
+		<Description>ofd读写类库</Description>
+		<Copyright>https://www.mit-license.org/</Copyright>
+		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+		<PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
+		<PackageLicenseExpression>MIT</PackageLicenseExpression>
+		<PackageReleaseNotes>修复bug</PackageReleaseNotes>
+	</PropertyGroup>
 
-  <ItemGroup>
-    <Compile Remove="Crypto\**" />
-    <Compile Remove="Layout\**" />
-    <EmbeddedResource Remove="Crypto\**" />
-    <EmbeddedResource Remove="Layout\**" />
-    <None Remove="Crypto\**" />
-    <None Remove="Layout\**" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Compile Include="Crypto\Sm2Utils.cs" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <PackageReference Include="Portable.BouncyCastle" Version="1.8.10" />
-  </ItemGroup>
+	<ItemGroup>
+		<PackageReference Include="Portable.BouncyCastle" Version="1.8.10" />
+	</ItemGroup>
 
 </Project>
