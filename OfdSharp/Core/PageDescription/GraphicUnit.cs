@@ -75,7 +75,7 @@ namespace OfdSharp.Core.PageDescription
         /// <summary>
         /// 图元动作
         /// </summary>
-        public IList<BaseAction> Actions { get; set; }
+        public IList<CtAction> Actions { get; set; }
 
         /// <summary>
         /// 图元对象的裁剪区域序列,采用对象空间坐标系

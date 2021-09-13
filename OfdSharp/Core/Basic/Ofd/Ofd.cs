@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Xml;
 
 namespace OfdSharp.Core.Basic.Ofd
 {
@@ -7,7 +6,7 @@ namespace OfdSharp.Core.Basic.Ofd
     /// 主入口
     /// OFD.xml
     /// </summary>
-    public class Ofd : OfdElement
+    public class Ofd
     {
         /// <summary>
         /// 文件格式的版本号
@@ -19,12 +18,6 @@ namespace OfdSharp.Core.Basic.Ofd
         /// 文件格式子集类型，取值为“OFD”，表明此文件符合本标准。
         /// </summary>
         public const string DocType = "OFD";
-
-        public Ofd(XmlDocument xmlDocument) : base(xmlDocument, "OFD")
-        {
-            Element.SetAttribute("Version", Version);
-            Element.SetAttribute("DocType", DocType);
-        }
 
         /// <summary>
         /// 获取所有文档入口

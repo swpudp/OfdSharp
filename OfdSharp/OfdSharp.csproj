@@ -15,8 +15,11 @@
 
   <ItemGroup>
     <Compile Remove="Crypto\**" />
+    <Compile Remove="Layout\**" />
     <EmbeddedResource Remove="Crypto\**" />
+    <EmbeddedResource Remove="Layout\**" />
     <None Remove="Crypto\**" />
+    <None Remove="Layout\**" />
   </ItemGroup>
 
   <ItemGroup>
@@ -25,13 +28,6 @@
 
   <ItemGroup>
     <PackageReference Include="Portable.BouncyCastle" Version="1.8.10" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Layout\Engine\" />
-    <Folder Include="Layout\Element\" />
-    <Folder Include="Layout\Edit\" />
-    <Folder Include="Layout\Exceptions\" />
   </ItemGroup>
 
 </Project>

@@ -1,5 +1,5 @@
 ﻿using OfdSharp.Core.Invoice;
-using OfdSharp.Core.Signs;
+using OfdSharp.Core.Signature;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
@@ -207,11 +207,11 @@ namespace OfdSharp.Reader
 
         }
 
-        public Signature GetSignature()
+        public DigestInfo GetSignature()
         {
             string signaturesBaseLocFile = GetSignatures();
             ZipArchiveEntry signatureFile = _archive.Entries.First(f => f.FullName == signaturesBaseLocFile.TrimStart('/'));
-            return Deserialize<Signature>(signatureFile);
+            return Deserialize<DigestInfo>(signatureFile);
         }
 
         public string GetSignedList()

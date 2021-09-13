@@ -1,21 +1,17 @@
-﻿using System;
-using System.Xml;
+﻿using OfdSharp.Primitives;
+using System;
 
 namespace OfdSharp.Core.Version
 {
     /// <summary>
     /// 版本
     /// </summary>
-    public class DocVersion : OfdElement
+    public class DocVersion 
     {
-        public DocVersion(XmlDocument xmlDocument) : base(xmlDocument, "DocVersion")
-        {
-        }
-
         /// <summary>
         /// 版本标识符
         /// </summary>
-        public string Id { get; set; }
+        public Id Id { get; set; }
 
         /// <summary>
         /// 该文件适用的格式版本
@@ -30,16 +26,16 @@ namespace OfdSharp.Core.Version
         /// <summary>
         /// 创建时间
         /// </summary>
-        public DateTime CreationDate { get; set; }
+        public DateTime? CreationDate { get; set; }
 
         /// <summary>
         /// 该版本的入口文件
         /// </summary>
-        public string DocRoot { get; set; }
+        public Location DocRoot { get; set; }
 
         /// <summary>
-        /// 版本包含的文件列表
+        /// 文件列表文件描述
         /// </summary>
-        public FileCollect FileList { get; set; }
+        public FileList FileList { get; set; }
     }
 }

@@ -1,18 +1,11 @@
-﻿using System.Xml;
-
-namespace OfdSharp.Core.Extensions
+﻿namespace OfdSharp.Core.Extensions
 {
     /// <summary>
     /// 扩展信息
     /// “Name Type Value” 的数值组，用于简单的扩展
     /// </summary>
-    public class Property : OfdElement
+    public class Property
     {
-        public Property(XmlDocument xmlDocument) : base(xmlDocument, "Property")
-        {
-
-        }
-
         /// <summary>
         /// 扩展属性名称
         /// </summary>

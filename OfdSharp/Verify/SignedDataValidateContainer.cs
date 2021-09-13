@@ -1,4 +1,4 @@
-﻿using OfdSharp.Core.Signs;
+﻿using OfdSharp.Core.Signature;
 
 namespace OfdSharp.Verify
 {
@@ -14,7 +14,7 @@ namespace OfdSharp.Verify
         /// <param name="type">电子签名类型</param>
         /// <param name="tbsContent">待签章内容</param>
         /// <param name="signedValue">电子签章数据或签名值（SignedValue.xml文件内容）</param>
-        public abstract VerifyResult Validate(SigType type, byte[] tbsContent, byte[] signedValue);
+        public abstract VerifyResult Validate(SignedType type, byte[] tbsContent, byte[] signedValue);
 
     }
 }

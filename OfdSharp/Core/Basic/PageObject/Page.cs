@@ -39,6 +39,6 @@ namespace OfdSharp.Core.Basic.PageObject
         /// 当存在多个 Action对象时，所有动作依次执行。
         /// 动作列表的动作与页面关联，事件类型为 PO（页面打开，见表 52 事件类型）
         /// </summary>
-        public IList<BaseAction> Actions { get; set; }
+        public IList<CtAction> Actions { get; set; }
     }
 }

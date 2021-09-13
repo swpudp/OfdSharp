@@ -1,7 +1,7 @@
 ﻿using Org.BouncyCastle.Asn1;
 using Org.BouncyCastle.Crypto.Digests;
 using System.IO;
-using OfdSharp.Core.Signs;
+using OfdSharp.Core.Signature;
 
 namespace OfdSharp.Sign
 {
@@ -39,6 +39,6 @@ namespace OfdSharp.Sign
         /// <summary>
         /// 获取签名节点类型
         /// </summary>
-        public abstract SigType SignType { get; }
+        public abstract SignedType SignType { get; }
     }
 }

@@ -1,6 +1,6 @@
 ﻿using OfdSharp.Reader;
 using System.Collections.Generic;
-using OfdSharp.Core.Signs;
+using OfdSharp.Core.Signature;
 
 namespace OfdSharp.Sign.Stamp
 {
@@ -49,16 +49,17 @@ namespace OfdSharp.Sign.Stamp
 
         public List<StampAnnot> GetAppearance(OfdReader ctx, AtomicSignId idProvider)
         {
-            // 解析OFD页码获取页面对应的ID
-            string id = string.Empty; //ctx.getPageObjectId(page).ref ();
-            StampAnnot annotation = new StampAnnot()
-            {
-                Id = idProvider.IncrementAndGet(),
-                Boundary = $"{Tlx} {Tly} {Width} {Height}",
-                PageRef = string.Empty
-            };
-            List<StampAnnot> res = new List<StampAnnot>(1) { annotation };
-            return res;
+            throw new System.NotImplementedException();
+            //// 解析OFD页码获取页面对应的ID
+            //string id = string.Empty; //ctx.getPageObjectId(page).ref ();
+            //StampAnnot annotation = new StampAnnot()
+            //{
+            //    Id = idProvider.IncrementAndGet(),
+            //    Boundary = $"{Tlx} {Tly} {Width} {Height}",
+            //    PageRef = string.Empty
+            //};
+            //List<StampAnnot> res = new List<StampAnnot>(1) { annotation };
+            //return res;
         }
     }
 }

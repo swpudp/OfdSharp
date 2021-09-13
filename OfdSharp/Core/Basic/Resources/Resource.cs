@@ -1,4 +1,4 @@
-﻿using OfdSharp.Core.Graph;
+﻿using OfdSharp.Core.CompositeObj;
 using OfdSharp.Core.PageDescription.ColorSpace;
 using OfdSharp.Core.PageDescription.DrawParam;
 using OfdSharp.Core.Text.Font;

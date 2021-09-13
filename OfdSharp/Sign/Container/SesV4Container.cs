@@ -1,6 +1,6 @@
 ﻿using System;
 using System.IO;
-using OfdSharp.Core.Signs;
+using OfdSharp.Core.Signature;
 using OfdSharp.Extensions;
 using OfdSharp.Ses;
 using OfdSharp.Ses.V4;
@@ -103,7 +103,7 @@ namespace OfdSharp.Sign.Container
         /// <summary>
         /// 获取签名节点类型
         /// </summary>
-        public override SigType SignType => SigType.Seal;
+        public override SignedType SignType => SignedType.Seal;
 
     }
 }

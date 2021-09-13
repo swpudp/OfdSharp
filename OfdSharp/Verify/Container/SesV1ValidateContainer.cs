@@ -1,4 +1,4 @@
-﻿using OfdSharp.Core.Signs;
+﻿using OfdSharp.Core.Signature;
 using OfdSharp.Ses.V1;
 using Org.BouncyCastle.Crypto;
 using Org.BouncyCastle.Crypto.Digests;
@@ -15,9 +15,9 @@ namespace OfdSharp.Verify.Container
     /// </summary>
     internal class SesV1ValidateContainer : SignedDataValidateContainer
     {
-        public override VerifyResult Validate(SigType type, byte[] tbsContent, byte[] signedValue)
+        public override VerifyResult Validate(SignedType type, byte[] tbsContent, byte[] signedValue)
         {
-            if (type == SigType.Sign)
+            if (type == SignedType.Sign)
             {
                 throw new ArgumentOutOfRangeException(nameof(type), "签名类型(type)必须是 Seal，不支持电子印章验证");
             }

@@ -1,4 +1,4 @@
-﻿using OfdSharp.Core.Signs;
+﻿using OfdSharp.Core.Signature;
 using OfdSharp.Ses.V4;
 using Org.BouncyCastle.Crypto;
 using Org.BouncyCastle.Crypto.Digests;
@@ -21,9 +21,9 @@ namespace OfdSharp.Verify.Container
         /// <param name="type">电子签名类型</param>
         /// <param name="tbsContent">待签章内容</param>
         /// <param name="signedValue">电子签章数据或签名值（SignedValue.xml文件内容）</param>
-        public override VerifyResult Validate(SigType type, byte[] tbsContent, byte[] signedValue)
+        public override VerifyResult Validate(SignedType type, byte[] tbsContent, byte[] signedValue)
         {
-            if (type == SigType.Sign)
+            if (type == SignedType.Sign)
             {
                 throw new ArgumentOutOfRangeException(nameof(type), "签名类型(type)必须是 Seal，不支持电子印章验证");
             }

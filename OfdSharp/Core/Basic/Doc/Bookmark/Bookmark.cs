@@ -10,7 +10,7 @@ namespace OfdSharp.Core.Basic.Doc.Bookmark
         /// <summary>
         /// 目标区域
         /// </summary>
-        public DestAction Dest { get; }
+        public CtDest Dest { get; }
 
         /// <summary>
         /// 书签名称

@@ -1,4 +1,4 @@
-﻿using OfdSharp.Core.Signs;
+﻿using OfdSharp.Core.Signature;
 using OfdSharp.Crypto;
 using Org.BouncyCastle.Crypto.Parameters;
 using Org.BouncyCastle.Utilities.Encoders;
@@ -29,9 +29,9 @@ namespace OfdSharp.Verify.Container
         //}
 
 
-        public override VerifyResult Validate(SigType type, byte[] tbsContent, byte[] signedValue)
+        public override VerifyResult Validate(SignedType type, byte[] tbsContent, byte[] signedValue)
         {
-            if (type != SigType.Sign)
+            if (type != SignedType.Sign)
             {
                 throw new ArgumentOutOfRangeException(nameof(type), "签名类型(type)必须是 Sign，不支持电子印章验证");
             }

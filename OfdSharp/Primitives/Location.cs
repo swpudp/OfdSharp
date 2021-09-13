@@ -12,6 +12,6 @@
         /// <summary>
         /// 路径
         /// </summary>
-        public string Path { get; set; }
+        public string Value { get; set; }
     }
 }

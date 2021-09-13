@@ -1,6 +1,6 @@
 ﻿using OfdSharp.Reader;
 using System.Collections.Generic;
-using OfdSharp.Core.Signs;
+using OfdSharp.Core.Signature;
 
 namespace OfdSharp.Sign.Stamp
 {

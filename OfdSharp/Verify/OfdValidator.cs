@@ -1,5 +1,5 @@
 ﻿using OfdSharp.Core.Signatures;
-using OfdSharp.Core.Signs;
+using OfdSharp.Core.Signature;
 using OfdSharp.Reader;
 using OfdSharp.Ses.Parse;
 using OfdSharp.Ses.V4;
@@ -38,7 +38,7 @@ namespace OfdSharp.Verify
             //1、读取OFD.xml文件的ofd:Signatures节点
             //2、读取Doc_0\Signs\Signatures.xml文件的ofd:Signature节点，从BaseLoc特性获取签名文件路径，如/Doc_0/Signs/Sign_0/Signature.xml
             //3、读取/Doc_0/Signs/Sign_0/Signature.xml文件
-            Signature signature = reader.GetSignature();
+            DigestInfo signature = reader.GetSignature();
             //获取签名算法
             IDigest digest = DigestUtilities.GetDigest(signature.SignedInfo.ReferenceCollect.CheckMethod);
             //验证文件完整性
@@ -57,7 +57,7 @@ namespace OfdSharp.Verify
         /// <summary>
         /// 验证文件完整性
         /// </summary>
-        private static VerifyResult CheckFileIntegrity(OfdReader reader, Signature signature, IDigest digest)
+        private static VerifyResult CheckFileIntegrity(OfdReader reader, DigestInfo signature, IDigest digest)
         {
             foreach (Reference referenceItem in signature.SignedInfo.ReferenceCollect.Items)
             {
@@ -91,7 +91,7 @@ namespace OfdSharp.Verify
         /// 检查印章匹配[可选-存在Seal.esl则验证，不存在不验证]
         /// 验证文件：Doc_0\Signs\Sign_0\Seal.esl、Doc_0\Signs\Sign_0\SignedValue.dat
         /// </summary>
-        private static VerifyResult CheckSealMatch(OfdReader reader, Signature signature)
+        private static VerifyResult CheckSealMatch(OfdReader reader, DigestInfo signature)
         {
             if (signature.SignedInfo.Seal == null)
             {
@@ -119,7 +119,7 @@ namespace OfdSharp.Verify
         /// 检查电子签章数据
         /// 验证文件：Doc_0\Signs\Sign_0\Signature.xml、Doc_0\Signs\Sign_0\SignedValue.dat
         /// </summary>
-        private static VerifyResult CheckSignedValue(OfdReader reader, Signature signature)
+        private static VerifyResult CheckSignedValue(OfdReader reader, DigestInfo signature)
         {
             string signatureFilePath = reader.GetSignatures();
             byte[] tbsContent = reader.ReadContent(signatureFilePath);
@@ -127,7 +127,7 @@ namespace OfdSharp.Verify
 
             SesV4ValidateContainer validateContainer = new SesV4ValidateContainer();
             //SesV1ValidateContainer validateContainer = new SesV1ValidateContainer();
-            return validateContainer.Validate(SigType.Seal, tbsContent, signedValue);
+            return validateContainer.Validate(SignedType.Seal, tbsContent, signedValue);
         }
     }
 }
