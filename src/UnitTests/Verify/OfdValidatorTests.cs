@@ -6,7 +6,7 @@ using Org.BouncyCastle.X509;
 using System;
 using System.IO;
 
-namespace OfdSharpUnitTest.Verify
+namespace UnitTests.Verify
 {
     /// <summary>
     /// OFD电子签名验证引擎测试

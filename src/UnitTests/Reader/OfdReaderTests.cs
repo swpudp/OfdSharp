@@ -5,7 +5,7 @@ using OfdSharp.Reader;
 using System.IO;
 using System.Linq;
 
-namespace OfdSharpUnitTest.Reader
+namespace UnitTests.Reader
 {
     [TestClass]
     public class OfdReaderTests

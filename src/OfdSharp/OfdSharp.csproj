@@ -7,7 +7,7 @@
 		<Authors>Apin</Authors>
 		<Description>ofd读写类库</Description>
 		<Copyright>https://www.mit-license.org/</Copyright>
-		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+		<GeneratePackageOnBuild>false</GeneratePackageOnBuild>
 		<PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
 		<PackageLicenseExpression>MIT</PackageLicenseExpression>
 		<PackageReleaseNotes>修复bug</PackageReleaseNotes>

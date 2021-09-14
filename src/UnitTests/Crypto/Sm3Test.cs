@@ -4,7 +4,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Org.BouncyCastle.Crypto.Digests;
 using Org.BouncyCastle.Utilities;
 
-namespace OfdSharpUnitTest.Crypto
+namespace UnitTests.Crypto
 {
     /// <summary>
     /// sm3加密测试

@@ -4,7 +4,7 @@ using Org.BouncyCastle.Utilities.Encoders;
 using System;
 using System.Linq;
 
-namespace OfdSharpUnitTest.Crypto
+namespace UnitTests.Crypto
 {
     [TestClass]
     public class Sm2UtilsTests

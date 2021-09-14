@@ -5,7 +5,7 @@ VisualStudioVersion = 16.0.30204.135
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OfdSharp", "OfdSharp\OfdSharp.csproj", "{B80B7F13-6C61-4B6B-878B-2B8EE46E6487}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OfdSharpUnitTest", "OfdSharpUnitTest\OfdSharpUnitTest.csproj", "{EACF7D39-439C-4714-A37B-EC32A566D918}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UnitTests", "UnitTests\UnitTests.csproj", "{EACF7D39-439C-4714-A37B-EC32A566D918}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

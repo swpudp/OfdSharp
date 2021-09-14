@@ -2,7 +2,7 @@
 using OfdSharp.Extensions;
 using System.Collections.Generic;
 
-namespace OfdSharpUnitTest.Extensions
+namespace UnitTests.Extensions
 {
     /// <summary>
     /// 迭代器扩展测试

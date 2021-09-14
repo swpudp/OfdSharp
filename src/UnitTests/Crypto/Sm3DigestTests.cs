@@ -18,7 +18,7 @@ using System.Net;
 using System.Security.Cryptography;
 using System.Text;
 
-namespace OfdSharpUnitTest.Crypto
+namespace UnitTests.Crypto
 {
     [TestClass]
     public class Sm3DigestTests

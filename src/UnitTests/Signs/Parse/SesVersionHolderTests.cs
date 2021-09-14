@@ -2,7 +2,7 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using OfdSharp.Ses.Parse;
 
-namespace OfdSharpUnitTest.Signs.Parse
+namespace UnitTests.Signs.Parse
 {
     [TestClass]
     public class SesVersionHolderTests
