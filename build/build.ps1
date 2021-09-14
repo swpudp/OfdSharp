@@ -14,19 +14,19 @@ Write-Host "  dotnet --version:" (dotnet --version)
 $basePath = resolve-path ..
 $packageOutputFolder = "$basePath\build\.nupkgs"
 $projectPath = "..\src\OfdSharp\OfdSharp.csproj"
-$testsPath = "..\src\OfdSharpUnitTest\OfdSharpUnitTest.csproj"
+$testsPath = "..\src\UnitTests\UnitTests.csproj"
 
 if ($PullRequestNumber) {
     Write-Host "Building for a pull request (#$PullRequestNumber), skipping packaging." -ForegroundColor Yellow
     $CreatePackages = $false
 }
 
-Write-Host "Building all projects (Build.csproj traversal)..." -ForegroundColor "Magenta"
+Write-Host "Building OfdSharp projects (OfdSharp.csproj traversal)..." -ForegroundColor "Magenta"
 dotnet build $projectPath -c Release /p:CI=true
 Write-Host "Done building." -ForegroundColor "Green"
 
 if ($RunTests) {
-    Write-Host "Running tests: Build.csproj traversal (all frameworks)" -ForegroundColor "Magenta"
+    Write-Host "Running tests: UnitTests.csproj traversal (all frameworks)" -ForegroundColor "Magenta"
     dotnet test $testsPath -c Release --no-build
     if ($LastExitCode -ne 0) {
         Write-Host "Error with tests, aborting build." -Foreground "Red"
