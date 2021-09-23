@@ -5,7 +5,7 @@
     /// </summary>
     public enum SesVersion
     {
-        V1=1,
-        V4=4
+        V1,
+        V4
     }
 }

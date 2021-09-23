@@ -8,6 +8,12 @@
 		<AssemblyName>UnitTests</AssemblyName>
 
 		<RootNamespace>UnitTests</RootNamespace>
+
+		<ApplicationIcon />
+
+		<OutputType>Library</OutputType>
+
+		<StartupObject />
 	</PropertyGroup>
 
 	<ItemGroup>

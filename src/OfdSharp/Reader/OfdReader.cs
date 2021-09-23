@@ -1,5 +1,6 @@
 ﻿using OfdSharp.Core.Invoice;
 using OfdSharp.Core.Signature;
+using OfdSharp.Utils;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
@@ -171,17 +172,7 @@ namespace OfdSharp.Reader
         {
             using (Stream entryStream = entry.Open())
             {
-                using (MemoryStream memory = new MemoryStream())
-                {
-                    entryStream.CopyTo(memory);
-                    memory.Seek(0, SeekOrigin.Begin);
-                    XmlSerializer serializer = new XmlSerializer(typeof(T));
-                    using (XmlReader xmlReader = XmlReader.Create(memory))
-                    {
-                        T signature = (T)serializer.Deserialize(xmlReader);
-                        return signature;
-                    }
-                }
+                return XmlUtils.Deserialize<T>(entryStream);
             }
         }
 
