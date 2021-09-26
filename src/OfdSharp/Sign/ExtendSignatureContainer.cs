@@ -1,7 +1,7 @@
 ﻿using Org.BouncyCastle.Asn1;
 using Org.BouncyCastle.Crypto.Digests;
 using System.IO;
-using OfdSharp.Core.Signature;
+using OfdSharp.Primitives.Signature;
 
 namespace OfdSharp.Sign
 {

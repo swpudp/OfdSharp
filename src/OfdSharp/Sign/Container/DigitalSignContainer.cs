@@ -1,5 +1,5 @@
 ﻿using System.IO;
-using OfdSharp.Core.Signature;
+using OfdSharp.Primitives.Signature;
 using OfdSharp.Extensions;
 using Org.BouncyCastle.Asn1;
 using Org.BouncyCastle.Asn1.GM;

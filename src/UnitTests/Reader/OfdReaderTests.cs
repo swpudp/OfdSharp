@@ -1,6 +1,6 @@
 ﻿using System;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using OfdSharp.Core.Invoice;
+using OfdSharp.Primitives.Invoice;
 using OfdSharp.Reader;
 using System.IO;
 using System.Linq;

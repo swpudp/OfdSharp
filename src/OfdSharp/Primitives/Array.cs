@@ -14,13 +14,13 @@ namespace OfdSharp.Primitives
         /// <summary>
         /// 元素收容
         /// </summary>
-        private List<string> array = new List<string>();
+        private readonly List<string> _array = new List<string>();
 
         /// <summary>
         /// 获取一个单位矩阵变换参数
         /// </summary>
         /// <returns>单位CTM举证</returns>
-        public static Array unitCTM()
+        public static Array UnitCTM()
         {
             return new Array(
                 "1", "0", // 0
@@ -31,12 +31,12 @@ namespace OfdSharp.Primitives
 
         public Array MtxMul(Array array)
         {
-            if (this.array.Count != 6 || array.array.Count != 6)
+            if (this._array.Count != 6 || array._array.Count != 6)
             {
                 throw new ArgumentOutOfRangeException();
             }
-            double[,] a = toMtx();
-            double[,] b = array.toMtx();
+            double[,] a = ToMtx();
+            double[,] b = array.ToMtx();
 
             double[,] res = new double[3, 3];
 
@@ -51,46 +51,43 @@ namespace OfdSharp.Primitives
                 }
             }
 
-            return new Array(fmt(res[0, 0]), fmt(res[0, 1]), fmt(res[1, 0]), fmt(res[1, 1]), fmt(res[2, 0]), fmt(res[2, 1]));
+            return new Array(Format(res[0, 0]), Format(res[0, 1]), Format(res[1, 0]), Format(res[1, 1]), Format(res[2, 0]), Format(res[2, 1]));
         }
 
 
         public Array(params string[] arr)
         {
-            array = new List<string>(arr.Length);
+            _array = new List<string>(arr.Length);
             foreach (string s in arr)
             {
-                array.Add(s);
+                _array.Add(s);
             }
         }
 
-        public static string fmt(double d)
+        public static string Format(double d)
         {
             return d.ToString(CultureInfo.InvariantCulture);
         }
 
-        public int size()
-        {
-            return array.Count;
-        }
+        public int Size => _array.Count;
 
-        public double[,] toMtx()
+        public double[,] ToMtx()
         {
-            if (size() != 6)
+            if (Size != 6)
             {
                 throw new ArgumentOutOfRangeException("矩阵数组必须有 9个元素");
             }
             double[,] mtx = new double[3, 3];
-            mtx[0, 0] = double.Parse(array.ElementAt(0));
-            mtx[0, 1] = double.Parse(array.ElementAt(1));
+            mtx[0, 0] = double.Parse(_array.ElementAt(0));
+            mtx[0, 1] = double.Parse(_array.ElementAt(1));
             mtx[0, 2] = 0;
 
-            mtx[1, 0] = double.Parse(array.ElementAt(2));
-            mtx[1, 1] = double.Parse(array.ElementAt(3));
+            mtx[1, 0] = double.Parse(_array.ElementAt(2));
+            mtx[1, 1] = double.Parse(_array.ElementAt(3));
             mtx[1, 2] = 0;
 
-            mtx[2, 0] = double.Parse(array.ElementAt(4));
-            mtx[2, 1] = double.Parse(array.ElementAt(5));
+            mtx[2, 0] = double.Parse(_array.ElementAt(4));
+            mtx[2, 1] = double.Parse(_array.ElementAt(5));
             mtx[2, 2] = 1;
 
             return mtx;

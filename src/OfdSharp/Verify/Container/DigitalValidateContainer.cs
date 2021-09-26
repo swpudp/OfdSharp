@@ -1,8 +1,9 @@
-﻿using OfdSharp.Core.Signature;
+﻿using OfdSharp.Primitives.Signature;
 using OfdSharp.Crypto;
 using Org.BouncyCastle.Crypto.Parameters;
 using Org.BouncyCastle.Utilities.Encoders;
 using System;
+using Org.BouncyCastle.X509;
 
 namespace OfdSharp.Verify.Container
 {
@@ -15,19 +16,17 @@ namespace OfdSharp.Verify.Container
         /// <summary>
         /// 验证使用的公钥
         /// </summary>
-        private ECPublicKeyParameters _pk;
+        private readonly ECPublicKeyParameters _pk;
 
         public DigitalValidateContainer(ECPublicKeyParameters pk)
         {
             _pk = pk ?? throw new ArgumentNullException(nameof(pk));
         }
 
-
-        //public DigitalValidateContainer(X509Certificate certificate)
-        //{
-        //    _pk = certificate();
-        //}
-
+        public DigitalValidateContainer(X509Certificate certificate)
+        {
+            _pk = (ECPublicKeyParameters)certificate.GetPublicKey();
+        }
 
         public override VerifyResult Validate(SignedType type, byte[] tbsContent, byte[] signedValue)
         {
@@ -35,17 +34,7 @@ namespace OfdSharp.Verify.Container
             {
                 throw new ArgumentOutOfRangeException(nameof(type), "签名类型(type)必须是 Sign，不支持电子印章验证");
             }
-
-            Sm2Utils.Verify("", Hex.ToHexString(tbsContent), Hex.ToHexString(signedValue));
-
-            //Signature sg = Signature.getInstance(alg, new BouncyCastleProvider());
-            //sg.initVerify(pk);
-            //sg.update(tbsContent);
-            //if (!sg.verify(signedValue))
-            //{
-            //    throw new InvalidSignedValueException("签名值不一致");
-            //}
-
+            Sm2Utils.Verify(Hex.ToHexString(_pk.Q.GetEncoded()), Hex.ToHexString(tbsContent), Hex.ToHexString(signedValue));
             return VerifyResult.Success;
         }
     }

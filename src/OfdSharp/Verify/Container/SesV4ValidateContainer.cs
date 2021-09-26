@@ -1,4 +1,4 @@
-﻿using OfdSharp.Core.Signature;
+﻿using OfdSharp.Primitives.Signature;
 using OfdSharp.Ses.V4;
 using Org.BouncyCastle.Crypto;
 using Org.BouncyCastle.Crypto.Digests;

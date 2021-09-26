@@ -1,7 +1,7 @@
 ﻿using OfdSharp.Reader;
 using System;
 using System.Collections.Generic;
-using OfdSharp.Core.Signature;
+using OfdSharp.Primitives.Signature;
 
 namespace OfdSharp.Sign.Stamp
 {

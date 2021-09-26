@@ -1,5 +1,5 @@
-﻿using OfdSharp.Core.Signatures;
-using OfdSharp.Core.Signature;
+﻿using OfdSharp.Primitives.Signatures;
+using OfdSharp.Primitives.Signature;
 using OfdSharp.Reader;
 using OfdSharp.Ses.Parse;
 using OfdSharp.Ses.V4;

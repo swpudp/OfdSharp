@@ -1,4 +1,4 @@
-﻿using OfdSharp.Core.Signature;
+﻿using OfdSharp.Primitives.Signature;
 
 namespace OfdSharp.Verify
 {

@@ -1,11 +1,10 @@
-﻿using OfdSharp.Core.Invoice;
-using OfdSharp.Core.Signature;
+﻿using OfdSharp.Primitives.Invoice;
+using OfdSharp.Primitives.Signature;
 using OfdSharp.Utils;
 using System.IO;
 using System.IO.Compression;
 using System.Linq;
 using System.Xml;
-using System.Xml.Serialization;
 
 namespace OfdSharp.Reader
 {

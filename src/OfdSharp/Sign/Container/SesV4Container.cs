@@ -1,6 +1,6 @@
 ﻿using System;
 using System.IO;
-using OfdSharp.Core.Signature;
+using OfdSharp.Primitives.Signature;
 using OfdSharp.Extensions;
 using OfdSharp.Ses;
 using OfdSharp.Ses.V4;
