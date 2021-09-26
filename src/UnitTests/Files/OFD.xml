@@ -1,2 +1,28 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<ofd:OFD xmlns:ofd="http://www.ofdspec.org/2016" DocType="OFD" Version="1.1"><ofd:DocBody><ofd:DocInfo><ofd:DocID>90baf370c9dc11e980000b7700000a77</ofd:DocID><ofd:CustomDatas><ofd:CustomData Name="模板编号">增值税电子普通发票</ofd:CustomData><ofd:CustomData Name="地区编码">北京</ofd:CustomData><ofd:CustomData Name="发票代码">011002680026</ofd:CustomData><ofd:CustomData Name="发票号码">71500013</ofd:CustomData><ofd:CustomData Name="开票类型">蓝字发票</ofd:CustomData><ofd:CustomData Name="开票日期">2020年02月20日</ofd:CustomData><ofd:CustomData Name="校验码">03272875819686271285</ofd:CustomData><ofd:CustomData Name="销售方纳税人识别号">91110101202001201</ofd:CustomData><ofd:CustomData Name="销售方名称">ukey测试</ofd:CustomData><ofd:CustomData Name="销售方地址、 电话">重庆市沙坪坝区狮子路11号</ofd:CustomData><ofd:CustomData Name="购买方纳税人识别号">91110108339805094M</ofd:CustomData><ofd:CustomData Name="购买方名称">百望股份有限公司</ofd:CustomData><ofd:CustomData Name="开票人">李大山</ofd:CustomData><ofd:CustomData Name="价税合计">10000.00</ofd:CustomData><ofd:CustomData Name="合计金额">9709.00</ofd:CustomData><ofd:CustomData Name="合计税额">291.00</ofd:CustomData></ofd:CustomDatas></ofd:DocInfo><ofd:DocRoot>Doc_0/Document.xml</ofd:DocRoot><ofd:Signatures>Doc_0/Signs/Signatures.xml</ofd:Signatures></ofd:DocBody></ofd:OFD>
+<ofd:OFD xmlns:ofd="http://www.ofdspec.org/2016" DocType="OFD" Version="1.1">
+	<ofd:DocBody>
+		<ofd:DocInfo>
+			<ofd:DocID>90baf370c9dc11e980000b7700000a77</ofd:DocID>
+			<ofd:CustomDatas>
+				<ofd:CustomData Name="模板编号">增值税电子普通发票</ofd:CustomData>
+				<ofd:CustomData Name="地区编码">北京</ofd:CustomData>
+				<ofd:CustomData Name="发票代码">011002680026</ofd:CustomData>
+				<ofd:CustomData Name="发票号码">71500013</ofd:CustomData>
+				<ofd:CustomData Name="开票类型">蓝字发票</ofd:CustomData>
+				<ofd:CustomData Name="开票日期">2020年02月20日</ofd:CustomData>
+				<ofd:CustomData Name="校验码">03272875819686271285</ofd:CustomData>
+				<ofd:CustomData Name="销售方纳税人识别号">91110101202001201</ofd:CustomData>
+				<ofd:CustomData Name="销售方名称">ukey测试</ofd:CustomData>
+				<ofd:CustomData Name="销售方地址、 电话">重庆市沙坪坝区狮子路11号</ofd:CustomData>
+				<ofd:CustomData Name="购买方纳税人识别号">91110108339805094M</ofd:CustomData>
+				<ofd:CustomData Name="购买方名称">百望股份有限公司</ofd:CustomData>
+				<ofd:CustomData Name="开票人">李大山</ofd:CustomData>
+				<ofd:CustomData Name="价税合计">10000.00</ofd:CustomData>
+				<ofd:CustomData Name="合计金额">9709.00</ofd:CustomData>
+				<ofd:CustomData Name="合计税额">291.00</ofd:CustomData>
+			</ofd:CustomDatas>
+		</ofd:DocInfo>
+		<ofd:DocRoot>Doc_0/Document.xml</ofd:DocRoot>
+		<ofd:Signatures>Doc_0/Signs/Signatures.xml</ofd:Signatures>
+	</ofd:DocBody>
+</ofd:OFD>

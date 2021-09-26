@@ -74,11 +74,11 @@ namespace OfdSharp.Primitives.PageDescription
         /// <summary>
         /// 图元动作
         /// </summary>
-        public IList<CtAction> Actions { get; set; }
+        public List<CtAction> Actions { get; set; }
 
         /// <summary>
         /// 图元对象的裁剪区域序列,采用对象空间坐标系
         /// </summary>
-        public IList<Clip> Clips { get; set; }
+        public List<Clip> Clips { get; set; }
     }
 }

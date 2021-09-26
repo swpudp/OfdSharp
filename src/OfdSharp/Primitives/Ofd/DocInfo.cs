@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Xml.Serialization;
 
 namespace OfdSharp.Primitives.Ofd
 {
@@ -11,6 +12,7 @@ namespace OfdSharp.Primitives.Ofd
         /// <summary>
         /// 文件标识符,采用UUID算法生成的32个字符组成的文件标识。每个DocID在文档创建或生成的时候分配
         /// </summary>
+        [XmlElement("DocID")]
         public string DocId { get; set; }
 
         /// <summary>
@@ -57,7 +59,7 @@ namespace OfdSharp.Primitives.Ofd
         /// 关键词集合
         /// 每一个关键词用一个“Keyword”子节点来表达
         /// </summary>
-        public IList<string> Keywords { get; set; }
+        public List<string> Keywords { get; set; }
 
         /// <summary>
         /// 创建文档的应用程序
@@ -72,6 +74,7 @@ namespace OfdSharp.Primitives.Ofd
         /// <summary>
         /// 用户自定义元数据集合
         /// </summary>
-        public IList<CustomData> CustomDatas { get; set; }
+        [XmlElement("CustomDatas")]
+        public List<CustomData> CustomDatas { get; set; }
     }
 }

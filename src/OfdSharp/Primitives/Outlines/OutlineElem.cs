@@ -28,7 +28,7 @@ namespace OfdSharp.Primitives.Outlines
         /// <summary>
         /// 当此大纲节点被激活时执行的动作序列
         /// </summary>
-        public IList<CtAction> Actions { get; set; }
+        public List<CtAction> Actions { get; set; }
 
         /// <summary>
         /// OutlineElem：该节点的子大纲节点。层层嵌套,形成树状结构

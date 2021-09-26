@@ -40,6 +40,6 @@ namespace OfdSharp.Primitives.PageDescription.Color
         /// <summary>
         /// 颜色段,至少出现两个
         /// </summary>
-        public IList<Segment> Segments { get; set; }
+        public List<Segment> Segments { get; set; }
     }
 }

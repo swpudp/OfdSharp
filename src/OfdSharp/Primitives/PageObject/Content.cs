@@ -10,6 +10,6 @@ namespace OfdSharp.Primitives.PageObject
         /// <summary>
         /// 层节点，一个页可包含一个或多个层
         /// </summary>
-        public IList<Layer> Layers { get; set; }
+        public List<Layer> Layers { get; set; }
     }
 }

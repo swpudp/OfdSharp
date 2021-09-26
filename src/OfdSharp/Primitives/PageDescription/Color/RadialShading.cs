@@ -60,6 +60,6 @@ namespace OfdSharp.Primitives.PageDescription.Color
         /// <summary>
         /// 颜色段
         /// </summary>
-        public IList<Segment> Segments { get; set; }
+        public List<Segment> Segments { get; set; }
     }
 }

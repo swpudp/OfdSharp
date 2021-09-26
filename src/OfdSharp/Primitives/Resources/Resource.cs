@@ -20,26 +20,26 @@ namespace OfdSharp.Primitives.Resources
         /// <summary>
         /// 包含了一组颜色空间的描述
         /// </summary>
-        public IList<CtColorSpace> ColorSpaces { get; set; }
+        public List<CtColorSpace> ColorSpaces { get; set; }
 
         /// <summary>
         /// 绘制参数描述序列
         /// </summary>
-        public IList<CtDrawParam> DrawParams { get; set; }
+        public List<CtDrawParam> DrawParams { get; set; }
 
         /// <summary>
         /// 包含了一组文档所用字型的描述
         /// </summary>
-        public IList<CtFont> Fonts { get; set; }
+        public List<CtFont> Fonts { get; set; }
 
         /// <summary>
         /// 多媒体资源描述列表
         /// </summary>
-        public IList<CtMultiMedia> MultiMedias { get; set; }
+        public List<CtMultiMedia> MultiMedias { get; set; }
 
         /// <summary>
         /// 包含了一组矢量图像(被复合图元对象所引用)的描述
         /// </summary>
-        public IList<VectorGraph> CompositeGraphicUnits { get; set; }
+        public List<VectorGraph> CompositeGraphicUnits { get; set; }
     }
 }

@@ -16,7 +16,7 @@ namespace OfdSharp.Primitives.PageDescription.Clips
         /// 裁剪区域
         /// 用一个图形对象或文字对象来描述裁剪区的一个组成部分，最终裁剪区是这些区域的并集
         /// </summary>
-        public IList<Area> Areas { get; set; }
+        public List<Area> Areas { get; set; }
 
         /// <summary>
         /// 用于裁剪的图形

@@ -11,6 +11,6 @@ namespace OfdSharp.Primitives.Graph.Tight
         /// <summary>
         /// 区域中所有分路径
         /// </summary>
-        public IList<CtArea> Areas { get; set; }
+        public List<CtArea> Areas { get; set; }
     }
 }

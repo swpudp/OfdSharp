@@ -11,6 +11,6 @@ namespace OfdSharp.Primitives.Attachments
         /// <summary>
         /// 附件列表根节点
         /// </summary>
-        public IList<Attachment> Attachments { get; set; }
+        public List<Attachment> Attachments { get; set; }
     }
 }

@@ -9,9 +9,9 @@ namespace OfdSharp.Ses.V4
     /// </summary>
     public class CertInfoCollect : Asn1Encodable, IEnumerable<Asn1OctetString>
     {
-        private readonly IList<Asn1OctetString> _dataSequence = new List<Asn1OctetString>();
+        private readonly List<Asn1OctetString> _dataSequence = new List<Asn1OctetString>();
 
-        public CertInfoCollect(IList<Asn1OctetString> asn1OctetStrings)
+        public CertInfoCollect(List<Asn1OctetString> asn1OctetStrings)
         {
             _dataSequence = asn1OctetStrings;
         }

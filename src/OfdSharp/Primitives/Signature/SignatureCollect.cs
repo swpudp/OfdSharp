@@ -19,6 +19,6 @@ namespace OfdSharp.Primitives.Signature
         /// <summary>
         /// 数字签名或安全签章在类表中的注册信息
         /// </summary>
-        public IList<SignatureInfo> Signatures { get; set; }
+        public List<SignatureInfo> Signatures { get; set; }
     }
 }

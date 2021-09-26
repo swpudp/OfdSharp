@@ -23,7 +23,7 @@ namespace OfdSharp.Primitives.PageDescription.Color
         /// <summary>
         /// 渐变控制点
         /// </summary>
-        public IList<ShadingPoint> Points { get; set; }
+        public List<ShadingPoint> Points { get; set; }
 
         /// <summary>
         /// 渐变范围外的填充颜色,应使用基本颜色

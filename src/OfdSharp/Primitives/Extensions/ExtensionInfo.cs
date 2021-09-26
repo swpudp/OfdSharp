@@ -36,12 +36,12 @@ namespace OfdSharp.Primitives.Extensions
         /// <summary>
         /// 扩展属性,"NameTypeValue"的数值组,用于简单的扩展
         /// </summary>
-        public IList<Property> Properties { get; set; }
+        public List<Property> Properties { get; set; }
 
         /// <summary>
         /// 扩展复杂属性,使用xs:anyType,用于较复杂的扩展
         /// </summary>
-        public IList<object> Data { get; set; }
+        public List<object> Data { get; set; }
 
         /// <summary>
         /// 扩展数据文件所在位置,用于扩展大量信息

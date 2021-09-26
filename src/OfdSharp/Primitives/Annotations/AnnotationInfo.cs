@@ -67,7 +67,7 @@ namespace OfdSharp.Primitives.Annotations
         /// <summary>
         /// 一组注释参数
         /// </summary>
-        public IList<Parameter> Parameters { get; set; }
+        public List<Parameter> Parameters { get; set; }
 
         /// <summary>
         /// 注释的静态呈现效果,使用页面块定义来描述

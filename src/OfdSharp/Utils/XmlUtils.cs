@@ -31,6 +31,25 @@ namespace OfdSharp.Utils
         }
 
         /// <summary>
+        /// 从文件反序列化对象实例
+        /// </summary>
+        /// <typeparam name="T">实例类型</typeparam>
+        /// <param name="stream">流</param>
+        /// <returns></returns>
+        public static T Deserialize<T>(string fullName)
+        {
+            using (var fileStream = new FileStream(fullName, FileMode.Open))
+            {
+                XmlSerializer serializer = new XmlSerializer(typeof(T));
+                using (XmlReader xmlReader = XmlReader.Create(fileStream))
+                {
+                    T instance = (T)serializer.Deserialize(xmlReader);
+                    return instance;
+                }
+            }
+        }
+
+        /// <summary>
         /// 序列化一个对象为XML字符串
         /// </summary>
         /// <typeparam name="T">对象类型</typeparam>

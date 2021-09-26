@@ -1,8 +1,5 @@
 {
   "profiles": {
-    "WSL": {
-      "commandName": "WSL2"
-    },
     "UnitTests": {
       "commandName": "Executable"
     }

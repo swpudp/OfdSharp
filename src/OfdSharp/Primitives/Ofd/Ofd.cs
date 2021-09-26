@@ -22,6 +22,6 @@ namespace OfdSharp.Primitives.Ofd
         /// <summary>
         /// 获取所有文档入口
         /// </summary>
-        public IList<DocBody> DocBodies { get; set; }
+        public List<DocBody> DocBodies { get; set; }
     }
 }

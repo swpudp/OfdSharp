@@ -10,6 +10,6 @@ namespace OfdSharp.Primitives.Version
         /// <summary>
         /// 文件列表文件描述
         /// </summary>
-        public IList<File> Files { get; set; }
+        public List<File> Files { get; set; }
     }
 }

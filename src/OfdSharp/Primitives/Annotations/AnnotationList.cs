@@ -11,6 +11,6 @@ namespace OfdSharp.Primitives.Annotations
         /// <summary>
         /// 注释所在页
         /// </summary>
-        public IList<RefPage> Pages { get; set; }
+        public List<RefPage> Pages { get; set; }
     }
 }

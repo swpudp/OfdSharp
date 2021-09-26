@@ -1,4 +1,5 @@
-﻿using System.Xml.Serialization;
+﻿using OfdSharp.Primitives;
+using System.Xml.Serialization;
 
 namespace OfdSharp.Reader
 {
@@ -6,23 +7,13 @@ namespace OfdSharp.Reader
     /// xml序列化
     /// </summary>
     /// <typeparam name="T"></typeparam>
-    [XmlRoot("OFD")]
-    internal class OfdRoot<T>
-    {
-        [XmlElement(Namespace = "http://www.ofdspec.org/2016")]
-        public DocInfo<T> DocInfo { get; set; }
-    }
-
-    /// <summary>
-    /// doc信息
-    /// </summary>
-    /// <typeparam name="T"></typeparam>
-    internal class DocInfo<T>
+    [XmlRoot(Namespace = "http://www.ofdspec.org/2016", ElementName = "OFD")]
+    public class OfdRoot
     {
         /// <summary>
-        /// xml内容
+        /// 文档正文
         /// </summary>
-        [XmlElement(Namespace = "http://www.ofdspec.org/2016")]
-        public DocBody<T> DocBody { get; set; }
+        [XmlElement("DocBody")]
+        public DocBody DocBody { get; set; }
     }
 }

@@ -14,6 +14,6 @@ namespace OfdSharp.Primitives.CustomTags
         /// <summary>
         /// 自定义标引入口列表
         /// </summary>
-        public IList<CustomTag> CustomTags { get; set; }
+        public List<CustomTag> CustomTags { get; set; }
     }
 }

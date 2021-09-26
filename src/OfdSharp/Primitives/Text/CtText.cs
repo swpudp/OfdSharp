@@ -67,12 +67,12 @@ namespace OfdSharp.Primitives.Text
         /// <summary>
         /// 指定字符编码到字符索引之间的变换关系序列
         /// </summary>
-        public IList<CtTransform> Transforms { get; set; }
+        public List<CtTransform> Transforms { get; set; }
 
         /// <summary>
         /// 文字内容,也就是一段字符编码串，如果字符编码不在XML编码方式的字符范围之内,应采用“\”加四位十六进制数的格式转义;文字内容中出现的空格也需要转义，
         /// 若TextCode作为占位符使用时,一律采用“¤”(u00A4)占位
         /// </summary>
-        public IList<string> TextCodes { get; set; }
+        public List<string> TextCodes { get; set; }
     }
 }

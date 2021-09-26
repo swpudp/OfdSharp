@@ -10,6 +10,6 @@ namespace OfdSharp.Primitives.Extensions
         /// <summary>
         /// 扩展信息节点
         /// </summary>
-        public IList<ExtensionInfo> Extensions { get; set; }
+        public List<ExtensionInfo> Extensions { get; set; }
     }
 }

@@ -10,6 +10,6 @@ namespace OfdSharp.Primitives.Annotations
         /// <summary>
         /// 注释信息列表
         /// </summary>
-        public IList<AnnotationInfo> Annotations { get; set; }
+        public List<AnnotationInfo> Annotations { get; set; }
     }
 }
