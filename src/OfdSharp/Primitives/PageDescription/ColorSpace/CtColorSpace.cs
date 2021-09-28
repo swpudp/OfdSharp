@@ -10,6 +10,11 @@
     public class CtColorSpace
     {
         /// <summary>
+        /// 标识
+        /// </summary>
+        public Id Id { get; set; }
+
+        /// <summary>
         /// 颜色空间的类型
         /// </summary>
         public ColorSpaceType Type { get; set; }

@@ -12,6 +12,7 @@ using System;
 using System.Text;
 using Org.BouncyCastle.Crypto.Signers;
 using Org.BouncyCastle.Utilities;
+using Org.BouncyCastle.Crypto.Digests;
 
 namespace OfdSharp.Crypto
 {

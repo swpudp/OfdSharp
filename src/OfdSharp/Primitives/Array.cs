@@ -33,18 +33,29 @@ namespace OfdSharp.Primitives
         }
 
         /// <summary>
+        /// 从字符串解析
+        /// </summary>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        public static Array Parse(string value)
+        {
+            string[] values = value.Split(' ');
+            return new Array(values);
+        }
+
+        /// <summary>
         /// 矩阵相乘
         /// </summary>
         /// <param name="array"></param>
         /// <returns></returns>
-        public Array Muliply(Array array)
+        public static Array operator *(Array a1, Array a2)
         {
-            if (_elements.Count != 6 || array.Size != 6)
+            if (a1.Size != 6 || a2.Size != 6)
             {
                 throw new ArgumentOutOfRangeException();
             }
-            double[,] a = ToMatrix();
-            double[,] b = array.ToMatrix();
+            double[,] a = a1.ToMatrix();
+            double[,] b = a2.ToMatrix();
             double[,] result = new double[3, 3];
             for (int k = 0; k < 3; k++)
             {
@@ -95,6 +106,35 @@ namespace OfdSharp.Primitives
             matrix[2, 1] = double.Parse(_elements.ElementAt(5));
             matrix[2, 2] = 1;
             return matrix;
+        }
+
+        public override string ToString()
+        {
+            return string.Join(" ", _elements);
+        }
+
+        public override bool Equals(object obj)
+        {
+            if (obj == null || !(obj is Array a))
+            {
+                return false;
+            }
+            return a._elements.SequenceEqual(_elements);
+        }
+
+        public static bool operator ==(Array a1, Array a2)
+        {
+            return a1._elements.SequenceEqual(a2._elements);
+        }
+
+        public static bool operator !=(Array a1, Array a2)
+        {
+            return !(a1 == a2);
+        }
+
+        public override int GetHashCode()
+        {
+            return string.Join(" ", _elements).GetHashCode();
         }
     }
 }

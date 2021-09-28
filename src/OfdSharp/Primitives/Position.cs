@@ -27,5 +27,29 @@
         {
             return $"{XCoordinate} {YCoordinate}";
         }
+
+        public static bool operator ==(Position a, Position b)
+        {
+            return a.XCoordinate == b.XCoordinate && a.YCoordinate == b.YCoordinate;
+        }
+
+        public static bool operator !=(Position a, Position b)
+        {
+            return !(a == b);
+        }
+
+        public override bool Equals(object obj)
+        {
+            if (obj == null || !(obj is Position position))
+            {
+                return false;
+            }
+            return position.XCoordinate == XCoordinate && position.YCoordinate == YCoordinate;
+        }
+
+        public override int GetHashCode()
+        {
+            return (XCoordinate + YCoordinate).GetHashCode();
+        }
     }
 }

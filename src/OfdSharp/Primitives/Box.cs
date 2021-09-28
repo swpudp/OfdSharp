@@ -29,9 +29,46 @@
             Height = height;
         }
 
+        public Box(double topLeftX, double topLeftY, double width, double height)
+        {
+            TopLeft = new Position(topLeftX, topLeftY);
+            Width = width;
+            Height = height;
+        }
+
         public override string ToString()
         {
             return $"{TopLeft.XCoordinate} {TopLeft.YCoordinate} {Width} {Height}";
+        }
+
+        public static Box Parse(string content)
+        {
+            var values = content.Split(' ');
+            return new Box(double.Parse(values[0]), double.Parse(values[1]), double.Parse(values[2]), double.Parse(values[3]));
+        }
+
+        public static bool operator ==(Box a, Box b)
+        {
+            return a.TopLeft == b.TopLeft && a.Width == b.Width && a.Height == b.Height;
+        }
+
+        public static bool operator !=(Box a, Box b)
+        {
+            return !(a == b);
+        }
+
+        public override bool Equals(object obj)
+        {
+            if (obj == null || !(obj is Box box))
+            {
+                return false;
+            }
+            return box.TopLeft == TopLeft && box.Width == Width && box.Height == Height;
+        }
+
+        public override int GetHashCode()
+        {
+            return (TopLeft.XCoordinate + TopLeft.YCoordinate + Width + Height).GetHashCode();
         }
     }
 }

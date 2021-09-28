@@ -9,6 +9,10 @@ using System.Xml;
 using System.Xml.Linq;
 using System.Xml.Serialization;
 using OfdSharp.Extensions;
+using OfdSharp.Primitives.Resources;
+using OfdSharp.Primitives.PageDescription.ColorSpace;
+using OfdSharp.Primitives.Fonts;
+using OfdSharp.Crypto;
 
 namespace OfdSharp.Utils.Tests
 {
@@ -47,27 +51,31 @@ namespace OfdSharp.Utils.Tests
         [TestMethod]
         public void LinqReadXmlTest()
         {
-            string filePath = Path.Combine(Directory.GetCurrentDirectory(), "Files", "OFD.xml");
-            XDocument document = XDocument.Load(filePath);
-            XNamespace ns = document.Root.Name.Namespace;
-            OfdRoot ofdRoot = new OfdRoot
+            string filePath = Path.Combine(Directory.GetCurrentDirectory(), "Files", "Doc_0", "DocumentRes.xml");
+            XDocument xDocument = XDocument.Load(filePath);
+            var documentResource = new DocumentResource
             {
-                DocBody = new Reader.DocBody
+                ColorSpaces = xDocument.GetDescendants("ColorSpace").Select(f => new CtColorSpace
                 {
-                    DocInfo = new DocInfo
-                    {
-                        DocId = document.Descendants(XName.Get("DocID", ns.NamespaceName)).First().Value,
-                        CustomDatas = document.Descendants(XName.Get("CustomData", ns.NamespaceName)).Select(f => new CustomData { Name = f.AttributeValueOrDefault<string>("Name"), Value = f.Value }).ToList()
-                    },
-                    DocRoot = new Location { Value = document.Descendants(XName.Get("DocRoot", ns.NamespaceName)).First().Value },
-                    Signatures = new Location { Value = document.Descendants(XName.Get("Signatures", ns.NamespaceName)).First().Value }
-                }
+                    Type = f.AttributeValueOrDefault("Type").ParseEnum<ColorSpaceType>(),
+                    BitsPerComponent = f.AttributeValueOrDefault("BitsPerComponent").ParseEnum<BitsPerComponent>(),
+                    Id = new Id(f.AttributeValueOrDefault("ID"))
+                }).ToList(),
+                Fonts = xDocument.GetDescendants("Font").Select(f => new CtFont
+                {
+                    Id = new Id(f.AttributeValueOrDefault("ID")),
+                    FontName = f.AttributeValueOrDefault("FontName"),
+                    FamilyName = f.AttributeValueOrDefault("FamilyName")
+                }).ToList(),
+                MultiMedias = xDocument.GetDescendants("MultiMedia").Select(f => new CtMultiMedia
+                {
+                    Type = f.AttributeValueOrDefault("Type").ParseEnum<MediaType>(),
+                    Id = new Id(f.AttributeValueOrDefault("ID")),
+                    MediaFile = new Location { Value = f.ElementValue("MediaFile") }
+                }).ToList()
             };
-            Assert.IsNotNull(ofdRoot);
-            Assert.IsNotNull(ofdRoot.DocBody);
-            Assert.IsNotNull(ofdRoot.DocBody.DocInfo);
-            Assert.AreEqual("90baf370c9dc11e980000b7700000a77", ofdRoot.DocBody.DocInfo.DocId);
-        }
+            Assert.IsNotNull(documentResource);
+        }     
     }
 
     [XmlType(AnonymousType = false, IncludeInSchema = false, Namespace = "http://www.ofdspec.org/2016", TypeName = "id-test")]

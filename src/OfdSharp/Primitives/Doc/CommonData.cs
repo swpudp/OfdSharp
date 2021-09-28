@@ -1,4 +1,5 @@
 ﻿using OfdSharp.Primitives.PageObject;
+using System.Collections.Generic;
 
 namespace OfdSharp.Primitives.Doc
 {
@@ -33,7 +34,7 @@ namespace OfdSharp.Primitives.Doc
         /// todo 模板页序列
         /// 模板页序列，为一系列模板页的集合，模板页内容和结构和普通页相同
         /// </summary>
-        public TemplatePage TemplatePage { get; set; }
+        public List<TemplatePage> TemplatePages { get; set; }
 
         /// <summary>
         /// 引用在资源文件中定义的颜色空间标识。如果此项不存在，采用RGB作为默认颜色空间

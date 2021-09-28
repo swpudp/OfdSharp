@@ -7,6 +7,11 @@
     public class CtFont
     {
         /// <summary>
+        /// 标识
+        /// </summary>
+        public Id Id { get; set; }
+
+        /// <summary>
         /// 字形名
         /// </summary>
         public string FontName { get; set; }

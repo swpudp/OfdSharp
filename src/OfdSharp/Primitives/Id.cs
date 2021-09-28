@@ -19,6 +19,11 @@ namespace OfdSharp.Primitives
             _value = value;
         }
 
+        public Id(string value)
+        {
+            _value = int.Parse(value);
+        }
+
         public static Id NewId()
         {
             Interlocked.Increment(ref _newValue);

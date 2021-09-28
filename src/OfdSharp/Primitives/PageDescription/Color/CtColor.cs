@@ -21,7 +21,7 @@ namespace OfdSharp.Primitives.PageDescription.Color
         /// 此属性不出现时,应采用Index属性从颜色空间的调色板中的取值。
         /// 当二者都不出现时,该颜色各通道的值全部为0
         /// </summary>
-        public Primitives.Array Value { get; set; }
+        public Array Value { get; set; }
 
         /// <summary>
         /// 调色板中颜色的编号,非负整数,将从当前颜色空间的调色板中取出相应索引的预定义颜色用来绘制。索引从0开始

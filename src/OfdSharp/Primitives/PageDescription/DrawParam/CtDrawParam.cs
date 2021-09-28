@@ -10,6 +10,11 @@ namespace OfdSharp.Primitives.PageDescription.DrawParam
     public class CtDrawParam
     {
         /// <summary>
+        /// 标识
+        /// </summary>
+        public Id Id { get; set; }
+
+        /// <summary>
         /// 基础绘制参数，引用资源文件中的绘制参数的标识符
         /// </summary>
         public RefId Relative { get; set; }

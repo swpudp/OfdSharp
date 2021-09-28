@@ -9,7 +9,7 @@ namespace OfdSharp.Primitives.Resources
     /// <summary>
     /// 资源文件
     /// </summary>
-    public class Resource
+    public class DocumentResource
     {
         /// <summary>
         /// 定义此资源文件的通用数据存储路径,BaseLoc属性的意义在于明确资源文件存储的位置,
