@@ -1,5 +1,6 @@
 ﻿using OfdSharp.Extensions;
 using OfdSharp.Primitives;
+using OfdSharp.Primitives.Attachments;
 using OfdSharp.Primitives.Doc;
 using OfdSharp.Primitives.Fonts;
 using OfdSharp.Primitives.Invoice;
@@ -80,7 +81,7 @@ namespace OfdSharp.Reader
         {
             if (!fileInfo.Exists)
             {
-                throw new FileNotFoundException($"文件{fileInfo.Name}未找到");
+                throw new FileNotFoundException("文件未找到", fileInfo.FullName);
             }
         }
 
@@ -342,6 +343,47 @@ namespace OfdSharp.Reader
                     MediaFile = new Location { Value = f.ElementValueOrDefault("MediaFile") }
                 }).ToList()
             };
+        }
+
+        /// <summary>
+        /// 附件信息
+        /// </summary>
+        private List<Attachment> _attachments;
+
+        /// <summary>
+        /// 获取附件信息
+        /// </summary>
+        /// <returns></returns>
+        public List<Attachment> GetAttachments()
+        {
+            if (_attachments != null)
+            {
+                return _attachments;
+            }
+            Document document = GetDocument();
+            _attachments = new List<Attachment>();
+            foreach (var attachLocation in document.Attachments)
+            {
+                ZipArchiveEntry entry = GetEntry(attachLocation.Value);
+                if (entry == null)
+                {
+                    return null;
+                }
+                using (MemoryStream memory = ReadEntry(entry))
+                {
+                    XDocument xDocument = XDocument.Load(memory);
+                    var currentAttachments = xDocument.GetDescendants("Attachment").Select(f => new Attachment
+                    {
+                        Id = new Id(f.AttributeValueOrDefault("ID")),
+                        Name = f.AttributeValueOrDefault("Name"),
+                        Format = f.AttributeValueOrDefault("Format"),
+                        Visible = bool.TryParse(f.AttributeValueOrDefault("Visible"), out bool visible) && visible,
+                        FileLoc = new Location { Value = f.ElementValueOrDefault("FileLoc") }
+                    }).ToList();
+                    _attachments.AddRange(currentAttachments);
+                }
+            }
+            return _attachments;
         }
 
         private static XmlDocument LoadXml(ZipArchiveEntry entry)
