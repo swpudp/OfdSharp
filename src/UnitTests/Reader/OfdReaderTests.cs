@@ -204,5 +204,24 @@ namespace UnitTests.Reader
             Assert.IsTrue(documentRes.MultiMedias.All(f => new List<MediaType> { MediaType.Image }.Contains(f.Type)));
             Assert.IsTrue(documentRes.MultiMedias.All(f => new List<string> { "image_0.png" }.Contains(f.MediaFile.Value)));
         }
+
+        /// <summary>
+        /// 测试附件Attachments.xml
+        /// </summary>
+        [TestMethod]
+        public void GetGetAttachmentsTest()
+        {
+            string filePath = Path.Combine(Directory.GetCurrentDirectory(), "Files", "test.ofd");
+            OfdReader reader = new OfdReader(filePath);
+            Assert.IsNotNull(reader);
+            var attachments = reader.GetAttachments();
+            Assert.IsNotNull(attachments);
+            Assert.IsTrue(attachments.Any());
+            Assert.IsTrue(attachments.All(f => new List<Id> { new Id("301") }.Contains(f.Id)));
+            Assert.IsTrue(attachments.All(f => new List<string> { "original_invoice" }.Contains(f.Name)));
+            Assert.IsTrue(attachments.All(f => new List<string> { "xml" }.Contains(f.Format)));
+            Assert.IsTrue(attachments.All(f => new List<bool> { false }.Contains(f.Visible)));
+            Assert.IsTrue(attachments.All(f => new List<string> { "original_invoice.xml" }.Contains(f.FileLoc.Value)));
+        }
     }
 }
