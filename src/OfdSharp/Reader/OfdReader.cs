@@ -1,6 +1,7 @@
 ﻿using OfdSharp.Extensions;
 using OfdSharp.Primitives;
 using OfdSharp.Primitives.Attachments;
+using OfdSharp.Primitives.CustomTags;
 using OfdSharp.Primitives.Doc;
 using OfdSharp.Primitives.Fonts;
 using OfdSharp.Primitives.Invoice;
@@ -384,6 +385,44 @@ namespace OfdSharp.Reader
                 }
             }
             return _attachments;
+        }
+
+        /// <summary>
+        /// 自定义标签
+        /// </summary>
+        private List<CustomTag> _customTags;
+
+        /// <summary>
+        /// 获取自定义标签
+        /// </summary>
+        /// <returns></returns>
+        public List<CustomTag> GetCustomTags()
+        {
+            if (_customTags != null)
+            {
+                return _customTags;
+            }
+            Document document = GetDocument();
+            _customTags = new List<CustomTag>();
+            foreach (var customTag in document.CustomTags)
+            {
+                ZipArchiveEntry entry = GetEntry(customTag.Value);
+                if (entry == null)
+                {
+                    return null;
+                }
+                using (MemoryStream memory = ReadEntry(entry))
+                {
+                    XDocument xDocument = XDocument.Load(memory);
+                    var currentCustomTag = xDocument.GetDescendants("CustomTag").Select(f => new CustomTag
+                    {
+                        TypeId = f.AttributeValueOrDefault("TypeID"),
+                        FileLoc = new Location { Value = f.ElementValueOrDefault("FileLoc") }
+                    });
+                    _customTags.AddRange(currentCustomTag);
+                }
+            }
+            return _customTags;
         }
 
         private static XmlDocument LoadXml(ZipArchiveEntry entry)

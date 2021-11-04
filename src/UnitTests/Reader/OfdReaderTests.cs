@@ -11,6 +11,7 @@ using OfdSharp.Primitives.PageObject;
 using OfdSharp.Primitives.Resources;
 using OfdSharp.Primitives.PageDescription.ColorSpace;
 
+
 namespace UnitTests.Reader
 {
     [TestClass]
@@ -222,6 +223,22 @@ namespace UnitTests.Reader
             Assert.IsTrue(attachments.All(f => new List<string> { "xml" }.Contains(f.Format)));
             Assert.IsTrue(attachments.All(f => new List<bool> { false }.Contains(f.Visible)));
             Assert.IsTrue(attachments.All(f => new List<string> { "original_invoice.xml" }.Contains(f.FileLoc.Value)));
+        }
+
+        /// <summary>
+        /// 测试附件CustomTags.xml
+        /// </summary>
+        [TestMethod]
+        public void GetCustomTagsTest()
+        {
+            string filePath = Path.Combine(Directory.GetCurrentDirectory(), "Files", "test.ofd");
+            OfdReader reader = new OfdReader(filePath);
+            Assert.IsNotNull(reader);
+            var attachments = reader.GetCustomTags();
+            Assert.IsNotNull(attachments);
+            Assert.IsTrue(attachments.Any());
+            Assert.IsTrue(attachments.All(f => new List<string> { "e-invoice" }.Contains(f.TypeId)));
+            Assert.IsTrue(attachments.All(f => new List<string> { "Tag_e-invoice.xml" }.Contains(f.FileLoc.Value)));
         }
     }
 }
