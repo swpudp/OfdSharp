@@ -67,11 +67,11 @@ namespace OfdSharp.Extensions
             {
                 return null;
             }
-            XName xName = XName.Get(childElement, parentElement.Document.Root.Name.NamespaceName);
+            var rootNamespace = parentElement.Name.Namespace;
+            XName xName = rootNamespace == null ? XName.Get(childElement) : XName.Get(childElement, rootNamespace.NamespaceName);
             XElement child = parentElement.Element(xName);
             return child?.Attribute(attributeName)?.Value;
         }
-
 
         /// <summary>
         /// Allows a safe way to retrieve the value of a nested element for a child element in the current element.
@@ -83,14 +83,48 @@ namespace OfdSharp.Extensions
             {
                 return null;
             }
-            XName xName = XName.Get(parentElementName, rootElement.Document.Root.Name.NamespaceName);
+            var rootNamespace = rootElement.Name.Namespace;
+            XName xName = rootNamespace == null ? XName.Get(parentElementName) : XName.Get(parentElementName, rootNamespace.NamespaceName);
             XElement parentElement = rootElement.Element(xName);
             if (parentElement == null)
             {
                 return null;
             }
-            XName childName = XName.Get(childElementName, rootElement.Document.Root.Name.NamespaceName);
+            XName childName = rootNamespace == null ? XName.Get(childElementName) : XName.Get(childElementName, rootNamespace.NamespaceName);
             return parentElement.Element(childName)?.Value;
+        }
+
+        /// <summary>
+        /// Allows a safe way to retrieve the value of a nested element for a child element in the current element.
+        /// </summary>
+        /// <typeparam name="T">the type for the conversion table</typeparam>
+        public static string ElementValueForElementOrDefault(this XElement rootElement, XName xName, XName childName)
+        {
+            if (rootElement == null)
+            {
+                return null;
+            }
+            var rootNamespace = rootElement.Name.Namespace;
+            XElement parentElement = rootElement.Element(xName);
+            if (parentElement == null)
+            {
+                return null;
+            }
+            return parentElement.Element(childName)?.Value;
+        }
+
+        /// <summary>
+        /// Converts an XmlNode to an XElement for LINQ queries
+        /// </summary>
+        public static XElement GetChildElement(this XElement rootElement, string elementName)
+        {
+            if (rootElement == null)
+            {
+                return null;
+            }
+            var rootNamespace = rootElement.Name.Namespace;
+            XName xName = rootNamespace == null ? XName.Get(elementName) : XName.Get(elementName, rootNamespace.NamespaceName);
+            return rootElement.Element(xName);
         }
 
         /// <summary>
@@ -105,7 +139,23 @@ namespace OfdSharp.Extensions
             {
                 return null;
             }
-            XName xName = XName.Get(childEelement, element.Document.Root.Name.NamespaceName);
+            var elementNamespace = element.Name.Namespace;
+            XName xName = elementNamespace == null ? XName.Get(childEelement) : XName.Get(childEelement, elementNamespace.NamespaceName);
+            return element.Element(xName)?.Value;
+        }
+
+        /// <summary>
+        /// Allows a safe way to retrieve element data
+        /// </summary>
+        /// <param name="element">A reference to the element object</param>
+        /// <param name="xName"></param>
+        /// <returns>Element content or an empty string</returns>
+        public static string ElementValueOrDefault(this XElement element, XName xName)
+        {
+            if (element == null)
+            {
+                return null;
+            }
             return element.Element(xName)?.Value;
         }
 
@@ -117,7 +167,8 @@ namespace OfdSharp.Extensions
         /// <returns></returns>
         public static string ElementValue(this XElement element, string childElementName)
         {
-            XName xName = XName.Get(childElementName, element.Document.Root.Name.NamespaceName);
+            var rootNamespace = element.Name.Namespace;
+            XName xName = rootNamespace == null ? XName.Get(childElementName) : XName.Get(childElementName, rootNamespace.NamespaceName);
             return element.Element(xName).Value;
         }
 
@@ -190,7 +241,8 @@ namespace OfdSharp.Extensions
         /// <returns></returns>
         public static IEnumerable<XElement> GetDescendants(this XDocument document, string nodeName)
         {
-            XName xName = XName.Get(nodeName, document.Root.Name.NamespaceName);
+            var rootNamespace = document.Document.Root.Name.Namespace;
+            XName xName = rootNamespace == null ? XName.Get(nodeName) : XName.Get(nodeName, rootNamespace.NamespaceName);
             return document.Descendants(xName);
         }
     }

@@ -61,6 +61,9 @@
         /// </summary>
         public string TaxAmount { get; set; }
 
+        /// <summary>
+        /// 优惠政策标识
+        /// </summary>
         public string PreferentialMark { get; set; }
 
         /// <summary>

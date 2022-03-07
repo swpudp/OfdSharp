@@ -234,11 +234,11 @@ namespace UnitTests.Reader
             string filePath = Path.Combine(Directory.GetCurrentDirectory(), "Files", "test.ofd");
             OfdReader reader = new OfdReader(filePath);
             Assert.IsNotNull(reader);
-            var attachments = reader.GetCustomTags();
-            Assert.IsNotNull(attachments);
-            Assert.IsTrue(attachments.Any());
-            Assert.IsTrue(attachments.All(f => new List<string> { "e-invoice" }.Contains(f.TypeId)));
-            Assert.IsTrue(attachments.All(f => new List<string> { "Tag_e-invoice.xml" }.Contains(f.FileLoc.Value)));
+            var customTags = reader.GetCustomTags();
+            Assert.IsNotNull(customTags);
+            Assert.IsTrue(customTags.Any());
+            Assert.IsTrue(customTags.All(f => new List<string> { "e-invoice" }.Contains(f.TypeId)));
+            Assert.IsTrue(customTags.All(f => new List<string> { "Tag_e-invoice.xml" }.Contains(f.FileLoc.Value)));
         }
     }
 }

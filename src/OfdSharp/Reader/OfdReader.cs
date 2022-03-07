@@ -379,7 +379,7 @@ namespace OfdSharp.Reader
                         Name = f.AttributeValueOrDefault("Name"),
                         Format = f.AttributeValueOrDefault("Format"),
                         Visible = bool.TryParse(f.AttributeValueOrDefault("Visible"), out bool visible) && visible,
-                        FileLoc = new Location { Value = f.ElementValueOrDefault("FileLoc") }
+                        FileLoc = new Location { Value = string.Concat(Path.GetDirectoryName(attachLocation.Value), "/", Path.GetFileName(f.ElementValueOrDefault("FileLoc"))) }
                     }).ToList();
                     _attachments.AddRange(currentAttachments);
                 }
@@ -424,6 +424,8 @@ namespace OfdSharp.Reader
             }
             return _customTags;
         }
+
+
 
         private static XmlDocument LoadXml(ZipArchiveEntry entry)
         {
@@ -502,14 +504,99 @@ namespace OfdSharp.Reader
         }
 
         /// <summary>
+        /// 发票信息
+        /// </summary>
+        private InvoiceInfo _invoiceInfo;
+
+        /// <summary>
         /// 获取发票信息
         /// </summary>
         /// <returns></returns>
         public InvoiceInfo GetInvoiceInfo()
         {
-            const string invoiceEntryName = "original_invoice.xml";
-            ZipArchiveEntry invoiceEntry = _archive.Entries.First(f => f.Name == invoiceEntryName);
-            return Deserialize<InvoiceInfo>(invoiceEntry);
+            if (_invoiceInfo != null)
+            {
+                return _invoiceInfo;
+            }
+            List<Attachment> attachments = GetAttachments();
+            Attachment invoiceAttachment = attachments.FirstOrDefault(f => f.Name == "original_invoice");
+            if (invoiceAttachment == null)
+            {
+                throw new FileNotFoundException("original_invoice.xml");
+            }
+            ZipArchiveEntry entry = GetEntry(invoiceAttachment.FileLoc.Value);
+            if (entry == null)
+            {
+                return null;
+            }
+            using (MemoryStream memory = ReadEntry(entry))
+            {
+                XDocument xDocument = XDocument.Load(memory);
+
+                //todo 无法读取namespace
+                const string InvoiceNamespace = "http://www.edrm.org.cn/schema/e-invoice/2019";
+                XElement root = xDocument.Root;
+                _invoiceInfo = new InvoiceInfo
+                {
+                    DocId = root.ElementValueOrDefault(XName.Get("DocID", InvoiceNamespace)),
+                    AreaCode = root.ElementValueOrDefault(XName.Get("AreaCode", InvoiceNamespace)),
+                    TypeCode = root.ElementValueOrDefault(XName.Get("TypeCode", InvoiceNamespace)),
+                    InvoiceSIA2 = root.ElementValueOrDefault(XName.Get("InvoiceSIA2", InvoiceNamespace)),
+                    InvoiceSIA1 = root.ElementValueOrDefault(XName.Get("InvoiceSIA1", InvoiceNamespace)),
+                    InvoiceCode = root.ElementValueOrDefault(XName.Get("InvoiceCode", InvoiceNamespace)),
+                    InvoiceNo = root.ElementValueOrDefault(XName.Get("InvoiceNo", InvoiceNamespace)),
+                    IssueDate = root.ElementValueOrDefault(XName.Get("IssueDate", InvoiceNamespace)),
+                    InvoiceCheckCode = root.ElementValueOrDefault(XName.Get("InvoiceCheckCode", InvoiceNamespace)),
+                    MachineNo = root.ElementValueOrDefault(XName.Get("MachineNo", InvoiceNamespace)),
+                    GraphCode = root.ElementValueOrDefault(XName.Get("GraphCode", InvoiceNamespace)),
+                    TaxControlCode = root.ElementValueOrDefault(XName.Get("TaxControlCode", InvoiceNamespace)),
+                    Buyer = new BuyerInfo
+                    {
+                        BuyerName = root.ElementValueForElementOrDefault(XName.Get("Buyer", InvoiceNamespace), XName.Get("BuyerName", InvoiceNamespace)),
+                        BuyerTaxNo = root.ElementValueForElementOrDefault(XName.Get("Buyer", InvoiceNamespace), XName.Get("BuyerTaxID", InvoiceNamespace)),
+                        BuyerAddressTel = root.ElementValueForElementOrDefault(XName.Get("Buyer", InvoiceNamespace), XName.Get("BuyerAddrTel", InvoiceNamespace)),
+                        BuyerBankAccount = root.ElementValueForElementOrDefault(XName.Get("Buyer", InvoiceNamespace), XName.Get("BuyerFinancialAccount", InvoiceNamespace))
+                    },
+                    Seller = new SellerInfo
+                    {
+                        SellerName = root.ElementValueForElementOrDefault(XName.Get("Seller", InvoiceNamespace), XName.Get("SellerName", InvoiceNamespace)),
+                        SellerTaxNo = root.ElementValueForElementOrDefault(XName.Get("Seller", InvoiceNamespace), XName.Get("SellerTaxID", InvoiceNamespace)),
+                        SellerAddressTel = root.ElementValueForElementOrDefault(XName.Get("Seller", InvoiceNamespace), XName.Get("SellerAddrTel", InvoiceNamespace)),
+                        SellerBankAccount = root.ElementValueForElementOrDefault(XName.Get("Seller", InvoiceNamespace), XName.Get("SellerFinancialAccount", InvoiceNamespace))
+                    },
+                    TaxInclusiveTotalAmount = root.ElementValueOrDefault(XName.Get("TaxInclusiveTotalAmount", InvoiceNamespace)),
+                    TaxInclusiveTotalAmountWithWords = root.ElementValueOrDefault(XName.Get("TaxInclusiveTotalAmountWithWords", InvoiceNamespace)),
+                    TaxExclusiveTotalAmount = root.ElementValueOrDefault(XName.Get("TaxExclusiveTotalAmount", InvoiceNamespace)),
+                    TaxTotalAmount = root.ElementValueOrDefault(XName.Get("TaxTotalAmount", InvoiceNamespace)),
+                    Note = root.ElementValueOrDefault(XName.Get("Note", InvoiceNamespace)),
+                    InvoiceClerk = root.ElementValueOrDefault(XName.Get("InvoiceClerk", InvoiceNamespace)),
+                    Payee = root.ElementValueOrDefault(XName.Get("Payee", InvoiceNamespace)),
+                    Checker = root.ElementValueOrDefault(XName.Get("Checker", InvoiceNamespace)),
+                    Signature = root.ElementValueOrDefault(XName.Get("Signature", InvoiceNamespace)),
+                    DeductibleAmount = root.ElementValueOrDefault(XName.Get("DeductibleAmount", InvoiceNamespace)),
+                    OriginalInvoiceCode = root.ElementValueOrDefault(XName.Get("OriginalInvoiceCode", InvoiceNamespace)),
+                    OriginalInvoiceNo = root.ElementValueOrDefault(XName.Get("OriginalInvoiceNo", InvoiceNamespace)),
+
+                };
+                _invoiceInfo.GoodsInfos = root.Descendants(XName.Get("GoodsInfo", InvoiceNamespace)).Select(f => new GoodsInfo
+                {
+                    LineNo = int.Parse(f.ElementValueOrDefault("LineNo")),
+                    LineNature = int.Parse(f.ElementValueOrDefault("LineNature")),
+                    Item = f.ElementValueOrDefault("Item"),
+                    Code = f.ElementValueOrDefault("Code"),
+                    Specification = f.ElementValueOrDefault("Specification"),
+                    MeasurementDimension = f.ElementValueOrDefault("MeasurementDimension"),
+                    Price = f.ElementValueOrDefault("Price"),
+                    Quantity = f.ElementValueOrDefault("Quantity"),
+                    Amount = f.ElementValueOrDefault("Amount"),
+                    TaxScheme = f.ElementValueOrDefault("TaxScheme"),
+                    TaxAmount = f.ElementValueOrDefault("TaxAmount"),
+                    PreferentialMark = f.ElementValueOrDefault("PreferentialMark"),
+                    FreeTaxMark = f.ElementValueOrDefault("FreeTaxMark"),
+                    VATSpecialManagement = f.ElementValueOrDefault("VATSpecialManagement")
+                }).ToList();
+            }
+            return _invoiceInfo;
         }
 
         /// <summary>
