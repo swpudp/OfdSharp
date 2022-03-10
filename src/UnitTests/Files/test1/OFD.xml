@@ -1,2 +1,25 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<ofd:OFD xmlns:ofd="http://www.ofdspec.org/2016" DocType="OFD" Version="1.1"><ofd:DocBody><ofd:DocInfo><ofd:DocID>c9a4ced42f284320964bf1e630d1fa2a</ofd:DocID><ofd:Author>China Tax</ofd:Author><ofd:CreationDate>2020-11-16</ofd:CreationDate><ofd:CustomDatas><ofd:CustomData Name="template-version">1.0.20.0422</ofd:CustomData><ofd:CustomData Name="native-producer">SuwellFormSDK</ofd:CustomData><ofd:CustomData Name="producer-version">1.0.20.0603</ofd:CustomData><ofd:CustomData Name="发票代码">032001900311</ofd:CustomData><ofd:CustomData Name="发票号码">25577301</ofd:CustomData><ofd:CustomData Name="合计税额">***</ofd:CustomData><ofd:CustomData Name="合计金额">181.14</ofd:CustomData><ofd:CustomData Name="开票日期">2020年11月12日</ofd:CustomData><ofd:CustomData Name="校验码">58569 30272 33709 75117</ofd:CustomData><ofd:CustomData Name="购买方纳税人识别号">91510700205412308D</ofd:CustomData><ofd:CustomData Name="销售方纳税人识别号">91320111339366503A</ofd:CustomData></ofd:CustomDatas></ofd:DocInfo><ofd:DocRoot>Doc_0/Document.xml</ofd:DocRoot><ofd:Signatures>Doc_0/Signs/Signatures.xml</ofd:Signatures></ofd:DocBody></ofd:OFD>
+<ofd:OFD xmlns:ofd="http://www.ofdspec.org/2016" DocType="OFD" Version="1.1">
+	<ofd:DocBody>
+		<ofd:DocInfo>
+			<ofd:DocID>c9a4ced42f284320964bf1e630d1fa2a</ofd:DocID>
+			<ofd:Author>China Tax</ofd:Author>
+			<ofd:CreationDate>2020-11-16</ofd:CreationDate>
+			<ofd:CustomDatas>
+				<ofd:CustomData Name="template-version">1.0.20.0422</ofd:CustomData>
+				<ofd:CustomData Name="native-producer">SuwellFormSDK</ofd:CustomData>
+				<ofd:CustomData Name="producer-version">1.0.20.0603</ofd:CustomData>
+				<ofd:CustomData Name="发票代码">032001900311</ofd:CustomData>
+				<ofd:CustomData Name="发票号码">25577301</ofd:CustomData>
+				<ofd:CustomData Name="合计税额">***</ofd:CustomData>
+				<ofd:CustomData Name="合计金额">181.14</ofd:CustomData>
+				<ofd:CustomData Name="开票日期">2020年11月12日</ofd:CustomData>
+				<ofd:CustomData Name="校验码">58569 30272 33709 75117</ofd:CustomData>
+				<ofd:CustomData Name="购买方纳税人识别号">91510700205412308D</ofd:CustomData>
+				<ofd:CustomData Name="销售方纳税人识别号">91320111339366503A</ofd:CustomData>
+			</ofd:CustomDatas>
+		</ofd:DocInfo>
+		<ofd:DocRoot>Doc_0/Document.xml</ofd:DocRoot>
+		<ofd:Signatures>Doc_0/Signs/Signatures.xml</ofd:Signatures>
+	</ofd:DocBody>
+</ofd:OFD>

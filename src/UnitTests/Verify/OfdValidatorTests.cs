@@ -1,4 +1,5 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
+using OfdSharp.Primitives.PageDescription.ColorSpace;
 using OfdSharp.Reader;
 using OfdSharp.Verify;
 using Org.BouncyCastle.Crypto.Signers;
@@ -70,5 +71,16 @@ namespace UnitTests.Verify
             Assert.IsTrue(result);
         }
 
+        /// <summary>
+        /// 枚举读取测试
+        /// </summary>
+        [TestMethod]
+        public void EnumReadTest()
+        {
+            ColorSpaceType? type = null;
+            Assert.AreEqual(0, Convert.ToInt32(type));
+            type = ColorSpaceType.CMYK;
+            Assert.AreEqual(2, Convert.ToInt32(type));
+        }
     }
 }
