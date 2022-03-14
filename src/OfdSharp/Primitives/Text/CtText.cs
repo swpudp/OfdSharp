@@ -1,5 +1,6 @@
-﻿using OfdSharp.Primitives.PageDescription.Color;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using OfdSharp.Primitives.Pages.Description;
+using OfdSharp.Primitives.Pages.Description.Color;
 
 namespace OfdSharp.Primitives.Text
 {
@@ -7,8 +8,13 @@ namespace OfdSharp.Primitives.Text
     /// 文字对象
     /// 11.2 文字对象 图 59 表 45
     /// </summary>
-    public class CtText
+    public class CtText : GraphicUnit
     {
+        /// <summary>
+        /// 标识
+        /// </summary>
+        public Id Id { get; set; }
+
         /// <summary>
         /// 引用资源文件中定义的字形标识
         /// </summary>
@@ -73,6 +79,6 @@ namespace OfdSharp.Primitives.Text
         /// 文字内容,也就是一段字符编码串，如果字符编码不在XML编码方式的字符范围之内,应采用“\”加四位十六进制数的格式转义;文字内容中出现的空格也需要转义，
         /// 若TextCode作为占位符使用时,一律采用“¤”(u00A4)占位
         /// </summary>
-        public List<string> TextCodes { get; set; }
+        public TextCode TextCode { get; set; }
     }
 }

@@ -1,8 +1,8 @@
-﻿using OfdSharp.Primitives.CompositeObj;
-using OfdSharp.Primitives.PageDescription.ColorSpace;
-using OfdSharp.Primitives.PageDescription.DrawParam;
-using OfdSharp.Primitives.Fonts;
+﻿using OfdSharp.Primitives.Fonts;
 using System.Collections.Generic;
+using OfdSharp.Primitives.Composite;
+using OfdSharp.Primitives.Pages.Description.ColorSpace;
+using OfdSharp.Primitives.Pages.Description.DrawParam;
 
 namespace OfdSharp.Primitives.Resources
 {

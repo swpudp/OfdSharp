@@ -1,5 +1,5 @@
-﻿using OfdSharp.Primitives.PageDescription;
-using OfdSharp.Primitives.PageDescription.Color;
+﻿using OfdSharp.Primitives.Pages.Description;
+using OfdSharp.Primitives.Pages.Description.Color;
 
 namespace OfdSharp.Primitives.Graph
 {
@@ -36,6 +36,11 @@ namespace OfdSharp.Primitives.Graph
         /// <summary>
         /// 图形轮廓数据,由一系列紧缩的操作符和操作数构成
         /// </summary>
-        public AbbreviatedData AbbreviatedData { get; set; }
+        public string AbbreviatedData { get; set; }
+
+        /// <summary>
+        /// 标识
+        /// </summary>
+        public Id Id { get; internal set; }
     }
 }

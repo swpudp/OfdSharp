@@ -1,4 +1,4 @@
-﻿using OfdSharp.Primitives.PageDescription.Color;
+﻿using OfdSharp.Primitives.Pages.Description.Color;
 
 namespace OfdSharp.Primitives.Image
 {

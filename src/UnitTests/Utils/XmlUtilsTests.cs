@@ -10,9 +10,9 @@ using System.Xml.Linq;
 using System.Xml.Serialization;
 using OfdSharp.Extensions;
 using OfdSharp.Primitives.Resources;
-using OfdSharp.Primitives.PageDescription.ColorSpace;
 using OfdSharp.Primitives.Fonts;
 using OfdSharp.Crypto;
+using OfdSharp.Primitives.Pages.Description.ColorSpace;
 
 namespace OfdSharp.Utils.Tests
 {

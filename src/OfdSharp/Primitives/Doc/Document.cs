@@ -1,8 +1,8 @@
 ﻿using OfdSharp.Primitives.Action;
 using OfdSharp.Primitives.Doc.View;
 using OfdSharp.Primitives.Outlines;
-using OfdSharp.Primitives.PageTree;
 using System.Collections.Generic;
+using OfdSharp.Primitives.Pages.Tree;
 
 namespace OfdSharp.Primitives.Doc
 {
@@ -19,7 +19,7 @@ namespace OfdSharp.Primitives.Doc
         /// <summary>
         /// 页树
         /// </summary>
-        public List<Page> Pages { get; set; }
+        public List<PageNode> Pages { get; set; }
 
         /// <summary>
         /// 大纲

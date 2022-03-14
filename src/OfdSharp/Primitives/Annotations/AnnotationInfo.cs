@@ -1,6 +1,6 @@
-﻿using OfdSharp.Primitives.PageObject;
-using System;
+﻿using System;
 using System.Collections.Generic;
+using OfdSharp.Primitives.Pages.Object;
 
 namespace OfdSharp.Primitives.Annotations
 {

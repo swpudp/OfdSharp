@@ -1,11 +1,11 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using OfdSharp.Primitives.PageDescription.ColorSpace;
 using OfdSharp.Reader;
 using OfdSharp.Verify;
 using Org.BouncyCastle.Crypto.Signers;
 using Org.BouncyCastle.X509;
 using System;
 using System.IO;
+using OfdSharp.Primitives.Pages.Description.ColorSpace;
 
 namespace UnitTests.Verify
 {

@@ -16,9 +16,15 @@ namespace OfdSharp.Writer.Tests
         public void WriteOfdRootTest()
         {
             OfdWriter writer = new OfdWriter();
+
             writer.WriteOfdRoot();
+            writer.WriteDocument();
+            writer.WriteDocumentRes();
+            writer.WritePublicRes();
+            writer.WritePages();
+
             byte[] content = writer.Flush();
-            string fileName = Path.Combine(Directory.GetCurrentDirectory(), "test-root.xml");
+            string fileName = Path.Combine(Directory.GetCurrentDirectory(), "test-root.ofd");
             File.WriteAllBytes(fileName, content);
             Assert.IsTrue(File.Exists(fileName));
         }

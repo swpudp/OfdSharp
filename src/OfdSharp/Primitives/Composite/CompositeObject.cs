@@ -1,6 +1,6 @@
-﻿using OfdSharp.Primitives.PageDescription;
+﻿using OfdSharp.Primitives.Pages.Description;
 
-namespace OfdSharp.Primitives.CompositeObj
+namespace OfdSharp.Primitives.Composite
 {
     /// <summary>
     /// 复合对象：复合对象是一种特殊的图元对象，拥有图元对象的一切特性，

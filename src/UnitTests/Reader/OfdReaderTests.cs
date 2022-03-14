@@ -7,9 +7,9 @@ using System.Linq;
 using OfdSharp.Primitives.Doc;
 using OfdSharp.Primitives;
 using System.Collections.Generic;
-using OfdSharp.Primitives.PageObject;
+using OfdSharp.Primitives.Pages.Description.ColorSpace;
+using OfdSharp.Primitives.Pages.Object;
 using OfdSharp.Primitives.Resources;
-using OfdSharp.Primitives.PageDescription.ColorSpace;
 
 
 namespace UnitTests.Reader

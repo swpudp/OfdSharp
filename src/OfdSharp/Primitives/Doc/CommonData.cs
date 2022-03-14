@@ -1,5 +1,5 @@
-﻿using OfdSharp.Primitives.PageObject;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
+using OfdSharp.Primitives.Pages.Object;
 
 namespace OfdSharp.Primitives.Doc
 {

@@ -4,7 +4,7 @@
     /// 文字定位，文字对象使用严格的文字定位信息进行定位
     /// 11.3 文字定位 图 61 表 46
     /// </summary>
-    public class TextCode 
+    public class TextCode
     {
         /// <summary>
         /// 第一个文字的字形在对象坐标系下的 X 坐标
@@ -35,5 +35,10 @@
         /// DeltaY 不出现时，表示文字的绘制点在 Y 方向不做偏移。
         /// </summary>
         public Array DeltaY { get; set; }
+
+        /// <summary>
+        /// 文字内容
+        /// </summary>
+        public string Value { get; set; }
     }
 }

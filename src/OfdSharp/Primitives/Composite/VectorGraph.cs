@@ -1,6 +1,6 @@
-﻿using OfdSharp.Primitives.PageObject;
+﻿using OfdSharp.Primitives.Pages.Object;
 
-namespace OfdSharp.Primitives.CompositeObj
+namespace OfdSharp.Primitives.Composite
 {
     /// <summary>
     /// 矢量图像

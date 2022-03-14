@@ -6,10 +6,6 @@ using OfdSharp.Primitives.Doc;
 using OfdSharp.Primitives.Fonts;
 using OfdSharp.Primitives.Invoice;
 using OfdSharp.Primitives.Ofd;
-using OfdSharp.Primitives.PageDescription.Color;
-using OfdSharp.Primitives.PageDescription.ColorSpace;
-using OfdSharp.Primitives.PageDescription.DrawParam;
-using OfdSharp.Primitives.PageObject;
 using OfdSharp.Primitives.Resources;
 using OfdSharp.Primitives.Signature;
 using OfdSharp.Utils;
@@ -20,6 +16,10 @@ using System.IO.Compression;
 using System.Linq;
 using System.Xml;
 using System.Xml.Linq;
+using OfdSharp.Primitives.Pages.Description.Color;
+using OfdSharp.Primitives.Pages.Description.ColorSpace;
+using OfdSharp.Primitives.Pages.Description.DrawParam;
+using OfdSharp.Primitives.Pages.Object;
 
 namespace OfdSharp.Reader
 {
@@ -135,7 +135,6 @@ namespace OfdSharp.Reader
             ZipArchiveEntry entry = _archive.Entries.First(f => f.FullName == entryFile.TrimStart('/'));
             using (Stream entryStream = entry.Open())
             {
-                System.Console.WriteLine(entryStream.GetType().FullName);
                 using (MemoryStream memory = new MemoryStream())
                 {
                     entryStream.CopyTo(memory);
@@ -183,7 +182,7 @@ namespace OfdSharp.Reader
             using (MemoryStream memory = ReadEntry(entry))
             {
                 var document = XDocument.Load(memory);
-                XNamespace ns = document.Root.Name.Namespace;
+                //XNamespace ns = document.Root.Name.Namespace;
                 _ofdRoot = new OfdRoot
                 {
                     DocBody = new DocBody
@@ -222,7 +221,6 @@ namespace OfdSharp.Reader
             using (MemoryStream memory = ReadEntry(entry))
             {
                 var document = XDocument.Load(memory);
-                XNamespace ns = document.Root.Name.Namespace;
                 _document = new Document
                 {
                     CommonData = new CommonData
@@ -238,7 +236,7 @@ namespace OfdSharp.Reader
                             ZOrder = f.AttributeValueOrDefault("ZOrder").ParseEnum<LayerType>()
                         }).ToList()
                     },
-                    Pages = document.GetDescendants("Page").Select(f => new Primitives.PageTree.Page { Id = new Id(f.AttributeValueOrDefault("ID")), BaseLoc = new Location { Value = f.AttributeValueOrDefault("BaseLoc") } }).ToList(),
+                    Pages = document.GetDescendants("Page").Select(f => new Primitives.Pages.Tree.PageNode{ Id = new Id(f.AttributeValueOrDefault("ID")), BaseLoc = new Location { Value = f.AttributeValueOrDefault("BaseLoc") } }).ToList(),
                     Annotations = new List<Location> { new Location { Value = document.FirstValueOrDefault("Annotations") } },
                     Attachments = new List<Location> { new Location { Value = document.FirstValueOrDefault("Attachments") } },
                     CustomTags = new List<Location> { new Location { Value = document.FirstValueOrDefault("CustomTags") } }
@@ -534,51 +532,51 @@ namespace OfdSharp.Reader
                 XDocument xDocument = XDocument.Load(memory);
 
                 //todo 无法读取namespace
-                const string InvoiceNamespace = "http://www.edrm.org.cn/schema/e-invoice/2019";
+                const string invoiceNamespace = "http://www.edrm.org.cn/schema/e-invoice/2019";
                 XElement root = xDocument.Root;
                 _invoiceInfo = new InvoiceInfo
                 {
-                    DocId = root.ElementValueOrDefault(XName.Get("DocID", InvoiceNamespace)),
-                    AreaCode = root.ElementValueOrDefault(XName.Get("AreaCode", InvoiceNamespace)),
-                    TypeCode = root.ElementValueOrDefault(XName.Get("TypeCode", InvoiceNamespace)),
-                    InvoiceSIA2 = root.ElementValueOrDefault(XName.Get("InvoiceSIA2", InvoiceNamespace)),
-                    InvoiceSIA1 = root.ElementValueOrDefault(XName.Get("InvoiceSIA1", InvoiceNamespace)),
-                    InvoiceCode = root.ElementValueOrDefault(XName.Get("InvoiceCode", InvoiceNamespace)),
-                    InvoiceNo = root.ElementValueOrDefault(XName.Get("InvoiceNo", InvoiceNamespace)),
-                    IssueDate = root.ElementValueOrDefault(XName.Get("IssueDate", InvoiceNamespace)),
-                    InvoiceCheckCode = root.ElementValueOrDefault(XName.Get("InvoiceCheckCode", InvoiceNamespace)),
-                    MachineNo = root.ElementValueOrDefault(XName.Get("MachineNo", InvoiceNamespace)),
-                    GraphCode = root.ElementValueOrDefault(XName.Get("GraphCode", InvoiceNamespace)),
-                    TaxControlCode = root.ElementValueOrDefault(XName.Get("TaxControlCode", InvoiceNamespace)),
+                    DocId = root.ElementValueOrDefault(XName.Get("DocID", invoiceNamespace)),
+                    AreaCode = root.ElementValueOrDefault(XName.Get("AreaCode", invoiceNamespace)),
+                    TypeCode = root.ElementValueOrDefault(XName.Get("TypeCode", invoiceNamespace)),
+                    InvoiceSIA2 = root.ElementValueOrDefault(XName.Get("InvoiceSIA2", invoiceNamespace)),
+                    InvoiceSIA1 = root.ElementValueOrDefault(XName.Get("InvoiceSIA1", invoiceNamespace)),
+                    InvoiceCode = root.ElementValueOrDefault(XName.Get("InvoiceCode", invoiceNamespace)),
+                    InvoiceNo = root.ElementValueOrDefault(XName.Get("InvoiceNo", invoiceNamespace)),
+                    IssueDate = root.ElementValueOrDefault(XName.Get("IssueDate", invoiceNamespace)),
+                    InvoiceCheckCode = root.ElementValueOrDefault(XName.Get("InvoiceCheckCode", invoiceNamespace)),
+                    MachineNo = root.ElementValueOrDefault(XName.Get("MachineNo", invoiceNamespace)),
+                    GraphCode = root.ElementValueOrDefault(XName.Get("GraphCode", invoiceNamespace)),
+                    TaxControlCode = root.ElementValueOrDefault(XName.Get("TaxControlCode", invoiceNamespace)),
                     Buyer = new BuyerInfo
                     {
-                        BuyerName = root.ElementValueForElementOrDefault(XName.Get("Buyer", InvoiceNamespace), XName.Get("BuyerName", InvoiceNamespace)),
-                        BuyerTaxNo = root.ElementValueForElementOrDefault(XName.Get("Buyer", InvoiceNamespace), XName.Get("BuyerTaxID", InvoiceNamespace)),
-                        BuyerAddressTel = root.ElementValueForElementOrDefault(XName.Get("Buyer", InvoiceNamespace), XName.Get("BuyerAddrTel", InvoiceNamespace)),
-                        BuyerBankAccount = root.ElementValueForElementOrDefault(XName.Get("Buyer", InvoiceNamespace), XName.Get("BuyerFinancialAccount", InvoiceNamespace))
+                        BuyerName = root.ElementValueForElementOrDefault(XName.Get("Buyer", invoiceNamespace), XName.Get("BuyerName", invoiceNamespace)),
+                        BuyerTaxNo = root.ElementValueForElementOrDefault(XName.Get("Buyer", invoiceNamespace), XName.Get("BuyerTaxID", invoiceNamespace)),
+                        BuyerAddressTel = root.ElementValueForElementOrDefault(XName.Get("Buyer", invoiceNamespace), XName.Get("BuyerAddrTel", invoiceNamespace)),
+                        BuyerBankAccount = root.ElementValueForElementOrDefault(XName.Get("Buyer", invoiceNamespace), XName.Get("BuyerFinancialAccount", invoiceNamespace))
                     },
                     Seller = new SellerInfo
                     {
-                        SellerName = root.ElementValueForElementOrDefault(XName.Get("Seller", InvoiceNamespace), XName.Get("SellerName", InvoiceNamespace)),
-                        SellerTaxNo = root.ElementValueForElementOrDefault(XName.Get("Seller", InvoiceNamespace), XName.Get("SellerTaxID", InvoiceNamespace)),
-                        SellerAddressTel = root.ElementValueForElementOrDefault(XName.Get("Seller", InvoiceNamespace), XName.Get("SellerAddrTel", InvoiceNamespace)),
-                        SellerBankAccount = root.ElementValueForElementOrDefault(XName.Get("Seller", InvoiceNamespace), XName.Get("SellerFinancialAccount", InvoiceNamespace))
+                        SellerName = root.ElementValueForElementOrDefault(XName.Get("Seller", invoiceNamespace), XName.Get("SellerName", invoiceNamespace)),
+                        SellerTaxNo = root.ElementValueForElementOrDefault(XName.Get("Seller", invoiceNamespace), XName.Get("SellerTaxID", invoiceNamespace)),
+                        SellerAddressTel = root.ElementValueForElementOrDefault(XName.Get("Seller", invoiceNamespace), XName.Get("SellerAddrTel", invoiceNamespace)),
+                        SellerBankAccount = root.ElementValueForElementOrDefault(XName.Get("Seller", invoiceNamespace), XName.Get("SellerFinancialAccount", invoiceNamespace))
                     },
-                    TaxInclusiveTotalAmount = root.ElementValueOrDefault(XName.Get("TaxInclusiveTotalAmount", InvoiceNamespace)),
-                    TaxInclusiveTotalAmountWithWords = root.ElementValueOrDefault(XName.Get("TaxInclusiveTotalAmountWithWords", InvoiceNamespace)),
-                    TaxExclusiveTotalAmount = root.ElementValueOrDefault(XName.Get("TaxExclusiveTotalAmount", InvoiceNamespace)),
-                    TaxTotalAmount = root.ElementValueOrDefault(XName.Get("TaxTotalAmount", InvoiceNamespace)),
-                    Note = root.ElementValueOrDefault(XName.Get("Note", InvoiceNamespace)),
-                    InvoiceClerk = root.ElementValueOrDefault(XName.Get("InvoiceClerk", InvoiceNamespace)),
-                    Payee = root.ElementValueOrDefault(XName.Get("Payee", InvoiceNamespace)),
-                    Checker = root.ElementValueOrDefault(XName.Get("Checker", InvoiceNamespace)),
-                    Signature = root.ElementValueOrDefault(XName.Get("Signature", InvoiceNamespace)),
-                    DeductibleAmount = root.ElementValueOrDefault(XName.Get("DeductibleAmount", InvoiceNamespace)),
-                    OriginalInvoiceCode = root.ElementValueOrDefault(XName.Get("OriginalInvoiceCode", InvoiceNamespace)),
-                    OriginalInvoiceNo = root.ElementValueOrDefault(XName.Get("OriginalInvoiceNo", InvoiceNamespace)),
+                    TaxInclusiveTotalAmount = root.ElementValueOrDefault(XName.Get("TaxInclusiveTotalAmount", invoiceNamespace)),
+                    TaxInclusiveTotalAmountWithWords = root.ElementValueOrDefault(XName.Get("TaxInclusiveTotalAmountWithWords", invoiceNamespace)),
+                    TaxExclusiveTotalAmount = root.ElementValueOrDefault(XName.Get("TaxExclusiveTotalAmount", invoiceNamespace)),
+                    TaxTotalAmount = root.ElementValueOrDefault(XName.Get("TaxTotalAmount", invoiceNamespace)),
+                    Note = root.ElementValueOrDefault(XName.Get("Note", invoiceNamespace)),
+                    InvoiceClerk = root.ElementValueOrDefault(XName.Get("InvoiceClerk", invoiceNamespace)),
+                    Payee = root.ElementValueOrDefault(XName.Get("Payee", invoiceNamespace)),
+                    Checker = root.ElementValueOrDefault(XName.Get("Checker", invoiceNamespace)),
+                    Signature = root.ElementValueOrDefault(XName.Get("Signature", invoiceNamespace)),
+                    DeductibleAmount = root.ElementValueOrDefault(XName.Get("DeductibleAmount", invoiceNamespace)),
+                    OriginalInvoiceCode = root.ElementValueOrDefault(XName.Get("OriginalInvoiceCode", invoiceNamespace)),
+                    OriginalInvoiceNo = root.ElementValueOrDefault(XName.Get("OriginalInvoiceNo", invoiceNamespace)),
 
                 };
-                _invoiceInfo.GoodsInfos = root.Descendants(XName.Get("GoodsInfo", InvoiceNamespace)).Select(f => new GoodsInfo
+                _invoiceInfo.GoodsInfos = root.Descendants(XName.Get("GoodsInfo", invoiceNamespace)).Select(f => new GoodsInfo
                 {
                     LineNo = int.Parse(f.ElementValueOrDefault("LineNo")),
                     LineNature = int.Parse(f.ElementValueOrDefault("LineNature")),
