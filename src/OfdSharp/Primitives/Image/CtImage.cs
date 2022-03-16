@@ -9,6 +9,11 @@ namespace OfdSharp.Primitives.Image
     public class CtImage : GraphicUnit
     {
         /// <summary>
+        /// 标识
+        /// </summary>
+        public Id Id { get; set; }
+
+        /// <summary>
         /// 引用资源文件的定义多媒体的标识
         /// </summary>
         public RefId ResourceId { get; set; }
@@ -30,5 +35,10 @@ namespace OfdSharp.Primitives.Image
         /// 图像边框
         /// </summary>
         public Border Border { get; set; }
+
+        /// <summary>
+        /// 针对对象坐标系,对Area下包含的Path和Text进行进一步的变换
+        /// </summary>
+        public Array Ctm { get; set; }
     }
 }

@@ -12,21 +12,26 @@ using System.Xml.Linq;
 using OfdSharp.Primitives.Pages.Object;
 using OfdSharp.Primitives.Pages.Tree;
 using OfdSharp.Primitives.Text;
+using OfdSharp.Primitives.Attachments;
 
 namespace OfdSharp.Writer
 {
     public class OfdWriter
     {
+        public bool IsFormating { get; set; }
         private XElement _rootElement;
         private XElement _documentElement;
         private XElement _documentResElement;
         private XElement _publicResElement;
         private XElement _pageElement;
+        private XElement _attachmentElement;
         private static readonly XNamespace OfdNamespace = "http://www.ofdspec.org/2016";
         private static readonly string OfdXmls = "http://www.ofdspec.org/2016";
 
         private List<PageNode> _pageNodes = new List<PageNode>();
         private List<PageObject> _pageObjects = new List<PageObject>();
+        private List<Attachment> _attachments = new List<Attachment>();
+        private List<XElement> _attachmentElements = new List<XElement>();
 
         public void WriteOfdRoot()
         {
@@ -122,6 +127,16 @@ namespace OfdSharp.Writer
                                         StrokeColor =new Primitives.Pages.Description.Color.CtColor{Value=new Primitives.Array("156 82 35")},
                                         AbbreviatedData ="M 0 0 L 73 0",
                                     }
+                                },
+                                new PageBlock
+                                {
+                                    ImageObject=new Primitives.Image.CtImage
+                                    {
+                                        Id=new Id(310),
+                                        Ctm=new Primitives.Array("20 0 0 20 0 0"),
+                                        Boundary=new Box(8.5 ,4 ,20, 20),
+                                        ResourceId=new RefId{Id=new Id(311)}
+                                    }
                                 }
                             }
                         }
@@ -145,8 +160,8 @@ namespace OfdSharp.Writer
             _documentElement.Add(annotationsElement);
 
             //Attachments
-            XElement attachmentsElement = new XElement(OfdNamespace + "Attachments");
-            _documentElement.Add(annotationsElement);
+            XElement attachmentsElement = new XElement(OfdNamespace + "Attachments", "Attachs/Attachments.xml");
+            _documentElement.Add(attachmentsElement);
 
             //CustomTags
             XElement customTagsElement = new XElement(OfdNamespace + "CustomTags", "Tags/CustomTags.xml");
@@ -225,10 +240,50 @@ namespace OfdSharp.Writer
                             pathObjectElement.Add(new XElement(OfdNamespace + "AbbreviatedData", pb.PathObject.AbbreviatedData));
                             layerElement.Add(pathObjectElement);
                         }
+                        if (pb.ImageObject != null)
+                        {
+                            layerElement.Add(new XElement(OfdNamespace + "ImageObject", new XAttribute("ID", pb.ImageObject.Id), new XAttribute("Boundary", pb.ImageObject.Boundary), new XAttribute("CTM", pb.ImageObject.Ctm), new XAttribute("ResourceID", pb.ImageObject.ResourceId)));
+                        }
                     }
                     contentElement.Add(layerElement);
                 }
                 _pageElement.Add(contentElement);
+            }
+        }
+
+
+        /// <summary>
+        /// 添加附件
+        /// </summary>
+        public void AddAttachment(string name, string fileName, string format, bool visible, XElement content)
+        {
+            Attachment attachment = new Attachment
+            {
+                Id = new Id(10),
+                Name = name,
+                FileLoc = new Location { Value = fileName },
+                Visible = visible,
+                Format = format
+            };
+            _attachments.Add(attachment);
+            _attachmentElements.Add(content);
+        }
+
+        /// <summary>
+        /// 写入附件信息
+        /// </summary>
+        private void ParseAttachment()
+        {
+            if (!_attachments.Any())
+            {
+                return;
+            }
+            _attachmentElement = new XElement(OfdNamespace + "Attachments", new XAttribute(XNamespace.Xmlns + "ofd", OfdXmls));
+            foreach (var attachment in _attachments)
+            {
+                XElement newAttachment = new XElement(OfdNamespace + "Attachment", new XAttribute("ID", attachment.Id), new XAttribute("Name", attachment.Name), new XAttribute("Format", attachment.Format), new XAttribute("Visible", attachment.Visible));
+                newAttachment.Add(new XElement(OfdNamespace + "FileLoc", attachment.FileLoc.Value));
+                _attachmentElement.Add(newAttachment);
             }
         }
 
@@ -238,11 +293,18 @@ namespace OfdSharp.Writer
             ZipArchive zipArchive = new ZipArchive(stream, ZipArchiveMode.Create, true);
             try
             {
-                zipArchive.CreateEntry("OFD.xml", _rootElement);
-                zipArchive.CreateEntry("Doc_0/Document.xml", _documentElement);
-                zipArchive.CreateEntry("Doc_0/DocumentRes.xml", _documentResElement);
-                zipArchive.CreateEntry("Doc_0/PublicRes.xml", _publicResElement);
-                zipArchive.CreateEntry("Doc_0/Pages/Page_0/Content.xml", _pageElement);
+                zipArchive.CreateEntry("OFD.xml", _rootElement, IsFormating);
+                zipArchive.CreateEntry("Doc_0/Document.xml", _documentElement, IsFormating);
+                zipArchive.CreateEntry("Doc_0/DocumentRes.xml", _documentResElement, IsFormating);
+                zipArchive.CreateEntry("Doc_0/PublicRes.xml", _publicResElement, IsFormating);
+                zipArchive.CreateEntry("Doc_0/Pages/Page_0/Content.xml", _pageElement, IsFormating);
+                ParseAttachment();
+                zipArchive.CreateEntry("Doc_0/Attachs/Attachments.xml", _attachmentElement, IsFormating);
+                foreach (var attachment in _attachments)
+                {
+                    XElement attachmentElement = _attachmentElements.ElementAt(_attachments.IndexOf(attachment));
+                    zipArchive.CreateEntry("Doc_0/Attachs/" + attachment.FileLoc.Value, attachmentElement, IsFormating);
+                }
             }
             finally
             {
@@ -268,13 +330,24 @@ namespace OfdSharp.Writer
         /// <param name="zipArchive"></param>
         /// <param name="entryName"></param>
         /// <param name="content"></param>
-        public static void CreateEntry(this ZipArchive zipArchive, string entryName, XElement content)
+        public static void CreateEntry(this ZipArchive zipArchive, string entryName, XElement content, bool isFormatting = false)
         {
+            if (content == null)
+            {
+                return;
+            }
             ZipArchiveEntry ofd = zipArchive.CreateEntry(entryName);
             using (StreamWriter sw = new StreamWriter(ofd.Open()))
             {
                 sw.WriteLine(DefaultDeclaration.ToString());
-                sw.WriteLine(content.ToString(SaveOptions.DisableFormatting));
+                if (isFormatting)
+                {
+                    sw.WriteLine(content.ToString());
+                }
+                else
+                {
+                    sw.WriteLine(content.ToString(SaveOptions.DisableFormatting));
+                }
             }
         }
     }
