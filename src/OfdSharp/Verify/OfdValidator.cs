@@ -8,6 +8,7 @@ using Org.BouncyCastle.Crypto;
 using Org.BouncyCastle.Security;
 using Org.BouncyCastle.Utilities;
 using System;
+using System.Linq;
 
 namespace OfdSharp.Verify
 {
@@ -38,7 +39,7 @@ namespace OfdSharp.Verify
             //1、读取OFD.xml文件的ofd:Signatures节点
             //2、读取Doc_0\Signs\Signatures.xml文件的ofd:Signature节点，从BaseLoc特性获取签名文件路径，如/Doc_0/Signs/Sign_0/Signature.xml
             //3、读取/Doc_0/Signs/Sign_0/Signature.xml文件
-            DigestInfo signature = reader.GetSignature();
+            DigestInfo signature = reader.GetDigestInfo();
             //获取签名算法
             IDigest digest = DigestUtilities.GetDigest(signature.SignedInfo.ReferenceCollect.CheckMethod);
             //验证文件完整性
@@ -121,7 +122,8 @@ namespace OfdSharp.Verify
         /// </summary>
         private static VerifyResult CheckSignedValue(OfdReader reader, DigestInfo signature)
         {
-            string signatureFilePath = reader.GetSignatures();
+            string signatureFilePath = reader.GetSignatureInfo().Signatures.First().BaseLoc;
+
             byte[] tbsContent = reader.ReadContent(signatureFilePath);
             byte[] signedValue = reader.ReadContent(signature.SignedValue);
 

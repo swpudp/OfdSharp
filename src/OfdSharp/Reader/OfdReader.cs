@@ -236,7 +236,7 @@ namespace OfdSharp.Reader
                             ZOrder = f.AttributeValueOrDefault("ZOrder").ParseEnum<LayerType>()
                         }).ToList()
                     },
-                    Pages = document.GetDescendants("Page").Select(f => new Primitives.Pages.Tree.PageNode{ Id = new Id(f.AttributeValueOrDefault("ID")), BaseLoc = new Location { Value = f.AttributeValueOrDefault("BaseLoc") } }).ToList(),
+                    Pages = document.GetDescendants("Page").Select(f => new Primitives.Pages.Tree.PageNode { Id = new Id(f.AttributeValueOrDefault("ID")), BaseLoc = new Location { Value = f.AttributeValueOrDefault("BaseLoc") } }).ToList(),
                     Annotations = new List<Location> { new Location { Value = document.FirstValueOrDefault("Annotations") } },
                     Attachments = new List<Location> { new Location { Value = document.FirstValueOrDefault("Attachments") } },
                     CustomTags = new List<Location> { new Location { Value = document.FirstValueOrDefault("CustomTags") } }
@@ -440,65 +440,121 @@ namespace OfdSharp.Reader
             }
         }
 
-        private static T Deserialize<T>(ZipArchiveEntry entry)
+        ///// <summary>
+        ///// 获取签名文件
+        ///// </summary>
+        ///// <returns></returns>
+        //public string GetSignatures()
+        //{
+
+
+
+        //    ZipArchiveEntry entry = _archive.Entries.First(f => f.FullName == "OFD.xml");
+        //    XmlDocument body = LoadXml(entry);
+
+        //    XmlNode node = body.LastChild.LastChild.LastChild.LastChild;
+        //    string signaturesFile = node.Value;
+
+        //    ZipArchiveEntry signaturesBaseLoc = _archive.Entries.First(f => f.FullName == signaturesFile);
+        //    XmlDocument signaturesBaseLocContent = LoadXml(signaturesBaseLoc);
+        //    string signaturesBaseLocFile = signaturesBaseLocContent.LastChild.LastChild.Attributes.GetNamedItem("BaseLoc").Value;
+
+
+        //    return signaturesBaseLocFile;
+
+
+        //}
+
+        private SignatureCollect _signatureInfo;
+
+        public SignatureCollect GetSignatureInfo()
         {
-            using (Stream entryStream = entry.Open())
+            if (_signatureInfo != null)
             {
-                return XmlUtils.Deserialize<T>(entryStream);
+                return _signatureInfo;
             }
+            OfdRoot ofdRoot = GetOfdRoot();
+            ZipArchiveEntry entry = GetEntry(ofdRoot.DocBody.Signatures.Value);
+            if (entry == null)
+            {
+                return null;
+            }
+            using (MemoryStream memory = ReadEntry(entry))
+            {
+                var xDocument = XDocument.Load(memory);
+                _signatureInfo = new SignatureCollect
+                {
+
+                    MaxSignId = new Id(xDocument.Root.ElementValueOrDefault("MaxSignId")),
+                    Signatures = xDocument.GetDescendants("Signature").Select(f => new SignatureInfo
+                    {
+                        BaseLoc = f.AttributeValueOrDefault("BaseLoc"),
+                        Id = f.AttributeValueOrDefault("ID")
+                    }).ToList()
+                };
+            }
+            return _signatureInfo;
         }
 
         /// <summary>
-        /// 获取签名文件
+        /// 摘要信息
+        /// </summary>
+        private DigestInfo _digestInfo;
+
+        /// <summary>
+        /// 文件签名摘要信息
         /// </summary>
         /// <returns></returns>
-        public string GetSignatures()
+        public DigestInfo GetDigestInfo()
         {
-            ZipArchiveEntry entry = _archive.Entries.First(f => f.FullName == "OFD.xml");
-            XmlDocument body = LoadXml(entry);
-
-            XmlNode node = body.LastChild.LastChild.LastChild.LastChild;
-            string signaturesFile = node.Value;
-
-            ZipArchiveEntry signaturesBaseLoc = _archive.Entries.First(f => f.FullName == signaturesFile);
-            XmlDocument signaturesBaseLocContent = LoadXml(signaturesBaseLoc);
-            string signaturesBaseLocFile = signaturesBaseLocContent.LastChild.LastChild.Attributes.GetNamedItem("BaseLoc").Value;
-
-
-            return signaturesBaseLocFile;
-
-
-        }
-
-        public DigestInfo GetSignature()
-        {
-            string signaturesBaseLocFile = GetSignatures();
-            ZipArchiveEntry signatureFile = _archive.Entries.First(f => f.FullName == signaturesBaseLocFile.TrimStart('/'));
-            return Deserialize<DigestInfo>(signatureFile);
-        }
-
-        public string GetSignedList()
-        {
-            string signatures = GetSignatures();
-            ZipArchiveEntry entry = _archive.Entries.First(f => f.FullName == signatures);
-            XmlDocument document = LoadXml(entry);
-            XmlNode node = document.LastChild.LastChild;
-            if (node == null)
+            if (_digestInfo != null)
             {
-                return string.Empty;
+                return _digestInfo;
             }
-            ZipArchiveEntry signedEntry = _archive.Entries.First(f => f.FullName == node.Value);
-            XmlDocument signedXml = LoadXml(signedEntry);
-            XmlNode signedNode = signedXml.LastChild.LastChild;
-            if (signedNode == null)
+            SignatureCollect signature = GetSignatureInfo();
+            ZipArchiveEntry signatureFile = _archive.Entries.First(f => f.FullName == signature.Signatures.First().BaseLoc.TrimStart('/'));
+            using (MemoryStream memory = ReadEntry(signatureFile))
             {
-                return string.Empty;
+                XDocument xDocument = XDocument.Load(memory);
+                XElement root = xDocument.Root;
+                XElement signedInfoElement = root.GetChildElement("SignedInfo");
+                XElement signedValueElement = root.GetChildElement("SignedValue");
+                _digestInfo = new DigestInfo
+                {
+                    SignedInfo = new SignedInfo
+                    {
+                        Provider = new Provider
+                        {
+                            ProviderName = signedInfoElement.AttributeValueForElementOrDefault("Provider", "ProviderName"),
+                            Company = signedInfoElement.AttributeValueForElementOrDefault("Provider", "Company"),
+                            Version = signedInfoElement.AttributeValueForElementOrDefault("Provider", "Version")
+                        },
+                        SignatureMethod = signedInfoElement.ElementValueOrDefault("SignatureMethod"),
+                        SignatureDateTime = signedInfoElement.ElementValueOrDefault("SignatureDateTime"),
+                        ReferenceCollect = new ReferenceCollect
+                        {
+                            CheckMethod = signedInfoElement.AttributeValueForElementOrDefault("References", "CheckMethod"),
+                            Items = signedInfoElement.GetDescendants("Reference", root.Name.NamespaceName).Select(f => new Primitives.Signatures.Reference
+                            {
+                                CheckValue = new CheckValue { Value = f.ElementValueOrDefault("CheckValue") },
+                                FileRef = f.AttributeValueOrDefault("FileRef")
+                            }).ToList()
+                        },
+                        StampAnnot = new StampAnnot
+                        {
+                            Id = new Id(signedInfoElement.AttributeValueForElementOrDefault("StampAnnot", "ID")),
+                            PageRef = new RefId { Id = new Id(signedInfoElement.AttributeValueForElementOrDefault("StampAnnot", "PageRef")) },
+                            Boundary = Box.Parse(signedInfoElement.AttributeValueForElementOrDefault("StampAnnot", "Boundary"))
+                        },
+                        Seal = new Seal
+                        {
+                            BaseLoc = new Location { Value = signedInfoElement.ElementValueForElementOrDefault("Seal", "BaseLoc") }
+                        }
+                    },
+                    SignedValue = signedValueElement.Value
+                };
             }
-            foreach (XmlElement childNode in signedNode.ChildNodes)
-            {
-                return childNode.Value;
-            }
-            return string.Empty;
+            return _digestInfo;
         }
 
         /// <summary>

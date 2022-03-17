@@ -10,7 +10,7 @@ using System.Collections.Generic;
 using OfdSharp.Primitives.Pages.Description.ColorSpace;
 using OfdSharp.Primitives.Pages.Object;
 using OfdSharp.Primitives.Resources;
-
+using OfdSharp.Primitives.Signature;
 
 namespace UnitTests.Reader
 {
@@ -59,8 +59,8 @@ namespace UnitTests.Reader
             OfdReader reader = new OfdReader(filePath);
             Assert.IsNotNull(reader);
 
-            string signatures = reader.GetSignatures();
-            Assert.IsNotNull(signatures);
+            DigestInfo digestInfo = reader.GetDigestInfo();
+            Assert.IsNotNull(digestInfo);
 
             reader.Close();
         }
@@ -73,8 +73,8 @@ namespace UnitTests.Reader
             OfdReader reader = new OfdReader(stream);
             Assert.IsNotNull(reader);
 
-            string signatures = reader.GetSignatures();
-            Assert.IsNotNull(signatures);
+            DigestInfo digestInfo = reader.GetDigestInfo();
+            Assert.IsNotNull(digestInfo);
 
             reader.Close();
         }

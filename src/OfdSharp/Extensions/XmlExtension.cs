@@ -245,5 +245,17 @@ namespace OfdSharp.Extensions
             XName xName = rootNamespace == null ? XName.Get(nodeName) : XName.Get(nodeName, rootNamespace.NamespaceName);
             return document.Descendants(xName);
         }
+
+        /// <summary>
+        /// 获取后代节点
+        /// </summary>
+        /// <param name="document"></param>
+        /// <returns></returns>
+        public static IEnumerable<XElement> GetDescendants(this XElement document, string nodeName, string elementNamespace)
+        {
+            var rootNamespace = document.Document.Root.Name.Namespace ?? elementNamespace;
+            XName xName = rootNamespace == null ? XName.Get(nodeName) : XName.Get(nodeName, rootNamespace.NamespaceName);
+            return document.Descendants(xName);
+        }
     }
 }

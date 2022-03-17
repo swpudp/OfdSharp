@@ -41,7 +41,6 @@ namespace OfdSharp.Primitives
 
         public string ToString(string format, IFormatProvider formatProvider)
         {
-            Console.WriteLine("format is " + format + ",formatProvider is " + formatProvider);
             return _value.ToString();
         }
 

@@ -18,7 +18,6 @@ namespace OfdSharp.Ses.V4
         /// 电子印章标识符
         /// 电子印章数据唯一标识编码
         /// </summary>
-
         public DerIA5String EsId { get; }
 
         /// <summary>

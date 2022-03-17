@@ -109,5 +109,18 @@ namespace UnitTests.Crypto
             bool isVerify = Sm2Utils.Verify(publicKey, plainText, sign);
             Assert.IsTrue(isVerify);
         }
+
+        [TestMethod]
+        public void MakeCertTest()
+        {
+            //Asn1Object
+            //Asn1lObject
+          var cert=  Sm2Utils.MakeCert("yzw","tax");
+
+            
+
+
+            
+        }
     }
 }

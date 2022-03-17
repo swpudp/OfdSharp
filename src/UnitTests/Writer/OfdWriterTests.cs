@@ -17,15 +17,22 @@ namespace OfdSharp.Writer.Tests
         [TestMethod()]
         public void WriteOfdRootTest()
         {
-            OfdWriter writer = new OfdWriter { IsFormating = true };
+            OfdWriter writer = new OfdWriter(true);
 
             writer.WriteOfdRoot();
             writer.WriteDocument();
             writer.WriteDocumentRes();
             writer.WritePublicRes();
             writer.WritePages();
-            XElement attachment = CreateInvoice();
+            InvoiceInfo invoiceInfo = CreateInvoiceInfo();
+            XElement attachment = CreateInvoiceElement(invoiceInfo);
+            XElement tag = CreateInvoiceTagElement();
+
             writer.AddAttachment("original_invoice", "original_invoice.xml", "xml", false, attachment);
+            writer.WriteTemplate();
+
+            writer.WriteCustomerTag(tag);
+            writer.WriteAnnotation();
 
             byte[] content = writer.Flush();
             string fileName = Path.Combine(Directory.GetCurrentDirectory(), "test-root.ofd");
@@ -33,12 +40,8 @@ namespace OfdSharp.Writer.Tests
             Assert.IsTrue(File.Exists(fileName));
         }
 
-
-        private static XElement CreateInvoice()
+        private static InvoiceInfo CreateInvoiceInfo()
         {
-            XNamespace invoiceNamespace = "http://www.edrm.org.cn/schema/e-invoice/2019";
-            string invoiceXmls = "http://www.edrm.org.cn/schema/e-invoice/2019";
-            XElement element = new XElement("eInvoice", new XAttribute(XNamespace.Xmlns + "fp", invoiceXmls), new XAttribute("Version", "1.0"));
             InvoiceInfo invoiceInfo = new InvoiceInfo
             {
                 DocId = "01",
@@ -95,6 +98,15 @@ namespace OfdSharp.Writer.Tests
                     VATSpecialManagement = string.Empty
                 }).ToList()
             };
+            return invoiceInfo;
+        }
+
+
+        private static XElement CreateInvoiceElement(InvoiceInfo invoiceInfo)
+        {
+            XNamespace invoiceNamespace = "http://www.edrm.org.cn/schema/e-invoice/2019";
+            string invoiceXmls = "http://www.edrm.org.cn/schema/e-invoice/2019";
+            XElement element = new XElement("eInvoice", new XAttribute(XNamespace.Xmlns + "fp", invoiceXmls), new XAttribute("Version", "1.0"));
 
             element.Add(new XElement(invoiceNamespace + "DocID", invoiceInfo.DocId));
             element.Add(new XElement(invoiceNamespace + "AreaCode", invoiceInfo.AreaCode));
@@ -117,10 +129,10 @@ namespace OfdSharp.Writer.Tests
             element.Add(buyerElement);
 
             XElement sellerElement = new XElement(invoiceNamespace + "Seller");
-            buyerElement.Add(new XElement("SellerName", new XCData(invoiceInfo.Seller.SellerName)));
-            buyerElement.Add(new XElement("SellerTaxID", invoiceInfo.Seller.SellerTaxNo));
-            buyerElement.Add(new XElement("SellerAddrTel", new XCData(invoiceInfo.Seller.SellerAddressTel)));
-            buyerElement.Add(new XElement("SellerFinancialAccount", new XCData(invoiceInfo.Seller.SellerBankAccount)));
+            sellerElement.Add(new XElement("SellerName", new XCData(invoiceInfo.Seller.SellerName)));
+            sellerElement.Add(new XElement("SellerTaxID", invoiceInfo.Seller.SellerTaxNo));
+            sellerElement.Add(new XElement("SellerAddrTel", new XCData(invoiceInfo.Seller.SellerAddressTel)));
+            sellerElement.Add(new XElement("SellerFinancialAccount", new XCData(invoiceInfo.Seller.SellerBankAccount)));
             element.Add(sellerElement);
 
             element.Add(new XElement(invoiceNamespace + "TaxInclusiveTotalAmount", invoiceInfo.TaxInclusiveTotalAmount));
@@ -163,6 +175,30 @@ namespace OfdSharp.Writer.Tests
             systemInfoElement.Add(new XElement(invoiceNamespace + "SystemName", "百望云"));
             systemInfoElement.Add(new XElement(invoiceNamespace + "SystemType", "2"));
             element.Add(systemInfoElement);
+
+            return element;
+        }
+
+        private static XElement CreateInvoiceTagElement()
+        {
+            XNamespace invoiceNamespace = "http://www.edrm.org.cn/schema/e-invoice/2019";
+            string invoiceXmls = "http://www.edrm.org.cn/schema/e-invoice/2019";
+            XElement element = new XElement("eInvoice", new XAttribute(XNamespace.Xmlns + "fp", invoiceXmls));
+            element.Add(new XElement("InvoiceCode", new XElement(invoiceNamespace + "ObjectRef", "64", new XAttribute("PageRef", "1"))));
+
+            XElement buyerElement = new XElement("Buyer");
+            buyerElement.Add(new XElement("BuyerName", new XElement(invoiceNamespace + "ObjectRef", "65", new XAttribute("PageRef", "1"))));
+            buyerElement.Add(new XElement("BuyerTaxID", new XElement(invoiceNamespace + "ObjectRef", "66", new XAttribute("PageRef", "1"))));
+            buyerElement.Add(new XElement("BuyerAddrTel", new XElement(invoiceNamespace + "ObjectRef", "76", new XAttribute("PageRef", "1"))));
+            buyerElement.Add(new XElement("BuyerFinancialAccount", new XElement(invoiceNamespace + "ObjectRef", "79", new XAttribute("PageRef", "1"))));
+            element.Add(buyerElement);
+
+            XElement sellerElement = new XElement("Seller");
+            sellerElement.Add(new XElement("SellerName", new XElement(invoiceNamespace + "ObjectRef", "68", new XAttribute("PageRef", "1"))));
+            sellerElement.Add(new XElement("SellerTaxID", new XElement(invoiceNamespace + "ObjectRef", "69", new XAttribute("PageRef", "1"))));
+            sellerElement.Add(new XElement("SellerAddrTel", new XElement(invoiceNamespace + "ObjectRef", "73", new XAttribute("PageRef", "1"))));
+            sellerElement.Add(new XElement("SellerFinancialAccount", new XElement(invoiceNamespace + "ObjectRef", "77", new XAttribute("PageRef", "1"))));
+            element.Add(sellerElement);
 
             return element;
         }

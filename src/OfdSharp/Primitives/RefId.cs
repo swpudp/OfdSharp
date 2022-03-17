@@ -6,5 +6,10 @@
     public class RefId
     {
         public Id Id { get; set; }
+
+        public override string ToString()
+        {
+            return Id.ToString("D", null);
+        }
     }
 }

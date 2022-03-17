@@ -13,6 +13,12 @@ using System.Text;
 using Org.BouncyCastle.Crypto.Signers;
 using Org.BouncyCastle.Utilities;
 using Org.BouncyCastle.Crypto.Digests;
+using Org.BouncyCastle.X509;
+using Org.BouncyCastle.Asn1.X509;
+using System.Collections;
+using Org.BouncyCastle.Asn1;
+using Org.BouncyCastle.Crypto.Operators;
+using Org.BouncyCastle.X509.Extension;
 
 namespace OfdSharp.Crypto
 {
@@ -175,6 +181,30 @@ namespace OfdSharp.Crypto
             //验证签名结果
             bool verify = sm2Signer.VerifySignature(signData);
             return verify;
+        }
+
+
+        public static X509Certificate MakeCert(string subjectName, string issuerName)
+        {
+            AsymmetricCipherKeyPair keypair = CreateKeyPairInternal();
+            ISignatureFactory sigFact = new Asn1SignatureFactory("SM3WithSM2", keypair.Private);
+            X509V3CertificateGenerator sm2CertGen = new X509V3CertificateGenerator();
+            sm2CertGen.SetSerialNumber(new BigInteger(128, new Random()));//128位   
+            sm2CertGen.SetIssuerDN(new X509Name("CN=" + issuerName));//签发者
+            sm2CertGen.SetNotBefore(DateTime.UtcNow.AddDays(-1));//有效期起
+            sm2CertGen.SetNotAfter(DateTime.UtcNow.AddYears(1));//有效期止
+            sm2CertGen.SetSubjectDN(new X509Name("CN=" + subjectName));//使用者
+            sm2CertGen.SetPublicKey(keypair.Public); //公钥
+
+            sm2CertGen.AddExtension(X509Extensions.BasicConstraints, true, new BasicConstraints(true));
+            sm2CertGen.AddExtension(X509Extensions.SubjectKeyIdentifier, false, new SubjectKeyIdentifierStructure(keypair.Public));
+            sm2CertGen.AddExtension(X509Extensions.AuthorityKeyIdentifier, false, new AuthorityKeyIdentifierStructure(keypair.Public));
+            sm2CertGen.AddExtension(X509Extensions.KeyUsage, true, new KeyUsage(6));
+
+            X509Certificate sm2Cert = sm2CertGen.Generate(sigFact);
+            sm2Cert.CheckValidity();
+            sm2Cert.Verify(keypair.Public);
+            return sm2Cert;
         }
     }
 }
