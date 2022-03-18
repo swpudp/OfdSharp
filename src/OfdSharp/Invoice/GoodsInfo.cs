@@ -1,4 +1,4 @@
-﻿namespace OfdSharp.Primitives.Invoice
+﻿namespace OfdSharp.Invoice
 {
     /// <summary>
     /// 商品信息

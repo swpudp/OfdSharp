@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using Org.BouncyCastle.Asn1;
 
-namespace OfdSharp.Ses.V1
+namespace OfdSharp.Ses
 {
     /// <summary>
     /// 自定义属性字段序列

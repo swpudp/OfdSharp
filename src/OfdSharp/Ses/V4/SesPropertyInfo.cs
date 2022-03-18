@@ -22,38 +22,39 @@ namespace OfdSharp.Ses.V4
         /// <summary>
         /// 印章类型
         /// </summary>
-        public DerInteger Type { get; }
+        public DerInteger Type { get; set; }
 
         /// <summary>
         /// 印章名称
         /// </summary>
-        public DerUtf8String Name { get; }
+        public DerUtf8String Name { get; set; }
 
         /// <summary>
         /// 签章者证书信息类型
         /// </summary>
-        public DerInteger CertListType { get; }
+        public DerInteger CertListType { get; set; }
 
         /// <summary>
         /// 签章者证书信息列表
         /// </summary>
-        public SesCertCollect CertList { get; }
+        public SesCertCollect CertList { get; set; }
 
         /// <summary>
         /// 印章制做日期
         /// </summary>
-        public DerGeneralizedTime CreateDate { get; }
+        public DerGeneralizedTime CreateDate { get; set; }
 
         /// <summary>
         /// 印章有效起始日期
         /// </summary>
-        public DerGeneralizedTime ValidStart { get; }
+        public DerGeneralizedTime ValidStart { get; set; }
 
         /// <summary>
         /// 印章有效终止日期
         /// </summary>
-        public DerGeneralizedTime ValidEnd { get; }
+        public DerGeneralizedTime ValidEnd { get; set; }
 
+        public SesPropertyInfo() { }
 
         public SesPropertyInfo(DerInteger type,
             DerUtf8String name,

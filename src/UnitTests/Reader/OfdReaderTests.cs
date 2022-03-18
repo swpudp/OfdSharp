@@ -1,12 +1,13 @@
 ﻿using System;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using OfdSharp.Primitives.Invoice;
 using OfdSharp.Reader;
 using System.IO;
 using System.Linq;
 using OfdSharp.Primitives.Doc;
 using OfdSharp.Primitives;
 using System.Collections.Generic;
+using OfdSharp.Invoice;
+using OfdSharp.Primitives.Entry;
 using OfdSharp.Primitives.Pages.Description.ColorSpace;
 using OfdSharp.Primitives.Pages.Object;
 using OfdSharp.Primitives.Resources;

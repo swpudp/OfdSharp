@@ -48,6 +48,7 @@ namespace OfdSharp.Verify
             {
                 return result;
             }
+
             //电子印章与电子签章数据的匹配性检查
             result = CheckSealMatch(reader, signature);
 
@@ -68,6 +69,7 @@ namespace OfdSharp.Verify
                     return verifyResult;
                 }
             }
+
             return VerifyResult.Success;
         }
 
@@ -81,11 +83,7 @@ namespace OfdSharp.Verify
             byte[] output = new byte[32];
             digest.DoFinal(output, 0);
             byte[] checkBytes = Convert.FromBase64String(item.CheckValue.Value);
-            if (!Arrays.AreEqual(output, checkBytes))
-            {
-                return VerifyResult.FileTampered;
-            }
-            return VerifyResult.Success;
+            return Arrays.AreEqual(output, checkBytes) ? VerifyResult.Success : VerifyResult.FileTampered;
         }
 
         /// <summary>
@@ -98,6 +96,7 @@ namespace OfdSharp.Verify
             {
                 return VerifyResult.Success;
             }
+
             byte[] sesSignatureBin = reader.ReadContent(signature.SignedValue);
             SesVersionHolder holder = VersionParser.ParseSignatureVersion(sesSignatureBin);
             if (holder.Version == SesVersion.V4)
@@ -112,6 +111,7 @@ namespace OfdSharp.Verify
                     return VerifyResult.SealNotMatch;
                 }
             }
+
             return VerifyResult.Success;
         }
 

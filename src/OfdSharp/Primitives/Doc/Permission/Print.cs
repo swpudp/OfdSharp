@@ -2,7 +2,7 @@
 {
     /// <summary>
     /// 打印权限
-    /// 具体的权限和份数设置由其属性 Printable 及 Copics 控制。若不设置 Print节点，
+    /// 具体的权限和份数设置由其属性 Printable 及 Copies 控制。若不设置 Print节点，
     /// 则默认可以打印，并且打印份数不受限制
     /// </summary>
     public class Print

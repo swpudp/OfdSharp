@@ -11,30 +11,31 @@ namespace OfdSharp.Ses.V4
         /// <summary>
         /// 头信息
         /// </summary>
-        public SesHeader Header { get; }
+        public SesHeader Header { get; set; }
 
 
         /// <summary>
         /// 电子印章标识符
         /// 电子印章数据唯一标识编码
         /// </summary>
-        public DerIA5String EsId { get; }
+        public DerIA5String EsId { get; set; }
 
         /// <summary>
         /// 印章属性信息
         /// </summary>
-        public SesPropertyInfo Property { get; }
+        public SesPropertyInfo Property { get; set; }
 
         /// <summary>
         /// 电子印章图片数据
         /// </summary>
-        public SesPictureInfo Picture { get; }
+        public SesPictureInfo Picture { get; set; }
 
         /// <summary>
         /// 自定义数据
         /// </summary>
-        public ExtensionData ExtensionData { get; }
+        public ExtensionData ExtensionData { get; set; }
 
+        public SealInfo() { }
 
         public SealInfo(SesHeader header, DerIA5String esId, SesPropertyInfo property, SesPictureInfo picture, ExtensionData extData)
         {

@@ -68,7 +68,7 @@ namespace OfdSharp.Sign.Container
         public override byte[] Sign(Stream inData, string propertyInfo)
         {
             GeneralDigest md = GetDigest();
-            byte[] input = inData.ToArray();
+            byte[] input = inData.ReadToEnd();
             md.BlockUpdate(input, 0, input.Length);
             byte[] output = new byte[32];
             md.DoFinal(output, 0);
@@ -104,6 +104,5 @@ namespace OfdSharp.Sign.Container
         /// 获取签名节点类型
         /// </summary>
         public override SignedType SignType => SignedType.Seal;
-
     }
 }

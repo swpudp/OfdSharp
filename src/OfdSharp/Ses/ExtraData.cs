@@ -1,7 +1,7 @@
 ﻿using System.Collections;
 using Org.BouncyCastle.Asn1;
 
-namespace OfdSharp.Ses.V1
+namespace OfdSharp.Ses
 {
     /// <summary>
     /// 厂商自定义数据

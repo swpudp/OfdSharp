@@ -2,7 +2,7 @@
 using OfdSharp.Extensions;
 using Org.BouncyCastle.Asn1;
 
-namespace OfdSharp.Ses.V1
+namespace OfdSharp.Ses
 {
     /// <summary>
     /// 印章图片信息

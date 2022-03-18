@@ -12,13 +12,15 @@ using System;
 using System.Text;
 using Org.BouncyCastle.Crypto.Signers;
 using Org.BouncyCastle.Utilities;
-using Org.BouncyCastle.Crypto.Digests;
 using Org.BouncyCastle.X509;
 using Org.BouncyCastle.Asn1.X509;
-using System.Collections;
-using Org.BouncyCastle.Asn1;
 using Org.BouncyCastle.Crypto.Operators;
 using Org.BouncyCastle.X509.Extension;
+using Org.BouncyCastle.Asn1;
+using OfdSharp.Ses.V4;
+using OfdSharp.Ses;
+using System.Collections.Generic;
+using Org.BouncyCastle.Crypto.Digests;
 
 namespace OfdSharp.Crypto
 {
@@ -151,7 +153,50 @@ namespace OfdSharp.Crypto
             sm2Signer.BlockUpdate(message, 0, message.Length);
             byte[] signBytes = sm2Signer.GenerateSignature();
 
-            return Hex.ToHexString(signBytes);
+            //return Hex.ToHexString(signBytes);
+            return Convert.ToBase64String(signBytes);
+        }
+
+        /// <summary>
+        /// SM3计算摘要
+        /// </summary>
+        /// <param name="data">待计算字符内容</param>
+        /// <param name="encoding">编码</param>
+        /// <returns>摘要字符</returns>
+        public static string Digest(string data, Encoding encoding)
+        {
+            SM3Digest digest = new SM3Digest();
+            byte[] cipherBytes = digest.ComputeHashBytes(data, encoding);
+            return encoding.GetString(Hex.Encode(cipherBytes));
+        }
+
+        /// <summary>
+        /// SM3计算摘要
+        /// </summary>
+        /// <param name="data">待计算字符内容</param>
+        /// <param name="encoding">编码</param>
+        /// <returns>摘要字符</returns>
+        public static byte[] Digest(string alg, string data, Encoding encoding)
+        {
+            IDigest digest = DigestUtilities.GetDigest(alg);
+            byte[] cipherBytes = digest.ComputeHashBytes(data, encoding);
+            return cipherBytes;
+        }
+
+        /// <summary>
+        /// 计算Hash字节
+        /// </summary>
+        /// <param name="digest"></param>
+        /// <param name="data"></param>
+        /// <param name="encoding"></param>
+        /// <returns></returns>
+        private static byte[] ComputeHashBytes(this IDigest digest, string data, Encoding encoding)
+        {
+            var hashBytes = new byte[digest.GetDigestSize()];
+            var bs = encoding.GetBytes(data);
+            digest.BlockUpdate(bs, 0, bs.Length);
+            digest.DoFinal(hashBytes, 0);
+            return hashBytes;
         }
 
         /// <summary>
@@ -187,24 +232,93 @@ namespace OfdSharp.Crypto
         public static X509Certificate MakeCert(string subjectName, string issuerName)
         {
             AsymmetricCipherKeyPair keypair = CreateKeyPairInternal();
-            ISignatureFactory sigFact = new Asn1SignatureFactory("SM3WithSM2", keypair.Private);
+            return MakeCert(keypair.Private, keypair.Public, subjectName, issuerName);
+        }
+
+        public static X509Certificate MakeCert(string publicKey, string privateKey, string subjectName, string issuerName)
+        {
+            ECDomainParameters domainParameters = new ECDomainParameters(Sm2EcParameters.Curve, Sm2EcParameters.G, Sm2EcParameters.N);
+            AsymmetricKeyParameter privateParameter = new ECPrivateKeyParameters(new BigInteger(1, Hex.Decode(privateKey)), domainParameters);
+            ECPublicKeyParameters publicParameter = new ECPublicKeyParameters(domainParameters.Curve.DecodePoint(Hex.Decode(publicKey)), domainParameters);
+            return MakeCert(privateParameter, publicParameter, subjectName, issuerName);
+        }
+
+        private static X509Certificate MakeCert(AsymmetricKeyParameter privateParameter, AsymmetricKeyParameter publicParameter, string subjectName, string issuerName)
+        {
+            ISignatureFactory sigFact = new Asn1SignatureFactory(GMObjectIdentifiers.sm2sign_with_sm3.Id, privateParameter);
             X509V3CertificateGenerator sm2CertGen = new X509V3CertificateGenerator();
             sm2CertGen.SetSerialNumber(new BigInteger(128, new Random()));//128位   
             sm2CertGen.SetIssuerDN(new X509Name("CN=" + issuerName));//签发者
             sm2CertGen.SetNotBefore(DateTime.UtcNow.AddDays(-1));//有效期起
             sm2CertGen.SetNotAfter(DateTime.UtcNow.AddYears(1));//有效期止
             sm2CertGen.SetSubjectDN(new X509Name("CN=" + subjectName));//使用者
-            sm2CertGen.SetPublicKey(keypair.Public); //公钥
+            sm2CertGen.SetPublicKey(publicParameter); //公钥
 
             sm2CertGen.AddExtension(X509Extensions.BasicConstraints, true, new BasicConstraints(true));
-            sm2CertGen.AddExtension(X509Extensions.SubjectKeyIdentifier, false, new SubjectKeyIdentifierStructure(keypair.Public));
-            sm2CertGen.AddExtension(X509Extensions.AuthorityKeyIdentifier, false, new AuthorityKeyIdentifierStructure(keypair.Public));
+            sm2CertGen.AddExtension(X509Extensions.SubjectKeyIdentifier, false, new SubjectKeyIdentifierStructure(publicParameter));
+            sm2CertGen.AddExtension(X509Extensions.AuthorityKeyIdentifier, false, new AuthorityKeyIdentifierStructure(publicParameter));
             sm2CertGen.AddExtension(X509Extensions.KeyUsage, true, new KeyUsage(6));
 
             X509Certificate sm2Cert = sm2CertGen.Generate(sigFact);
             sm2Cert.CheckValidity();
-            sm2Cert.Verify(keypair.Public);
+            sm2Cert.Verify(publicParameter);
             return sm2Cert;
+        }
+
+        /// <summary>
+        /// 创建签章签名值文件
+        /// </summary>
+        /// <param name="dataHash"></param>
+        /// <param name="pic"></param>
+        /// <param name="certBytes">制章人证书</param>
+        /// <param name="signBytes"></param>
+        /// <param name="signerCert"></param>
+        public static byte[] CreateSignedValueData(SesSignatureInfo signatureInfo)
+        {
+            TbsSign toSign = new TbsSign
+            {
+                Version = SesHeader.V4,
+                TimeInfo = new DerGeneralizedTime(DateTime.Now.ToString("yyyyMMddHHmmss")),
+                DataHash = new DerBitString(signatureInfo.dataHash),
+                PropertyInfo = new DerIA5String(signatureInfo.PropertyInfo),
+                ExtData = null
+            };
+            SesHeader sesHeader = new SesHeader(SesHeader.V4, new DerIA5String(signatureInfo.manufacturer));
+            SesPropertyInfo sesPropertyInfo = new SesPropertyInfo
+            {
+                Type = new DerInteger(3),
+                Name = new DerUtf8String(signatureInfo.sealName),
+                CertListType = SesPropertyInfo.CertType,
+                CertList = new SesCertCollect(new CertInfoCollect(new List<Asn1OctetString> { new DerOctetString(signatureInfo.signerCert) })),
+                CreateDate = new DerGeneralizedTime(DateTime.Now),
+                ValidStart = new DerGeneralizedTime(DateTime.Now),
+                ValidEnd = new DerGeneralizedTime(DateTime.Now.AddYears(1))
+            };
+
+            SesPictureInfo sesPictureInfo = new SesPictureInfo(new DerIA5String("ofd"), new DerOctetString(signatureInfo.sealPicture), new DerInteger(30), new DerInteger(20));
+            SealInfo sealInfo = new SealInfo
+            {
+                Header = sesHeader,
+                EsId = new DerIA5String(signatureInfo.esId),
+                Picture = sesPictureInfo,
+                Property = sesPropertyInfo,
+                ExtensionData = null
+            };
+            toSign.EsSeal = new SeSeal
+            {
+                SealInfo = sealInfo,
+                Cert = new DerOctetString(signatureInfo.sealCert),
+                SignAlgId = GMObjectIdentifiers.sm2sign_with_sm3,
+                SignedValue = new DerBitString(signatureInfo.sealSign)
+            };
+            SesSignature sesSignature = new SesSignature
+            {
+                TbsSign = toSign,
+                Cert = new DerOctetString(signatureInfo.signerCert),
+                SignatureAlgId = GMObjectIdentifiers.sm2sign_with_sm3,
+                Signature = new DerBitString(signatureInfo.signature)
+            };
+            return sesSignature.GetDerEncoded();
         }
     }
 }

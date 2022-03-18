@@ -1,23 +1,25 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using OfdSharp.Primitives.Invoice;
-using OfdSharp.Writer;
-using System;
-using System.Collections.Generic;
-using System.IO;
+﻿using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Xml.Linq;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+using OfdSharp.Crypto;
+using OfdSharp.Invoice;
+using OfdSharp.Reader;
+using OfdSharp.Verify;
+using OfdSharp.Writer;
 
-namespace OfdSharp.Writer.Tests
+namespace UnitTests.Writer
 {
-    [TestClass()]
+    [TestClass]
     public class OfdWriterTests
     {
-        [TestMethod()]
+        private const string pub = "04b7443d2949201fe7d564ab0638e44a6f2ea8f85a7046185b2d7ccc3e80cbb25fa38adba287070d762ea9c6816bbe266d088ed69862a15695736fb8ad23489c58";
+        private const string pri = "4f58588c3aecd59aa16c9f18f1b7e4b81f7a331f75ceb94dc9ae6dbf40faf2b4";
+
+        [TestMethod]
         public void WriteOfdRootTest()
         {
-            OfdWriter writer = new OfdWriter(true);
+            OfdWriter writer = new OfdWriter(false);
 
             writer.WriteOfdRoot();
             writer.WriteDocument();
@@ -34,10 +36,27 @@ namespace OfdSharp.Writer.Tests
             writer.WriteCustomerTag(tag);
             writer.WriteAnnotation();
 
+            Org.BouncyCastle.X509.X509Certificate sealCert = Sm2Utils.MakeCert(pub, pri, "yzw", "tax");
+            Org.BouncyCastle.X509.X509Certificate signerCert = Sm2Utils.MakeCert(pub, pri, "yzw", "tax");
+            writer.WriteCert(sealCert.GetEncoded(), signerCert.GetEncoded()).WriteSignature();
+
             byte[] content = writer.Flush();
             string fileName = Path.Combine(Directory.GetCurrentDirectory(), "test-root.ofd");
             File.WriteAllBytes(fileName, content);
             Assert.IsTrue(File.Exists(fileName));
+        }
+
+        /// <summary>
+        /// 新创建文件验证
+        /// </summary>
+        [TestMethod]
+        public void ValidateAfterWrite()
+        {
+            string filePath = Path.Combine(Directory.GetCurrentDirectory(), "test-root.ofd");
+            OfdReader reader = new OfdReader(filePath);
+            VerifyResult verifyResult = OfdValidator.Validate(reader);
+            Assert.IsNotNull(verifyResult);
+            Assert.AreEqual(VerifyResult.Success, verifyResult);
         }
 
         private static InvoiceInfo CreateInvoiceInfo()
@@ -149,7 +168,7 @@ namespace OfdSharp.Writer.Tests
             element.Add(new XElement(invoiceNamespace + "OriginalInvoiceNo", invoiceInfo.OriginalInvoiceNo));
 
             XElement goodsElement = new XElement(invoiceNamespace + "GoodsInfos");
-            foreach (var goods in invoiceInfo.GoodsInfos)
+            foreach (GoodsInfo goods in invoiceInfo.GoodsInfos)
             {
                 XElement goodsInfoElement = new XElement(invoiceNamespace + "GoodsInfo");
                 goodsInfoElement.Add(new XElement(invoiceNamespace + "LineNo", goods.LineNo));

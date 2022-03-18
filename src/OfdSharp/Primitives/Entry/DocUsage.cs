@@ -1,4 +1,4 @@
-﻿namespace OfdSharp.Primitives.Ofd
+﻿namespace OfdSharp.Primitives.Entry
 {
     /// <summary>
     /// 文档分类

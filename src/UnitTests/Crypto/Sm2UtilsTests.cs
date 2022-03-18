@@ -1,7 +1,9 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using OfdSharp.Crypto;
+using OfdSharp.Ses;
 using Org.BouncyCastle.Utilities.Encoders;
 using System;
+using System.IO;
 using System.Linq;
 
 namespace UnitTests.Crypto
@@ -84,6 +86,8 @@ namespace UnitTests.Crypto
         public void CreateKeyPairAndEncryptTest()
         {
             Tuple<string, string> key = Sm2Utils.CreateKeyPair(false);
+            Console.WriteLine("pub:" + key.Item1);
+            Console.WriteLine("pri:" + key.Item2);
 
             //加密
             string publicKey = key.Item1;
@@ -110,17 +114,41 @@ namespace UnitTests.Crypto
             Assert.IsTrue(isVerify);
         }
 
+        /// <summary>
+        /// 制证测试
+        /// </summary>
         [TestMethod]
         public void MakeCertTest()
         {
             //Asn1Object
             //Asn1lObject
-          var cert=  Sm2Utils.MakeCert("yzw","tax");
+            var cert = Sm2Utils.MakeCert("yzw", "tax");
+            Assert.IsNotNull(cert);
+        }
 
-            
-
-
-            
+        /// <summary>
+        /// 创建签章签名值文件测试
+        /// </summary>
+        [TestMethod]
+        public void CreateSignedValueDataTest()
+        {
+            var sealCert = Sm2Utils.MakeCert("yzw", "tax");
+            var signerCert = Sm2Utils.MakeCert("yzw", "tax");
+            SesSignatureInfo t = new SesSignatureInfo
+            {
+                dataHash = new byte[128],
+                PropertyInfo = "/Doc_0/Signs/Sign_0/Signature.xml",
+                manufacturer = "GOMAIN",
+                sealName = "测试全国统一发票监制章国家税务总局重庆市税务局",
+                esId = "50011200000001",
+                sealCert = sealCert.GetEncoded(),
+                sealPicture = File.ReadAllBytes(Path.Combine(Directory.GetCurrentDirectory(), "Files", "image_78.jb2")),
+                sealSign = new byte[128],
+                signature = new byte[128],
+                signerCert = signerCert.GetEncoded()
+            };
+            byte[] signedValue = Sm2Utils.CreateSignedValueData(t);
+            Assert.IsNotNull(signedValue);
         }
     }
 }

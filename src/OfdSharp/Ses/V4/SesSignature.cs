@@ -12,27 +12,29 @@ namespace OfdSharp.Ses.V4
         /// <summary>
         /// 签章者证书
         /// </summary>
-        public TbsSign TbsSign { get; }
+        public TbsSign TbsSign { get; set; }
 
         /// <summary>
         /// 签章者证书
         /// </summary>
-        public Asn1OctetString Cert { get; }
+        public Asn1OctetString Cert { get; set; }
 
         /// <summary>
         /// 签名算法标识
         /// </summary>
-        public DerObjectIdentifier SignatureAlgId { get; }
+        public DerObjectIdentifier SignatureAlgId { get; set; }
 
         /// <summary>
         /// 签名值
         /// </summary>
-        public DerBitString Signature { get; private set; }
+        public DerBitString Signature { get; set; }
 
         /// <summary>
         /// 对签名值的时间戳
         /// </summary>
-        public DerBitString TimeStamp { get; }
+        public DerBitString TimeStamp { get; set; }
+
+        public SesSignature() { }
 
         public SesSignature(TbsSign toSign, Asn1OctetString cert, DerObjectIdentifier signatureAlgId, DerBitString signature, DerBitString timeStamp)
         {

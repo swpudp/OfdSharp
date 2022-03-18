@@ -31,7 +31,7 @@ namespace OfdSharp.Ses
         /// 电子印章厂商ID
         /// 在互联互通时，用于识别不同的软件厂商实现
         /// </summary>
-        public DerIA5String Vid { get; set; }
+        public DerIA5String Vid { get; }
 
         public SesHeader(DerInteger version, DerIA5String manufacturer)
         {
@@ -54,12 +54,13 @@ namespace OfdSharp.Ses
             {
                 return sesHeader;
             }
+
             return o != null ? new SesHeader(Asn1Sequence.GetInstance(o)) : null;
         }
 
         public override Asn1Object ToAsn1Object()
         {
-            Asn1EncodableVector v = new Asn1EncodableVector(3) { Id, Version, Vid };
+            Asn1EncodableVector v = new Asn1EncodableVector(3) {Id, Version, Vid};
             return new DerSequence(v);
         }
     }

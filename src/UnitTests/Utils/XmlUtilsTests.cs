@@ -1,31 +1,29 @@
-﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using OfdSharp.Primitives;
-using OfdSharp.Primitives.Ofd;
-using OfdSharp.Reader;
-using System;
+﻿using System;
 using System.IO;
 using System.Linq;
-using System.Xml;
 using System.Xml.Linq;
 using System.Xml.Serialization;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using OfdSharp.Extensions;
-using OfdSharp.Primitives.Resources;
+using OfdSharp.Primitives;
+using OfdSharp.Primitives.Entry;
 using OfdSharp.Primitives.Fonts;
-using OfdSharp.Crypto;
 using OfdSharp.Primitives.Pages.Description.ColorSpace;
+using OfdSharp.Primitives.Resources;
+using OfdSharp.Utils;
 
-namespace OfdSharp.Utils.Tests
+namespace UnitTests.Utils
 {
-    [TestClass()]
+    [TestClass]
     public class XmlUtilsTests
     {
-        [TestMethod()]
+        [TestMethod]
         public void DeserializeTest()
         {
             Assert.Fail();
         }
 
-        [TestMethod()]
+        [TestMethod]
         public void SerializeTest()
         {
             IdTest idTest = new IdTest { Id = Id.NewId(), Key = Guid.NewGuid(), Value = "test" };

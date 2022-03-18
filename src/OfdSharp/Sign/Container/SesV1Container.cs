@@ -68,7 +68,7 @@ namespace OfdSharp.Sign.Container
         {
             //原文杂凑值计算
             GeneralDigest digest = GetDigest();
-            byte[] block = inData.ToArray();
+            byte[] block = inData.ReadToEnd();
             digest.BlockUpdate(block, 0, block.Length);
             byte[] outBytes = new byte[32];
             digest.DoFinal(outBytes, 0);

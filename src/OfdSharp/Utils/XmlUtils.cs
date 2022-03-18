@@ -34,7 +34,7 @@ namespace OfdSharp.Utils
         /// 从文件反序列化对象实例
         /// </summary>
         /// <typeparam name="T">实例类型</typeparam>
-        /// <param name="stream">流</param>
+        /// <param name="fullName"></param>
         /// <returns></returns>
         public static T Deserialize<T>(string fullName)
         {

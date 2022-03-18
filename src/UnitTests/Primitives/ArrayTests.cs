@@ -1,24 +1,19 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using OfdSharp.Primitives;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Array = OfdSharp.Primitives.Array;
 
-namespace OfdSharp.Primitives.Tests
+namespace UnitTests.Primitives
 {
-    [TestClass()]
+    [TestClass]
     public class ArrayTests
     {
-        [TestMethod()]
+        [TestMethod]
         public void ArrayTest()
         {
             Array a1 = new Array("1", "2", "3", "4", "5", "6");
             Assert.IsNotNull(a1);
         }
 
-        [TestMethod()]
+        [TestMethod]
         public void FormatTest()
         {
             Array a1 = new Array("1", "2", "3", "4", "5", "6");
@@ -26,7 +21,7 @@ namespace OfdSharp.Primitives.Tests
             Assert.AreEqual("1 2 3 4 5 6", a1.ToString());
         }
 
-        [TestMethod()]
+        [TestMethod]
         public void ToMatrixTest()
         {
             Array a1 = new Array("1", "2", "3", "4", "5", "6");
@@ -35,7 +30,7 @@ namespace OfdSharp.Primitives.Tests
             Assert.AreEqual(9, matrix.Length);
         }
 
-        [TestMethod()]
+        [TestMethod]
         public void MultiplyTest()
         {
             Array a1 = new Array("1", "2", "3", "4", "5", "6");

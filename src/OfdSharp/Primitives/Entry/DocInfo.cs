@@ -1,8 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Xml.Serialization;
 
-namespace OfdSharp.Primitives.Ofd
+namespace OfdSharp.Primitives.Entry
 {
     /// <summary>
     /// 文档元数据信息描述
@@ -12,7 +11,6 @@ namespace OfdSharp.Primitives.Ofd
         /// <summary>
         /// 文件标识符,采用UUID算法生成的32个字符组成的文件标识。每个DocID在文档创建或生成的时候分配
         /// </summary>
-        [XmlElement("DocID")]
         public string DocId { get; set; }
 
         /// <summary>
@@ -74,7 +72,6 @@ namespace OfdSharp.Primitives.Ofd
         /// <summary>
         /// 用户自定义元数据集合
         /// </summary>
-        [XmlElement("CustomDatas")]
-        public List<CustomData> CustomDatas { get; set; }
+        public List<CustomData> CustomDataList { get; set; }
     }
 }

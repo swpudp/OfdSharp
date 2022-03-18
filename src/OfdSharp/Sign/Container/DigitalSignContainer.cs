@@ -42,7 +42,7 @@ namespace OfdSharp.Sign.Container
         {
             ISigner signer = SignerUtilities.GetSigner(GMObjectIdentifiers.sm2sign_with_sm3);
             signer.Init(false, null);
-            byte[] signBytes = inData.ToArray();
+            byte[] signBytes = inData.ReadToEnd();
             signer.BlockUpdate(signBytes, 0, signBytes.Length);
             byte[] sign = signer.GenerateSignature();
 

@@ -12,23 +12,24 @@ namespace OfdSharp.Ses.V4
         /// <summary>
         /// 印章信息
         /// </summary>
-        public SealInfo SealInfo { get; }
+        public SealInfo SealInfo { get; set; }
 
         /// <summary>
         /// 制章人证书
         /// </summary>
-        public Asn1OctetString Cert { get; private set; }
+        public Asn1OctetString Cert { get; set; }
 
         /// <summary>
         /// 签名算法标识符
         /// </summary>
-        public DerObjectIdentifier SignAlgId { get; }
+        public DerObjectIdentifier SignAlgId { get; set; }
 
         /// <summary>
         /// 签名值
         /// </summary>
-        public DerBitString SignedValue { get; private set; }
+        public DerBitString SignedValue { get; set; }
 
+        public SeSeal() { }
 
         public SeSeal(SealInfo eSealInfo, Asn1OctetString cert, DerObjectIdentifier signAlgId, DerBitString signedValue)
         {
