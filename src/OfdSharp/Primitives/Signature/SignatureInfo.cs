@@ -12,11 +12,6 @@
         public string Id { get; set; }
 
         /// <summary>
-        /// 签名节点的类型
-        /// </summary>
-        public SignedType Type { get; set; }
-
-        /// <summary>
         /// 指向包内的签名描述文件
         /// </summary>
         public string BaseLoc { get; set; }

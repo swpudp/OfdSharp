@@ -59,7 +59,7 @@ namespace OfdSharp.Ses.V4
             }
         }
 
-        public static SealInfo GetInstance(Object o)
+        public static SealInfo GetInstance(object o)
         {
             if (o is SealInfo sealInfo)
             {

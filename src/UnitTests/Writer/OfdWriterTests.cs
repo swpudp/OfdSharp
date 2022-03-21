@@ -13,8 +13,13 @@ namespace UnitTests.Writer
     [TestClass]
     public class OfdWriterTests
     {
-        private const string pub = "04b7443d2949201fe7d564ab0638e44a6f2ea8f85a7046185b2d7ccc3e80cbb25fa38adba287070d762ea9c6816bbe266d088ed69862a15695736fb8ad23489c58";
-        private const string pri = "4f58588c3aecd59aa16c9f18f1b7e4b81f7a331f75ceb94dc9ae6dbf40faf2b4";
+        private const string sealPub = "04fe69384d7f63148445ffbf77ebb635ccaba6a1b1c47484898449f360b0b337697b7b3478ba5c8dbc16a93acbf6a16f4b82f3fefe56e9224ee380f9bc75859bd3";
+        private const string sealPri = "4a8b59be706e1de560e23b01dee790d55d51b57b768f8f13930841299a73017e";
+        private static CipherKeyPair sealKey = new CipherKeyPair(sealPub, sealPri);
+
+        private const string signerPub = "04b7443d2949201fe7d564ab0638e44a6f2ea8f85a7046185b2d7ccc3e80cbb25fa38adba287070d762ea9c6816bbe266d088ed69862a15695736fb8ad23489c58";
+        private const string signerPri = "4f58588c3aecd59aa16c9f18f1b7e4b81f7a331f75ceb94dc9ae6dbf40faf2b4";
+        private static CipherKeyPair signerKey = new CipherKeyPair(signerPub, signerPri);
 
         [TestMethod]
         public void WriteOfdRootTest()
@@ -36,9 +41,8 @@ namespace UnitTests.Writer
             writer.WriteCustomerTag(tag);
             writer.WriteAnnotation();
 
-            Org.BouncyCastle.X509.X509Certificate sealCert = Sm2Utils.MakeCert(pub, pri, "yzw", "tax");
-            Org.BouncyCastle.X509.X509Certificate signerCert = Sm2Utils.MakeCert(pub, pri, "yzw", "tax");
-            writer.WriteCert(sealCert.GetEncoded(), signerCert.GetEncoded()).WriteSignature();
+
+            writer.WriteCert(sealKey, signerKey).WriteSignature();
 
             byte[] content = writer.Flush();
             string fileName = Path.Combine(Directory.GetCurrentDirectory(), "test-root.ofd");

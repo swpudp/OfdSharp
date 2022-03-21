@@ -33,13 +33,13 @@ namespace UnitTests.Crypto
         [TestMethod]
         public void GenerateKeyPairTest()
         {
-            Tuple<string, string> keyPair = Sm2Utils.CreateKeyPair(false);
-            Console.WriteLine("公钥是：{0}", keyPair.Item1);
-            Console.WriteLine("密钥是：{0}", keyPair.Item2);
-            Assert.IsNotNull(keyPair.Item1);
-            Assert.IsNotNull(keyPair.Item2);
-            Assert.AreEqual(65, Hex.Decode(keyPair.Item1).Length);
-            Assert.AreEqual(32, Hex.Decode(keyPair.Item2).Length);
+            CipherKeyPair keyPair = Sm2Utils.CreateKeyPair(false);
+            Console.WriteLine("公钥是：{0}", keyPair.PublicKey);
+            Console.WriteLine("密钥是：{0}", keyPair.PrivateKey);
+            Assert.IsNotNull(keyPair.PublicKey);
+            Assert.IsNotNull(keyPair.PublicKey);
+            Assert.AreEqual(65, Hex.Decode(keyPair.PublicKey).Length);
+            Assert.AreEqual(32, Hex.Decode(keyPair.PrivateKey).Length);
         }
 
         /// <summary>
@@ -48,10 +48,10 @@ namespace UnitTests.Crypto
         [TestMethod]
         public void Sm2TestUtilKeyTest()
         {
-            Tuple<string, string> key = Sm2Utils.CreateKeyPair();
-            Console.WriteLine("公钥是：{0}", key.Item1);
-            Console.WriteLine("密钥是：{0}", key.Item2);
-            Assert.IsTrue(new[] { "03", "02" }.Contains(key.Item1.Substring(0, 2)));
+            CipherKeyPair key = Sm2Utils.CreateKeyPair();
+            Console.WriteLine("公钥是：{0}", key.PublicKey);
+            Console.WriteLine("密钥是：{0}", key.PrivateKey);
+            Assert.IsTrue(new[] { "03", "02" }.Contains(key.PublicKey.Substring(0, 2)));
         }
 
         /// <summary>
@@ -60,10 +60,10 @@ namespace UnitTests.Crypto
         [TestMethod]
         public void Sm2TestUtilKeyNoCompressTest()
         {
-            Tuple<string, string> key = Sm2Utils.CreateKeyPair(false);
-            Console.WriteLine("公钥是：{0}", key.Item1);
-            Console.WriteLine("密钥是：{0}", key.Item2);
-            Assert.AreEqual("04", key.Item1.Substring(0, 2));
+            CipherKeyPair key = Sm2Utils.CreateKeyPair(false);
+            Console.WriteLine("公钥是：{0}", key.PublicKey);
+            Console.WriteLine("密钥是：{0}", key.PrivateKey);
+            Assert.AreEqual("04", key.PublicKey.Substring(0, 2));
         }
 
         [TestMethod]
@@ -85,17 +85,17 @@ namespace UnitTests.Crypto
         [TestMethod]
         public void CreateKeyPairAndEncryptTest()
         {
-            Tuple<string, string> key = Sm2Utils.CreateKeyPair(false);
-            Console.WriteLine("pub:" + key.Item1);
-            Console.WriteLine("pri:" + key.Item2);
+            CipherKeyPair key = Sm2Utils.CreateKeyPair(false);
+            Console.WriteLine("pub:" + key.PublicKey);
+            Console.WriteLine("pri:" + key.PrivateKey);
 
             //加密
-            string publicKey = key.Item1;
+            string publicKey = key.PublicKey;
             string plainText = string.Join(",", Enumerable.Repeat(Guid.NewGuid(), 10000));
             string cipher = Sm2Utils.Encrypt(publicKey, plainText);
 
             //解密
-            string primaryKey = key.Item2;
+            string primaryKey = key.PrivateKey;
             string content = Sm2Utils.Decrypt(primaryKey, cipher);
             Assert.AreEqual(content, plainText);
         }
@@ -108,7 +108,7 @@ namespace UnitTests.Crypto
             string privateKey = "008125e15f2961d94876c1e8bccf0b14de6c2e8eda390a50d00e4999d25cdcdee2";
             string plainText = string.Join(",", Enumerable.Repeat(Guid.NewGuid(), 10000));
             //加签
-            string sign = Sm2Utils.Sign(privateKey, plainText);
+            string sign = Convert.ToBase64String(Sm2Utils.Sign(privateKey, plainText));
             //验签
             bool isVerify = Sm2Utils.Verify(publicKey, plainText, sign);
             Assert.IsTrue(isVerify);
@@ -124,31 +124,6 @@ namespace UnitTests.Crypto
             //Asn1lObject
             var cert = Sm2Utils.MakeCert("yzw", "tax");
             Assert.IsNotNull(cert);
-        }
-
-        /// <summary>
-        /// 创建签章签名值文件测试
-        /// </summary>
-        [TestMethod]
-        public void CreateSignedValueDataTest()
-        {
-            var sealCert = Sm2Utils.MakeCert("yzw", "tax");
-            var signerCert = Sm2Utils.MakeCert("yzw", "tax");
-            SesSignatureInfo t = new SesSignatureInfo
-            {
-                dataHash = new byte[128],
-                PropertyInfo = "/Doc_0/Signs/Sign_0/Signature.xml",
-                manufacturer = "GOMAIN",
-                sealName = "测试全国统一发票监制章国家税务总局重庆市税务局",
-                esId = "50011200000001",
-                sealCert = sealCert.GetEncoded(),
-                sealPicture = File.ReadAllBytes(Path.Combine(Directory.GetCurrentDirectory(), "Files", "image_78.jb2")),
-                sealSign = new byte[128],
-                signature = new byte[128],
-                signerCert = signerCert.GetEncoded()
-            };
-            byte[] signedValue = Sm2Utils.CreateSignedValueData(t);
-            Assert.IsNotNull(signedValue);
         }
     }
 }

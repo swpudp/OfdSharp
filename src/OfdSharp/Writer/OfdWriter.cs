@@ -17,9 +17,10 @@ using OfdSharp.Primitives.Entry;
 using OfdSharp.Crypto;
 using OfdSharp.Ses;
 using OfdSharp.Primitives.Signature;
-using Org.BouncyCastle.Asn1.GM;
+//using Org.BouncyCastle.Asn1.GM;
 using System.Text;
 using System;
+using OfdSharp.Sign;
 
 namespace OfdSharp.Writer
 {
@@ -58,7 +59,8 @@ namespace OfdSharp.Writer
         private List<XElement> _customTagElements = new List<XElement>();
 
         private XElement _annotationElement;
-        private byte[] _sealCert, _signerCert;
+        private Org.BouncyCastle.X509.X509Certificate _sealCert, _signerCert;
+        private CipherKeyPair _sealKey, _signerKey;
 
         public OfdWriter()
         {
@@ -72,10 +74,10 @@ namespace OfdSharp.Writer
 
         public void WriteOfdRoot()
         {
-            XElement docInfo = new XElement(Const.OfdNamespace + "DocInfo");
-            docInfo.Add(new XElement(Const.OfdNamespace + "DocID", "c9a4ced42f284320964bf1e630d1fa2a"));
-            docInfo.Add(new XElement(Const.OfdNamespace + "Author", "China Tax"));
-            docInfo.Add(new XElement(Const.OfdNamespace + "CreationDate", "2020-11-16"));
+            XElement docInfo = new XElement(ConstDefined.OfdNamespace + "DocInfo");
+            docInfo.Add(new XElement(ConstDefined.OfdNamespace + "DocID", "c9a4ced42f284320964bf1e630d1fa2a"));
+            docInfo.Add(new XElement(ConstDefined.OfdNamespace + "Author", "China Tax"));
+            docInfo.Add(new XElement(ConstDefined.OfdNamespace + "CreationDate", "2020-11-16"));
             List<CustomData> customDatas = new List<CustomData>
             {
                 new CustomData {Name = "template-version", Value = "1.0.20.0422"},
@@ -90,33 +92,33 @@ namespace OfdSharp.Writer
                 new CustomData {Name = "购买方纳税人识别号", Value = "91510700205412308D"},
                 new CustomData {Name = "销售方纳税人识别号", Value = "91320111339366503A"}
             };
-            XElement customDataElement = new XElement(Const.OfdNamespace + "CustomDatas");
+            XElement customDataElement = new XElement(ConstDefined.OfdNamespace + "CustomDatas");
             foreach (var item in customDatas)
             {
-                customDataElement.Add(new XElement(Const.OfdNamespace + "CustomData", new XAttribute("Name", item.Name), item.Value));
+                customDataElement.Add(new XElement(ConstDefined.OfdNamespace + "CustomData", new XAttribute("Name", item.Name), item.Value));
             }
 
             docInfo.Add(customDataElement);
-            XElement docBody = new XElement(Const.OfdNamespace + "DocBody", docInfo);
-            docBody.Add(new XElement(Const.OfdNamespace + "DocRoot", "Doc_0/Document.xml"));
-            docBody.Add(new XElement(Const.OfdNamespace + "Signatures", "Doc_0/Signs/Signatures.xml"));
-            _rootElement = new XElement(Const.OfdNamespace + "OFD", new XAttribute(XNamespace.Xmlns + "ofd", Const.OfdXmlns), new XAttribute("DocType", "OFD"), new XAttribute("Version", "1.1"), docBody);
+            XElement docBody = new XElement(ConstDefined.OfdNamespace + "DocBody", docInfo);
+            docBody.Add(new XElement(ConstDefined.OfdNamespace + "DocRoot", "Doc_0/Document.xml"));
+            docBody.Add(new XElement(ConstDefined.OfdNamespace + "Signatures", "Doc_0/Signs/Signatures.xml"));
+            _rootElement = new XElement(ConstDefined.OfdNamespace + "OFD", new XAttribute(XNamespace.Xmlns + "ofd", ConstDefined.OfdXmlns), new XAttribute("DocType", "OFD"), new XAttribute("Version", "1.1"), docBody);
         }
 
         public void WriteDocument()
         {
-            XElement commonDataElement = new XElement(Const.OfdNamespace + "CommonData");
-            commonDataElement.Add(new XElement(Const.OfdNamespace + "MaxUnitID", "97"));
-            commonDataElement.Add(new XElement(Const.OfdNamespace + "TemplatePage", new XAttribute("ID", "2"), new XAttribute("BaseLoc", "Tpls/Tpl_0/Content.xml")));
-            commonDataElement.Add(new XElement(Const.OfdNamespace + "PageArea", new XElement(Const.OfdNamespace + "PhysicalBox", "0 0 210 140")));
-            commonDataElement.Add(new XElement(Const.OfdNamespace + "DocumentRes", "DocumentRes.xml"));
-            commonDataElement.Add(new XElement(Const.OfdNamespace + "PublicRes", "PublicRes.xml"));
+            XElement commonDataElement = new XElement(ConstDefined.OfdNamespace + "CommonData");
+            commonDataElement.Add(new XElement(ConstDefined.OfdNamespace + "MaxUnitID", "97"));
+            commonDataElement.Add(new XElement(ConstDefined.OfdNamespace + "TemplatePage", new XAttribute("ID", "2"), new XAttribute("BaseLoc", "Tpls/Tpl_0/Content.xml")));
+            commonDataElement.Add(new XElement(ConstDefined.OfdNamespace + "PageArea", new XElement(ConstDefined.OfdNamespace + "PhysicalBox", "0 0 210 140")));
+            commonDataElement.Add(new XElement(ConstDefined.OfdNamespace + "DocumentRes", "DocumentRes.xml"));
+            commonDataElement.Add(new XElement(ConstDefined.OfdNamespace + "PublicRes", "PublicRes.xml"));
 
-            _documentElement = new XElement(Const.OfdNamespace + "Document", new XAttribute(XNamespace.Xmlns + "ofd", Const.OfdXmlns));
+            _documentElement = new XElement(ConstDefined.OfdNamespace + "Document", new XAttribute(XNamespace.Xmlns + "ofd", ConstDefined.OfdXmlns));
             _documentElement.Add(commonDataElement);
 
             //Pages
-            XElement pagesElement = new XElement(Const.OfdNamespace + "Pages");
+            XElement pagesElement = new XElement(ConstDefined.OfdNamespace + "Pages");
             _pageObjects.Add(new PageObject
             {
                 PageRes = new Location { Value = "Pages/Page_0/Content.xml" },
@@ -188,43 +190,43 @@ namespace OfdSharp.Writer
 
             foreach (var pg in _pageNodes)
             {
-                pagesElement.Add(new XElement(Const.OfdNamespace + "Page", new XAttribute("ID", pg.Id.ToString()), new XAttribute("BaseLoc", pg.BaseLoc.Value)));
+                pagesElement.Add(new XElement(ConstDefined.OfdNamespace + "Page", new XAttribute("ID", pg.Id.ToString()), new XAttribute("BaseLoc", pg.BaseLoc.Value)));
             }
 
             _documentElement.Add(pagesElement);
 
             //Annotations
-            XElement annotationsElement = new XElement(Const.OfdNamespace + "Annotations", "Annots/Annotations.xml");
+            XElement annotationsElement = new XElement(ConstDefined.OfdNamespace + "Annotations", "Annots/Annotations.xml");
             _documentElement.Add(annotationsElement);
 
             //Attachments
-            XElement attachmentsElement = new XElement(Const.OfdNamespace + "Attachments", "Attachs/Attachments.xml");
+            XElement attachmentsElement = new XElement(ConstDefined.OfdNamespace + "Attachments", "Attachs/Attachments.xml");
             _documentElement.Add(attachmentsElement);
 
             //CustomTags
-            XElement customTagsElement = new XElement(Const.OfdNamespace + "CustomTags", "Tags/CustomTags.xml");
+            XElement customTagsElement = new XElement(ConstDefined.OfdNamespace + "CustomTags", "Tags/CustomTags.xml");
             _documentElement.Add(customTagsElement);
         }
 
         public void WriteDocumentRes()
         {
-            _documentResElement = new XElement(Const.OfdNamespace + "Res", new XAttribute(XNamespace.Xmlns + "ofd", Const.OfdXmlns), new XAttribute("BaseLoc", "Res"));
+            _documentResElement = new XElement(ConstDefined.OfdNamespace + "Res", new XAttribute(XNamespace.Xmlns + "ofd", ConstDefined.OfdXmlns), new XAttribute("BaseLoc", "Res"));
             //DrawParams
-            XElement drawParams = new XElement(Const.OfdNamespace + "DrawParams");
-            XElement drawParam = new XElement(Const.OfdNamespace + "DrawParam", new XAttribute("ID", "4"), new XAttribute("LineWidth", "0.25"));
-            drawParam.Add(new XElement(Const.OfdNamespace + "FillColor", new XAttribute("Value", "156 82 35"), new XAttribute("ColorSpace", "5")));
-            drawParam.Add(new XElement(Const.OfdNamespace + "StrokeColor", new XAttribute("Value", "156 82 35"), new XAttribute("ColorSpace", "5")));
+            XElement drawParams = new XElement(ConstDefined.OfdNamespace + "DrawParams");
+            XElement drawParam = new XElement(ConstDefined.OfdNamespace + "DrawParam", new XAttribute("ID", "4"), new XAttribute("LineWidth", "0.25"));
+            drawParam.Add(new XElement(ConstDefined.OfdNamespace + "FillColor", new XAttribute("Value", "156 82 35"), new XAttribute("ColorSpace", "5")));
+            drawParam.Add(new XElement(ConstDefined.OfdNamespace + "StrokeColor", new XAttribute("Value", "156 82 35"), new XAttribute("ColorSpace", "5")));
             drawParams.Add(drawParam);
             _documentResElement.Add(drawParams);
 
             _ctMultiMedias.Add(new CtMultiMedia { Format = "GBIG2", Type = MediaType.Image, Id = new Id(78), MediaFile = new Location { Value = "image_78.jb2" } });
             _ctMultiMedias.Add(new CtMultiMedia { Format = "GBIG2", Type = MediaType.Image, Id = new Id(79), MediaFile = new Location { Value = "image_80.jb2" } });
             //MultiMedias
-            XElement multiMedias = new XElement(Const.OfdNamespace + "MultiMedias");
+            XElement multiMedias = new XElement(ConstDefined.OfdNamespace + "MultiMedias");
             foreach (var ctMultiMedia in _ctMultiMedias)
             {
-                XElement multiMedia = new XElement(Const.OfdNamespace + "MultiMedia", new XAttribute("ID", ctMultiMedia.Id), new XAttribute("Type", ctMultiMedia.Type), new XAttribute("Format", ctMultiMedia.Format));
-                multiMedia.Add(new XElement(Const.OfdNamespace + "MediaFile", ctMultiMedia.MediaFile.Value));
+                XElement multiMedia = new XElement(ConstDefined.OfdNamespace + "MultiMedia", new XAttribute("ID", ctMultiMedia.Id), new XAttribute("Type", ctMultiMedia.Type), new XAttribute("Format", ctMultiMedia.Format));
+                multiMedia.Add(new XElement(ConstDefined.OfdNamespace + "MediaFile", ctMultiMedia.MediaFile.Value));
                 multiMedias.Add(multiMedia);
             }
 
@@ -233,13 +235,13 @@ namespace OfdSharp.Writer
 
         public void WritePublicRes()
         {
-            _publicResElement = new XElement(Const.OfdNamespace + "Res", new XAttribute(XNamespace.Xmlns + "ofd", Const.OfdXmlns), new XAttribute("BaseLoc", "Res"));
+            _publicResElement = new XElement(ConstDefined.OfdNamespace + "Res", new XAttribute(XNamespace.Xmlns + "ofd", ConstDefined.OfdXmlns), new XAttribute("BaseLoc", "Res"));
 
-            XElement colorSpaces = new XElement(Const.OfdNamespace + "ColorSpaces");
-            colorSpaces.Add(new XElement(Const.OfdNamespace + "ColorSpace", new XAttribute("ID", "5"), new XAttribute("Type", "RGB"), new XAttribute("BitsPerComponent", "8")));
+            XElement colorSpaces = new XElement(ConstDefined.OfdNamespace + "ColorSpaces");
+            colorSpaces.Add(new XElement(ConstDefined.OfdNamespace + "ColorSpace", new XAttribute("ID", "5"), new XAttribute("Type", "RGB"), new XAttribute("BitsPerComponent", "8")));
             _publicResElement.Add(colorSpaces);
 
-            XElement fonts = new XElement(Const.OfdNamespace + "Fonts");
+            XElement fonts = new XElement(ConstDefined.OfdNamespace + "Fonts");
             List<CtFont> ctFonts = new List<CtFont>
             {
                 new CtFont {Id = new Id(29), FontName = "楷体", FamilyName = "楷体"},
@@ -249,7 +251,7 @@ namespace OfdSharp.Writer
             };
             foreach (var ctFont in ctFonts)
             {
-                fonts.Add(new XElement(Const.OfdNamespace + "Font", new XAttribute("ID", ctFont.Id.ToString()), new XAttribute("FontName", ctFont.FontName), new XAttribute("FamilyName", ctFont.FamilyName)));
+                fonts.Add(new XElement(ConstDefined.OfdNamespace + "Font", new XAttribute("ID", ctFont.Id.ToString()), new XAttribute("FontName", ctFont.FontName), new XAttribute("FamilyName", ctFont.FamilyName)));
             }
 
             _publicResElement.Add(fonts);
@@ -257,38 +259,38 @@ namespace OfdSharp.Writer
 
         public void WritePages()
         {
-            _pageElement = new XElement(Const.OfdNamespace + "Page", new XAttribute(XNamespace.Xmlns + "ofd", Const.OfdXmlns));
+            _pageElement = new XElement(ConstDefined.OfdNamespace + "Page", new XAttribute(XNamespace.Xmlns + "ofd", ConstDefined.OfdXmlns));
             foreach (var po in _pageObjects)
             {
-                _pageElement.Add(new XElement(Const.OfdNamespace + "Area", new XElement(Const.OfdNamespace + "PhysicalBox", po.Area.Physical.ToString())));
-                _pageElement.Add(new XElement(Const.OfdNamespace + "Template", new XAttribute("TemplateID", po.Template.TemplateId), new XAttribute("ZOrder", po.Template.ZOrder)));
+                _pageElement.Add(new XElement(ConstDefined.OfdNamespace + "Area", new XElement(ConstDefined.OfdNamespace + "PhysicalBox", po.Area.Physical.ToString())));
+                _pageElement.Add(new XElement(ConstDefined.OfdNamespace + "Template", new XAttribute("TemplateID", po.Template.TemplateId), new XAttribute("ZOrder", po.Template.ZOrder)));
 
-                XElement contentElement = new XElement(Const.OfdNamespace + "Content");
+                XElement contentElement = new XElement(ConstDefined.OfdNamespace + "Content");
                 foreach (var layer in po.Content.Layers)
                 {
-                    XElement layerElement = new XElement(Const.OfdNamespace + "Layer", new XAttribute("ID", layer.Id.ToString()));
+                    XElement layerElement = new XElement(ConstDefined.OfdNamespace + "Layer", new XAttribute("ID", layer.Id.ToString()));
 
                     foreach (var pb in layer.PageBlocks)
                     {
                         if (pb.TextObject != null)
                         {
-                            XElement textObjectElement = new XElement(Const.OfdNamespace + "TextObject", new XAttribute("ID", pb.TextObject.Id.ToString()), new XAttribute("Boundary", pb.TextObject.Boundary.ToString()), new XAttribute("Font", pb.TextObject.Font.Id.ToString()), new XAttribute("Size", pb.TextObject.Size));
-                            textObjectElement.Add(new XElement(Const.OfdNamespace + "FillColor", new XAttribute("Value", pb.TextObject.FillColor.Value.ToString())));
-                            textObjectElement.Add(new XElement(Const.OfdNamespace + "TextCode", pb.TextObject.TextCode.Value, new XAttribute("X", pb.TextObject.TextCode.X), new XAttribute("Y", pb.TextObject.TextCode.Y), new XAttribute("DeltaX", "g " + pb.TextObject.TextCode.DeltaX)));
+                            XElement textObjectElement = new XElement(ConstDefined.OfdNamespace + "TextObject", new XAttribute("ID", pb.TextObject.Id.ToString()), new XAttribute("Boundary", pb.TextObject.Boundary.ToString()), new XAttribute("Font", pb.TextObject.Font.Id.ToString()), new XAttribute("Size", pb.TextObject.Size));
+                            textObjectElement.Add(new XElement(ConstDefined.OfdNamespace + "FillColor", new XAttribute("Value", pb.TextObject.FillColor.Value.ToString())));
+                            textObjectElement.Add(new XElement(ConstDefined.OfdNamespace + "TextCode", pb.TextObject.TextCode.Value, new XAttribute("X", pb.TextObject.TextCode.X), new XAttribute("Y", pb.TextObject.TextCode.Y), new XAttribute("DeltaX", "g " + pb.TextObject.TextCode.DeltaX)));
                             layerElement.Add(textObjectElement);
                         }
 
                         if (pb.PathObject != null)
                         {
-                            XElement pathObjectElement = new XElement(Const.OfdNamespace + "PathObject", new XAttribute("ID", pb.PathObject.Id.ToString()), new XAttribute("Boundary", pb.PathObject.Boundary.ToString()), new XAttribute("LineWidth", pb.PathObject.LineWidth));
-                            pathObjectElement.Add(new XElement(Const.OfdNamespace + "StrokeColor", new XAttribute("Value", pb.PathObject.StrokeColor.Value.ToString())));
-                            pathObjectElement.Add(new XElement(Const.OfdNamespace + "AbbreviatedData", pb.PathObject.AbbreviatedData));
+                            XElement pathObjectElement = new XElement(ConstDefined.OfdNamespace + "PathObject", new XAttribute("ID", pb.PathObject.Id.ToString()), new XAttribute("Boundary", pb.PathObject.Boundary.ToString()), new XAttribute("LineWidth", pb.PathObject.LineWidth));
+                            pathObjectElement.Add(new XElement(ConstDefined.OfdNamespace + "StrokeColor", new XAttribute("Value", pb.PathObject.StrokeColor.Value.ToString())));
+                            pathObjectElement.Add(new XElement(ConstDefined.OfdNamespace + "AbbreviatedData", pb.PathObject.AbbreviatedData));
                             layerElement.Add(pathObjectElement);
                         }
 
                         if (pb.ImageObject != null)
                         {
-                            layerElement.Add(new XElement(Const.OfdNamespace + "ImageObject", new XAttribute("ID", pb.ImageObject.Id), new XAttribute("Boundary", pb.ImageObject.Boundary), new XAttribute("CTM", pb.ImageObject.Ctm), new XAttribute("ResourceID", pb.ImageObject.ResourceId)));
+                            layerElement.Add(new XElement(ConstDefined.OfdNamespace + "ImageObject", new XAttribute("ID", pb.ImageObject.Id), new XAttribute("Boundary", pb.ImageObject.Boundary), new XAttribute("CTM", pb.ImageObject.Ctm), new XAttribute("ResourceID", pb.ImageObject.ResourceId)));
                         }
                     }
 
@@ -326,11 +328,11 @@ namespace OfdSharp.Writer
                 return;
             }
 
-            _attachmentElement = new XElement(Const.OfdNamespace + "Attachments", new XAttribute(XNamespace.Xmlns + "ofd", Const.OfdXmlns));
+            _attachmentElement = new XElement(ConstDefined.OfdNamespace + "Attachments", new XAttribute(XNamespace.Xmlns + "ofd", ConstDefined.OfdXmlns));
             foreach (var attachment in _attachments)
             {
-                XElement newAttachment = new XElement(Const.OfdNamespace + "Attachment", new XAttribute("ID", attachment.Id), new XAttribute("Name", attachment.Name), new XAttribute("Format", attachment.Format), new XAttribute("Visible", attachment.Visible));
-                newAttachment.Add(new XElement(Const.OfdNamespace + "FileLoc", attachment.FileLoc.Value));
+                XElement newAttachment = new XElement(ConstDefined.OfdNamespace + "Attachment", new XAttribute("ID", attachment.Id), new XAttribute("Name", attachment.Name), new XAttribute("Format", attachment.Format), new XAttribute("Visible", attachment.Visible));
+                newAttachment.Add(new XElement(ConstDefined.OfdNamespace + "FileLoc", attachment.FileLoc.Value));
                 _attachmentElement.Add(newAttachment);
             }
         }
@@ -480,27 +482,27 @@ namespace OfdSharp.Writer
 
             foreach (var pageObject in _templatePages)
             {
-                XElement pageElement = new XElement(Const.OfdNamespace + "Page", new XAttribute(XNamespace.Xmlns + "ofd", Const.OfdXmlns));
-                XElement contentElement = new XElement(Const.OfdNamespace + "Content");
+                XElement pageElement = new XElement(ConstDefined.OfdNamespace + "Page", new XAttribute(XNamespace.Xmlns + "ofd", ConstDefined.OfdXmlns));
+                XElement contentElement = new XElement(ConstDefined.OfdNamespace + "Content");
                 foreach (var layer in pageObject.Content.Layers)
                 {
-                    XElement layerElement = new XElement(Const.OfdNamespace + "Layer", new XAttribute("DrawParam", layer.DrawParam), new XAttribute("ID", layer.Id));
+                    XElement layerElement = new XElement(ConstDefined.OfdNamespace + "Layer", new XAttribute("DrawParam", layer.DrawParam), new XAttribute("ID", layer.Id));
                     foreach (var pageBlock in layer.PageBlocks)
                     {
                         if (pageBlock.PathObject != null)
                         {
-                            XElement pathElement = new XElement(Const.OfdNamespace + "PathObject", new XAttribute("ID", pageBlock.PathObject.Id), new XAttribute("Boundary", pageBlock.PathObject.Boundary), new XAttribute("LineWidth", pageBlock.PathObject.LineWidth));
-                            pathElement.Add(new XElement(Const.OfdNamespace + "FillColor", new XAttribute("Value", pageBlock.PathObject.FillColor.Value), new XAttribute("ColorSpace", pageBlock.PathObject.FillColor.ColorSpace)));
-                            pathElement.Add(new XElement(Const.OfdNamespace + "StrokeColor", new XAttribute("Value", pageBlock.PathObject.StrokeColor.Value), new XAttribute("ColorSpace", pageBlock.PathObject.StrokeColor.ColorSpace)));
-                            pathElement.Add(new XElement(Const.OfdNamespace + "AbbreviatedData", new XAttribute("Value", pageBlock.PathObject.AbbreviatedData)));
+                            XElement pathElement = new XElement(ConstDefined.OfdNamespace + "PathObject", new XAttribute("ID", pageBlock.PathObject.Id), new XAttribute("Boundary", pageBlock.PathObject.Boundary), new XAttribute("LineWidth", pageBlock.PathObject.LineWidth));
+                            pathElement.Add(new XElement(ConstDefined.OfdNamespace + "FillColor", new XAttribute("Value", pageBlock.PathObject.FillColor.Value), new XAttribute("ColorSpace", pageBlock.PathObject.FillColor.ColorSpace)));
+                            pathElement.Add(new XElement(ConstDefined.OfdNamespace + "StrokeColor", new XAttribute("Value", pageBlock.PathObject.StrokeColor.Value), new XAttribute("ColorSpace", pageBlock.PathObject.StrokeColor.ColorSpace)));
+                            pathElement.Add(new XElement(ConstDefined.OfdNamespace + "AbbreviatedData", new XAttribute("Value", pageBlock.PathObject.AbbreviatedData)));
                             layerElement.Add(pathElement);
                         }
 
                         if (pageBlock.TextObject != null)
                         {
-                            XElement textObjectElement = new XElement(Const.OfdNamespace + "TextObject", new XAttribute("ID", pageBlock.TextObject.Id.ToString()), new XAttribute("Boundary", pageBlock.TextObject.Boundary.ToString()), new XAttribute("Font", pageBlock.TextObject.Font.Id.ToString()), new XAttribute("Size", pageBlock.TextObject.Size));
-                            textObjectElement.Add(new XElement(Const.OfdNamespace + "FillColor", new XAttribute("Value", pageBlock.TextObject.FillColor.Value.ToString())));
-                            textObjectElement.Add(new XElement(Const.OfdNamespace + "TextCode", pageBlock.TextObject.TextCode.Value, new XAttribute("X", pageBlock.TextObject.TextCode.X), new XAttribute("Y", pageBlock.TextObject.TextCode.Y), new XAttribute("DeltaX", pageBlock.TextObject.TextCode.DeltaX)));
+                            XElement textObjectElement = new XElement(ConstDefined.OfdNamespace + "TextObject", new XAttribute("ID", pageBlock.TextObject.Id.ToString()), new XAttribute("Boundary", pageBlock.TextObject.Boundary.ToString()), new XAttribute("Font", pageBlock.TextObject.Font.Id.ToString()), new XAttribute("Size", pageBlock.TextObject.Size));
+                            textObjectElement.Add(new XElement(ConstDefined.OfdNamespace + "FillColor", new XAttribute("Value", pageBlock.TextObject.FillColor.Value.ToString())));
+                            textObjectElement.Add(new XElement(ConstDefined.OfdNamespace + "TextCode", pageBlock.TextObject.TextCode.Value, new XAttribute("X", pageBlock.TextObject.TextCode.X), new XAttribute("Y", pageBlock.TextObject.TextCode.Y), new XAttribute("DeltaX", pageBlock.TextObject.TextCode.DeltaX)));
                             layerElement.Add(textObjectElement);
                         }
                     }
@@ -515,14 +517,14 @@ namespace OfdSharp.Writer
 
         public void WriteCustomerTag(XElement content)
         {
-            _customerTagsElement = new XElement(Const.OfdNamespace + "CustomTags", new XAttribute(XNamespace.Xmlns + "ofd", Const.OfdXmlns));
+            _customerTagsElement = new XElement(ConstDefined.OfdNamespace + "CustomTags", new XAttribute(XNamespace.Xmlns + "ofd", ConstDefined.OfdXmlns));
             CustomTag customTag = new CustomTag { FileLoc = new Location { Value = "CustomTag.xml" }, TypeId = "0" };
             _customTags.Add(customTag);
             foreach (var tg in _customTags)
             {
-                XElement customerTagElement = new XElement(Const.OfdNamespace + "CustomTag");
+                XElement customerTagElement = new XElement(ConstDefined.OfdNamespace + "CustomTag");
                 customerTagElement.Add(new XAttribute("TypeID", tg.TypeId));
-                customerTagElement.Add(new XElement(Const.OfdNamespace + "FileLoc", tg.FileLoc));
+                customerTagElement.Add(new XElement(ConstDefined.OfdNamespace + "FileLoc", tg.FileLoc));
                 _customerTagsElement.Add(customerTagElement);
             }
 
@@ -532,7 +534,7 @@ namespace OfdSharp.Writer
 
         public void WriteAnnotation()
         {
-            _annotationsElement = new XElement(Const.OfdNamespace + "Annotations", new XAttribute(XNamespace.Xmlns + "ofd", Const.OfdXmlns));
+            _annotationsElement = new XElement(ConstDefined.OfdNamespace + "Annotations", new XAttribute(XNamespace.Xmlns + "ofd", ConstDefined.OfdXmlns));
             AnnotationInfo annotationInfo = new AnnotationInfo
             {
                 Type = AnnotationType.Stamp,
@@ -554,57 +556,62 @@ namespace OfdSharp.Writer
                     }
                 }
             };
-            _annotationsElement.Add(new XElement(Const.OfdNamespace + "Page", new XAttribute("PageID", "1"), new XElement(Const.OfdNamespace + "FileLoc", "Page_0/Annotation.xml")));
+            _annotationsElement.Add(new XElement(ConstDefined.OfdNamespace + "Page", new XAttribute("PageID", "1"), new XElement(ConstDefined.OfdNamespace + "FileLoc", "Page_0/Annotation.xml")));
 
-            _annotationElement = new XElement(Const.OfdNamespace + "PageAnnot", new XAttribute(XNamespace.Xmlns + "ofd", Const.OfdXmlns));
-            XElement annotElement = new XElement(Const.OfdNamespace + "Annot");
+            _annotationElement = new XElement(ConstDefined.OfdNamespace + "PageAnnot", new XAttribute(XNamespace.Xmlns + "ofd", ConstDefined.OfdXmlns));
+            XElement annotElement = new XElement(ConstDefined.OfdNamespace + "Annot");
             annotElement.Add(new XAttribute("Type", annotationInfo.Type));
             annotElement.Add(new XAttribute("ID", annotationInfo.Id));
             annotElement.Add(new XAttribute("Subtype", annotationInfo.Subtype));
 
-            XElement parametersElement = new XElement(Const.OfdNamespace + "Parameters");
+            XElement parametersElement = new XElement(ConstDefined.OfdNamespace + "Parameters");
             foreach (var p in annotationInfo.Parameters)
             {
-                parametersElement.Add(new XElement(Const.OfdNamespace + "Parameter", p.Value, new XAttribute("Name", p.Name)));
+                parametersElement.Add(new XElement(ConstDefined.OfdNamespace + "Parameter", p.Value, new XAttribute("Name", p.Name)));
             }
 
             annotElement.Add(parametersElement);
-            annotElement.Add(new XElement(Const.OfdNamespace + "Appearance", new XAttribute("Boundary", annotationInfo.Appearance.PathObject.Boundary)));
+            annotElement.Add(new XElement(ConstDefined.OfdNamespace + "Appearance", new XAttribute("Boundary", annotationInfo.Appearance.PathObject.Boundary)));
             _annotationElement.Add(annotElement);
         }
 
-        public OfdWriter WriteCert(byte[] sealCert, byte[] signerCert)
+        public OfdWriter WriteCert(CipherKeyPair sealKey, CipherKeyPair signerKey)
         {
-            _sealCert = sealCert;
-            _signerCert = signerCert;
+            //印章
+            _sealKey = sealKey;
+            _sealCert = Sm2Utils.MakeCert(sealKey.PublicKey, sealKey.PrivateKey, "yzw", "tax");
+
+            //签章者
+            _signerKey = signerKey;
+            _signerCert = Sm2Utils.MakeCert(signerKey.PublicKey, signerKey.PrivateKey, "yzw", "tax");
             return this;
         }
 
         public void WriteSignature()
         {
-            _signaturesElement = new XElement(Const.OfdNamespace + "Signatures", new XAttribute(XNamespace.Xmlns + "ofd", Const.OfdXmlns));
-            _signaturesElement.Add(new XElement(Const.OfdNamespace + "MaxSignId", "2"));
-            _signaturesElement.Add(new XElement(Const.OfdNamespace + "Signature", new XAttribute("ID", 2), new XAttribute("BaseLoc", "/Doc_0/Signs/Sign_0/Signature.xml")));
+            _signaturesElement = new XElement(ConstDefined.OfdNamespace + "Signatures", new XAttribute(XNamespace.Xmlns + "ofd", ConstDefined.OfdXmlns));
+            _signaturesElement.Add(new XElement(ConstDefined.OfdNamespace + "MaxSignId", "2"));
+            _signaturesElement.Add(new XElement(ConstDefined.OfdNamespace + "Signature", new XAttribute("ID", 2), new XAttribute("BaseLoc", "/Doc_0/Signs/Sign_0/Signature.xml")));
 
-            _signatureElement = new XElement(Const.OfdNamespace + "Signature", new XAttribute(XNamespace.Xmlns + "ofd", Const.OfdXmlns), new XAttribute("ID", 2), new XAttribute("Type", "Seal"));
+            _signatureElement = new XElement(ConstDefined.OfdNamespace + "Signature", new XAttribute(XNamespace.Xmlns + "ofd", ConstDefined.OfdXmlns), new XAttribute("ID", 2), new XAttribute("Type", "Seal"));
 
             string c = _annotationElement.GetElementContentTest();
 
             SignedInfo signedInfo = new SignedInfo
             {
                 Provider = new Provider { Company = "gomain", ProviderName = "gomain_eseal", Version = "2.0" },
-                SignatureMethod = GMObjectIdentifiers.sm2sign_with_sm3.Id,
+                SignatureMethod = SesSigner.SignatureMethod.Id,
                 SignatureDateTime = "20220124060837.228Z",
                 ReferenceCollect = new ReferenceCollect
                 {
-                    CheckMethod = GMObjectIdentifiers.sm3.Id,
+                    CheckMethod = SesSigner.DigestMethod.Id,
                     Items = new List<Primitives.Signatures.Reference>
                     {
                         new Primitives.Signatures.Reference
                         {
                             CheckValue = new CheckValue
                             {
-                                Value= Convert.ToBase64String(Sm2Utils.Digest (GMObjectIdentifiers.sm3.Id,c,Encoding.UTF8)),//   "afw9LQlHy/iFpYgqFX2sBVWELplp+aIu+udBowwTztI="
+                                Value= Convert.ToBase64String(Sm2Utils.Digest (c,Encoding.UTF8)),
                             },
                             FileRef="/Doc_0/Annots/Page_0/Annotation.xml"
                         }
@@ -629,23 +636,23 @@ namespace OfdSharp.Writer
                 SignedInfo = signedInfo,
                 SignedValue = "/Doc_0/Signs/Sign_0/SignedValue.dat"
             };
-            var signedInfoElement = new XElement(Const.OfdNamespace + "SignedInfo");
-            signedInfoElement.Add(new XElement(Const.OfdNamespace + "Provider", new XAttribute("ProviderName", signedInfo.Provider.ProviderName), new XAttribute("Version", signedInfo.Provider.Version), new XAttribute("Company", signedInfo.Provider.Company)));
-            signedInfoElement.Add(new XElement(Const.OfdNamespace + "SignatureMethod", signedInfo.SignatureMethod));
-            signedInfoElement.Add(new XElement(Const.OfdNamespace + "SignatureDateTime", signedInfo.SignatureDateTime));
+            var signedInfoElement = new XElement(ConstDefined.OfdNamespace + "SignedInfo");
+            signedInfoElement.Add(new XElement(ConstDefined.OfdNamespace + "Provider", new XAttribute("ProviderName", signedInfo.Provider.ProviderName), new XAttribute("Version", signedInfo.Provider.Version), new XAttribute("Company", signedInfo.Provider.Company)));
+            signedInfoElement.Add(new XElement(ConstDefined.OfdNamespace + "SignatureMethod", signedInfo.SignatureMethod));
+            signedInfoElement.Add(new XElement(ConstDefined.OfdNamespace + "SignatureDateTime", signedInfo.SignatureDateTime));
 
-            XElement referencesElement = new XElement(Const.OfdNamespace + "References", new XAttribute("CheckMethod", signedInfo.ReferenceCollect.CheckMethod));
+            XElement referencesElement = new XElement(ConstDefined.OfdNamespace + "References", new XAttribute("CheckMethod", signedInfo.ReferenceCollect.CheckMethod));
             foreach (var reference in signedInfo.ReferenceCollect.Items)
             {
-                XElement referenceElement = new XElement(Const.OfdNamespace + "Reference", new XAttribute("FileRef", reference.FileRef));
-                referenceElement.Add(new XElement(Const.OfdNamespace + "CheckValue", reference.CheckValue.Value));
+                XElement referenceElement = new XElement(ConstDefined.OfdNamespace + "Reference", new XAttribute("FileRef", reference.FileRef));
+                referenceElement.Add(new XElement(ConstDefined.OfdNamespace + "CheckValue", reference.CheckValue.Value));
                 referencesElement.Add(referenceElement);
             }
             signedInfoElement.Add(referencesElement);
-            signedInfoElement.Add(new XElement(Const.OfdNamespace + "StampAnnot", new XAttribute("ID", signedInfo.StampAnnot.Id), new XAttribute("PageRef", signedInfo.StampAnnot.PageRef), new XAttribute("Boundary", signedInfo.StampAnnot.Boundary)));
+            signedInfoElement.Add(new XElement(ConstDefined.OfdNamespace + "StampAnnot", new XAttribute("ID", signedInfo.StampAnnot.Id), new XAttribute("PageRef", signedInfo.StampAnnot.PageRef), new XAttribute("Boundary", signedInfo.StampAnnot.Boundary)));
 
             _signatureElement.Add(signedInfoElement);
-            _signatureElement.Add(new XElement(Const.OfdNamespace + "SignedValue", digestInfo.SignedValue));
+            _signatureElement.Add(new XElement(ConstDefined.OfdNamespace + "SignedValue", digestInfo.SignedValue));
         }
 
         /// <summary>
@@ -653,22 +660,44 @@ namespace OfdSharp.Writer
         /// </summary>
         private byte[] CreateSignedValueDataFileContent()
         {
-
-            SesSignatureInfo t = new SesSignatureInfo
+            string s = _signatureElement.GetElementContentTest();
+            //SesSignatureInfo t = new SesSignatureInfo
+            //{
+            //    dataHash = Sm2Utils.Digest(s, Encoding.UTF8),
+            //    PropertyInfo = "/Doc_0/Signs/Sign_0/Signature.xml",
+            //    manufacturer = "GOMAIN",
+            //    sealName = "测试全国统一发票监制章国家税务总局重庆市税务局",
+            //    esId = "50011200000001",
+            //    sealCert = _sealCert.GetEncoded(),
+            //    sealPrivateKey = _sealKey.PrivateKey,
+            //    sealPicture = File.ReadAllBytes(Path.Combine(Directory.GetCurrentDirectory(), "Files", "image_78.jb2")),
+            //    sealType = "ofd",
+            //    sealWidth = 30,
+            //    sealHeigth = 20,
+            //    signature = Sm2Utils.Sign(_signerKey.PrivateKey, s),
+            //    signerCert = _signerCert.GetEncoded()
+            //};
+            SesSealConfig config = new SesSealConfig
             {
-                dataHash = new byte[128],
-                PropertyInfo = "/Doc_0/Signs/Sign_0/Signature.xml",
                 manufacturer = "GOMAIN",
                 sealName = "测试全国统一发票监制章国家税务总局重庆市税务局",
                 esId = "50011200000001",
-                sealCert = _sealCert,
+                sealCert = _sealCert.GetEncoded(),
+                sealPrivateKey = _sealKey.PrivateKey,
                 sealPicture = File.ReadAllBytes(Path.Combine(Directory.GetCurrentDirectory(), "Files", "image_78.jb2")),
-                sealSign = new byte[128],
-                signature = new byte[128],
-                signerCert = _signerCert
+                sealType = "ofd",
+                sealWidth = 30,
+                sealHeigth = 20,
+                signerPrivateKey = _signerKey.PrivateKey,
+                signerCert = _signerCert.GetEncoded()
             };
-            return Sm2Utils.CreateSignedValueData(t);
+
+            return new SesSigner(config).Sign(Encoding.UTF8.GetBytes(s), "/Doc_0/Signs/Sign_0/Signature.xml");
+
+
+            //return Sm2Utils.CreateSignedValueData(t);
         }
+
         public byte[] Flush()
         {
             var stream = new MemoryStream();

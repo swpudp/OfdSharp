@@ -6,11 +6,6 @@ namespace OfdSharp.Ses
 {
     public class SesHeader : Asn1Encodable
     {
-        /**
-         * 电子印章数据结构版本号，V4
-         */
-        public static readonly DerInteger V4 = new DerInteger(4);
-
         /// <summary>
         /// 电子印章数据标识符
         /// 固定值“ES”
@@ -23,7 +18,7 @@ namespace OfdSharp.Ses
         public DerIA5String Id { get; }
 
         /// <summary>
-        /// 电子印章数据版本号标识，V4
+        /// 电子印章数据版本号标识
         /// </summary>
         public DerInteger Version { get; }
 
@@ -33,6 +28,11 @@ namespace OfdSharp.Ses
         /// </summary>
         public DerIA5String Vid { get; }
 
+        /// <summary>
+        /// 签章头数据
+        /// </summary>
+        /// <param name="version">版本</param>
+        /// <param name="manufacturer">厂商</param>
         public SesHeader(DerInteger version, DerIA5String manufacturer)
         {
             Id = Identified;
@@ -60,7 +60,7 @@ namespace OfdSharp.Ses
 
         public override Asn1Object ToAsn1Object()
         {
-            Asn1EncodableVector v = new Asn1EncodableVector(3) {Id, Version, Vid};
+            Asn1EncodableVector v = new Asn1EncodableVector(3) { Id, Version, Vid };
             return new DerSequence(v);
         }
     }

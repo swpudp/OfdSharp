@@ -16,10 +16,6 @@ using Org.BouncyCastle.X509;
 using Org.BouncyCastle.Asn1.X509;
 using Org.BouncyCastle.Crypto.Operators;
 using Org.BouncyCastle.X509.Extension;
-using Org.BouncyCastle.Asn1;
-using OfdSharp.Ses.V4;
-using OfdSharp.Ses;
-using System.Collections.Generic;
 using Org.BouncyCastle.Crypto.Digests;
 
 namespace OfdSharp.Crypto
@@ -64,7 +60,7 @@ namespace OfdSharp.Crypto
         /// </summary>
         /// <param name="compressedPubKey">是否压缩公钥 默认压缩</param>
         /// <returns>Item1-公钥 Item2-私钥</returns>
-        public static Tuple<string, string> CreateKeyPair(bool compressedPubKey = true)
+        public static CipherKeyPair CreateKeyPair(bool compressedPubKey = true)
         {
             AsymmetricCipherKeyPair asymmetricCipherKeyPair = CreateKeyPairInternal();
 
@@ -77,7 +73,7 @@ namespace OfdSharp.Crypto
             BigInteger privateKey = ((ECPrivateKeyParameters)asymmetricCipherKeyPair.Private).D;
             string priKey = Hex.ToHexString(privateKey.ToByteArray());
 
-            return new Tuple<string, string>(pubKey, priKey);
+            return new CipherKeyPair(pubKey, priKey);
         }
 
         /// <summary>
@@ -134,7 +130,7 @@ namespace OfdSharp.Crypto
         /// <param name="privateKey">私钥</param>
         /// <param name="content">待签名内容</param>
         /// <returns>签名值</returns>
-        public static string Sign(string privateKey, string content)
+        public static byte[] Sign(string privateKey, string content)
         {
             //待签名内容转为字节数组
             byte[] message = Encoding.UTF8.GetBytes(content);
@@ -153,21 +149,44 @@ namespace OfdSharp.Crypto
             sm2Signer.BlockUpdate(message, 0, message.Length);
             byte[] signBytes = sm2Signer.GenerateSignature();
 
-            //return Hex.ToHexString(signBytes);
-            return Convert.ToBase64String(signBytes);
+            return signBytes;
+        }
+
+        /// <summary>
+        /// 签名
+        /// </summary>
+        /// <param name="privateKey">私钥</param>
+        /// <param name="content">待签名内容</param>
+        /// <returns>签名值</returns>
+        public static byte[] Sign(string privateKey, byte[] content)
+        {
+            //构造domain参数
+            ECDomainParameters domainParameters = new ECDomainParameters(Sm2EcParameters.Curve, Sm2EcParameters.G, Sm2EcParameters.N);
+
+            BigInteger privateKeyD = new BigInteger(privateKey, 16);
+            ECPrivateKeyParameters privateKeyParameters = new ECPrivateKeyParameters(privateKeyD, domainParameters);
+
+            //创建签名实例
+            SM2Signer sm2Signer = new SM2Signer();
+
+            //初始化签名实例,带上ID,国密的要求,ID默认值:1234567812345678
+            sm2Signer.Init(true, new ParametersWithID(new ParametersWithRandom(privateKeyParameters, SecureRandom.GetInstance("SHA1PRNG")), DefaultParamId));
+            sm2Signer.BlockUpdate(content, 0, content.Length);
+            byte[] signBytes = sm2Signer.GenerateSignature();
+
+            return signBytes;
         }
 
         /// <summary>
         /// SM3计算摘要
         /// </summary>
         /// <param name="data">待计算字符内容</param>
-        /// <param name="encoding">编码</param>
         /// <returns>摘要字符</returns>
-        public static string Digest(string data, Encoding encoding)
+        public static byte[] Digest(byte[] data)
         {
             SM3Digest digest = new SM3Digest();
-            byte[] cipherBytes = digest.ComputeHashBytes(data, encoding);
-            return encoding.GetString(Hex.Encode(cipherBytes));
+            byte[] cipherBytes = digest.ComputeHashBytes(data);
+            return cipherBytes;
         }
 
         /// <summary>
@@ -176,9 +195,9 @@ namespace OfdSharp.Crypto
         /// <param name="data">待计算字符内容</param>
         /// <param name="encoding">编码</param>
         /// <returns>摘要字符</returns>
-        public static byte[] Digest(string alg, string data, Encoding encoding)
+        public static byte[] Digest(string data, Encoding encoding)
         {
-            IDigest digest = DigestUtilities.GetDigest(alg);
+            SM3Digest digest = new SM3Digest();
             byte[] cipherBytes = digest.ComputeHashBytes(data, encoding);
             return cipherBytes;
         }
@@ -195,6 +214,20 @@ namespace OfdSharp.Crypto
             var hashBytes = new byte[digest.GetDigestSize()];
             var bs = encoding.GetBytes(data);
             digest.BlockUpdate(bs, 0, bs.Length);
+            digest.DoFinal(hashBytes, 0);
+            return hashBytes;
+        }
+
+        /// <summary>
+        /// 计算Hash字节
+        /// </summary>
+        /// <param name="digest"></param>
+        /// <param name="data"></param>
+        /// <returns></returns>
+        private static byte[] ComputeHashBytes(this IDigest digest, byte[] data)
+        {
+            var hashBytes = new byte[digest.GetDigestSize()];
+            digest.BlockUpdate(data, 0, data.Length);
             digest.DoFinal(hashBytes, 0);
             return hashBytes;
         }
@@ -228,6 +261,24 @@ namespace OfdSharp.Crypto
             return verify;
         }
 
+        /// <summary>
+        /// 验证签名
+        /// </summary>
+        /// <param name="alg">公钥</param>
+        /// <param name="cert">公钥</param>
+        /// <param name="content">待签名内容</param>
+        /// <param name="sign">签名值</param>
+        /// <returns></returns>
+        public static bool Verify(string alg, X509Certificate cert, byte[] content, byte[] sign)
+        {
+            ISigner signer = SignerUtilities.GetSigner(alg);
+            AsymmetricKeyParameter p = cert.GetPublicKey();
+            signer.Init(false, p);
+            signer.BlockUpdate(content, 0, content.Length);
+            //验证签名结果
+            bool verify = signer.VerifySignature(sign);
+            return verify;
+        }
 
         public static X509Certificate MakeCert(string subjectName, string issuerName)
         {
@@ -239,7 +290,7 @@ namespace OfdSharp.Crypto
         {
             ECDomainParameters domainParameters = new ECDomainParameters(Sm2EcParameters.Curve, Sm2EcParameters.G, Sm2EcParameters.N);
             AsymmetricKeyParameter privateParameter = new ECPrivateKeyParameters(new BigInteger(1, Hex.Decode(privateKey)), domainParameters);
-            ECPublicKeyParameters publicParameter = new ECPublicKeyParameters(domainParameters.Curve.DecodePoint(Hex.Decode(publicKey)), domainParameters);
+            AsymmetricKeyParameter publicParameter = new ECPublicKeyParameters(domainParameters.Curve.DecodePoint(Hex.Decode(publicKey)), domainParameters);
             return MakeCert(privateParameter, publicParameter, subjectName, issuerName);
         }
 
@@ -263,62 +314,6 @@ namespace OfdSharp.Crypto
             sm2Cert.CheckValidity();
             sm2Cert.Verify(publicParameter);
             return sm2Cert;
-        }
-
-        /// <summary>
-        /// 创建签章签名值文件
-        /// </summary>
-        /// <param name="dataHash"></param>
-        /// <param name="pic"></param>
-        /// <param name="certBytes">制章人证书</param>
-        /// <param name="signBytes"></param>
-        /// <param name="signerCert"></param>
-        public static byte[] CreateSignedValueData(SesSignatureInfo signatureInfo)
-        {
-            TbsSign toSign = new TbsSign
-            {
-                Version = SesHeader.V4,
-                TimeInfo = new DerGeneralizedTime(DateTime.Now.ToString("yyyyMMddHHmmss")),
-                DataHash = new DerBitString(signatureInfo.dataHash),
-                PropertyInfo = new DerIA5String(signatureInfo.PropertyInfo),
-                ExtData = null
-            };
-            SesHeader sesHeader = new SesHeader(SesHeader.V4, new DerIA5String(signatureInfo.manufacturer));
-            SesPropertyInfo sesPropertyInfo = new SesPropertyInfo
-            {
-                Type = new DerInteger(3),
-                Name = new DerUtf8String(signatureInfo.sealName),
-                CertListType = SesPropertyInfo.CertType,
-                CertList = new SesCertCollect(new CertInfoCollect(new List<Asn1OctetString> { new DerOctetString(signatureInfo.signerCert) })),
-                CreateDate = new DerGeneralizedTime(DateTime.Now),
-                ValidStart = new DerGeneralizedTime(DateTime.Now),
-                ValidEnd = new DerGeneralizedTime(DateTime.Now.AddYears(1))
-            };
-
-            SesPictureInfo sesPictureInfo = new SesPictureInfo(new DerIA5String("ofd"), new DerOctetString(signatureInfo.sealPicture), new DerInteger(30), new DerInteger(20));
-            SealInfo sealInfo = new SealInfo
-            {
-                Header = sesHeader,
-                EsId = new DerIA5String(signatureInfo.esId),
-                Picture = sesPictureInfo,
-                Property = sesPropertyInfo,
-                ExtensionData = null
-            };
-            toSign.EsSeal = new SeSeal
-            {
-                SealInfo = sealInfo,
-                Cert = new DerOctetString(signatureInfo.sealCert),
-                SignAlgId = GMObjectIdentifiers.sm2sign_with_sm3,
-                SignedValue = new DerBitString(signatureInfo.sealSign)
-            };
-            SesSignature sesSignature = new SesSignature
-            {
-                TbsSign = toSign,
-                Cert = new DerOctetString(signatureInfo.signerCert),
-                SignatureAlgId = GMObjectIdentifiers.sm2sign_with_sm3,
-                Signature = new DerBitString(signatureInfo.signature)
-            };
-            return sesSignature.GetDerEncoded();
         }
     }
 }

@@ -2,27 +2,14 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace OfdSharp.Ses
+namespace OfdSharp.Sign
 {
-    /// <summary>
-    /// 签名参数
-    /// </summary>
-    public class SesSignatureInfo
+    public class SesSealConfig
     {
         /// <summary>
         /// 厂商
         /// </summary>
         public string manufacturer { get; set; }
-
-        /// <summary>
-        /// /Doc_0/Signs/Sign_0/Signature.xml
-        /// </summary>
-        public string PropertyInfo { get; set; }
-
-        /// <summary>
-        /// /Doc_0/Signs/Sign_0/Signature.xml杂凑值
-        /// </summary>
-        public byte[] dataHash { get; set; }
 
         /// <summary>
         /// 印章图片字节数组
@@ -65,10 +52,9 @@ namespace OfdSharp.Ses
         public byte[] signerCert { get; set; }
 
         /// <summary>
-        /// SignedValue.xml签名值
-        /// Signature.xml
+        /// 签章者私钥
         /// </summary>
-        public byte[] signature { get; set; }
+        public string signerPrivateKey { get; set; }
 
         /// <summary>
         /// 印章标识

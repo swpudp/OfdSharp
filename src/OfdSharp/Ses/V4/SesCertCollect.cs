@@ -8,8 +8,14 @@ namespace OfdSharp.Ses.V4
     /// </summary>
     public class SesCertCollect : Asn1Encodable, IAsn1Choice
     {
+        /// <summary>
+        /// 签章者证书
+        /// </summary>
         private readonly CertInfoCollect _certInfoCollect;
 
+        /// <summary>
+        /// 签章者证书杂凑值
+        /// </summary>
         private readonly CertDigestCollect _certDigestCollect;
 
         public SesCertCollect(CertInfoCollect certInfoCollect)

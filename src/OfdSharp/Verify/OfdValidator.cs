@@ -3,12 +3,12 @@ using OfdSharp.Primitives.Signature;
 using OfdSharp.Reader;
 using OfdSharp.Ses.Parse;
 using OfdSharp.Ses.V4;
-using OfdSharp.Verify.Container;
 using Org.BouncyCastle.Crypto;
 using Org.BouncyCastle.Security;
 using Org.BouncyCastle.Utilities;
 using System;
 using System.Linq;
+using OfdSharp.Crypto;
 
 namespace OfdSharp.Verify
 {
@@ -111,7 +111,6 @@ namespace OfdSharp.Verify
                     return VerifyResult.SealNotMatch;
                 }
             }
-
             return VerifyResult.Success;
         }
 
@@ -123,13 +122,45 @@ namespace OfdSharp.Verify
         private static VerifyResult CheckSignedValue(OfdReader reader, DigestInfo signature)
         {
             string signatureFilePath = reader.GetSignatureInfo().Signatures.First().BaseLoc;
-
             byte[] tbsContent = reader.ReadContent(signatureFilePath);
             byte[] signedValue = reader.ReadContent(signature.SignedValue);
+            return Validate(tbsContent, signedValue);
+        }
 
-            SesV4ValidateContainer validateContainer = new SesV4ValidateContainer();
-            //SesV1ValidateContainer validateContainer = new SesV1ValidateContainer();
-            return validateContainer.Validate(SignedType.Seal, tbsContent, signedValue);
+        /// <summary>
+        /// 签名数据验证，技术标准：《GB/T 38540-2020 信息安全技术 安全电子签章密码技术规范》 电子印章数据验证
+        /// </summary>
+        /// <param name="tbsContent">待签章内容</param>
+        /// <param name="signedValue">电子签章数据或签名值（SignedValue.xml文件内容）</param>
+        private static VerifyResult Validate(byte[] tbsContent, byte[] signedValue)
+        {
+            //计算原文摘要
+            byte[] output = Sm2Utils.Digest(tbsContent);
+
+            SesSignature sesSignature = SesSignature.GetInstance(signedValue);
+            TbsSign toSign = sesSignature.TbsSign;
+
+            byte[] exceptHash = toSign.DataHash.GetOctets();
+            if (!Arrays.AreEqual(output, exceptHash))
+            {
+                return VerifyResult.SignedNotMatch;
+            }
+            //加载证书
+            byte[] certDer = sesSignature.Cert.GetOctets();
+            Org.BouncyCastle.X509.X509CertificateParser parser = new Org.BouncyCastle.X509.X509CertificateParser();
+            Org.BouncyCastle.X509.X509Certificate cert = parser.ReadCertificate(certDer);
+            //判断证书是否过期
+            if (!cert.IsValid(DateTime.Now))
+            {
+                return VerifyResult.SealOutdated;
+            }
+            //预期的电子签章数据，签章值
+            byte[] expect = sesSignature.Signature.GetOctets();
+            //验证签名
+            byte[] signed = toSign.GetDerEncoded();
+            bool result = Sm2Utils.Verify(sesSignature.SignatureAlgId.Id, cert, signed, expect);
+            //验证签名
+            return result ? VerifyResult.Success : VerifyResult.SealTampered;
         }
     }
 }

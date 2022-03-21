@@ -1,11 +1,11 @@
 ﻿using System.Xml.Linq;
 
-namespace OfdSharp.Primitives
+namespace OfdSharp
 {
     /// <summary>
     /// 静态变量
     /// </summary>
-    public static class Const
+    internal static class ConstDefined
     {
         /// <summary>
         /// 命名空间 URI,《GB/T_33190-2016》 7.1 命名空间
@@ -47,5 +47,15 @@ namespace OfdSharp.Primitives
         /// Xmlns uri
         /// </summary>
         public const string OfdXmlns = "http://www.ofdspec.org/2016";
+
+        /// <summary>
+        /// 签章版本v1
+        /// </summary>
+        public const int SesV1 = 1;
+
+        /// <summary>
+        /// 签章版本v4
+        /// </summary>
+        public const int SesV4 = 4;
     }
 }

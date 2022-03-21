@@ -1,6 +1,4 @@
-﻿using System.Xml.Serialization;
-
-namespace OfdSharp.Primitives.Signature
+﻿namespace OfdSharp.Primitives.Signature
 {
     /// <summary>
     /// 文件签名摘要信息
@@ -10,13 +8,11 @@ namespace OfdSharp.Primitives.Signature
         /// <summary>
         /// 签名信息
         /// </summary>
-        [XmlElement]
         public SignedInfo SignedInfo { get; set; }
 
         /// <summary>
         /// 签名值
         /// </summary>
-        [XmlElement]
         public string SignedValue { get; set; }
     }
 }

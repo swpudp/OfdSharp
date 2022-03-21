@@ -25,7 +25,7 @@ namespace OfdSharp.Ses.V4
         public DerObjectIdentifier SignAlgId { get; set; }
 
         /// <summary>
-        /// 签名值
+        /// 签名值，制章者对电子印章格式中的印章信息域SES_SealInfo，按照Sequence方式组成的信息内容进行数字签名所得的结果
         /// </summary>
         public DerBitString SignedValue { get; set; }
 

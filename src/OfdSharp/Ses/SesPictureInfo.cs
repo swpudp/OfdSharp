@@ -13,22 +13,24 @@ namespace OfdSharp.Ses
         /// 图片类型
         /// 代表印章图片类型，如 GIF、BMP、JPG、SVG等
         /// </summary>
-        public DerIA5String Type { get; }
+        public DerIA5String Type { get; set; }
 
         /// <summary>
         /// 印章图片数据
         /// </summary>
-        public Asn1OctetString Data { get; }
+        public Asn1OctetString Data { get; set; }
 
         /// <summary>
         /// 图片显示宽度，单位为毫米（mm）
         /// </summary>
-        public DerInteger Width { get; }
+        public DerInteger Width { get; set; }
 
         /// <summary>
         /// 图片显示高度，单位为毫米（mm）
         /// </summary>
-        public DerInteger Height { get; }
+        public DerInteger Height { get; set; }
+
+        public SesPictureInfo() { }
 
         public SesPictureInfo(Asn1Sequence seq)
         {

@@ -3,6 +3,7 @@
     /// <summary>
     /// 签名节点的类型
     /// </summary>
+    [System.Obsolete("没作用", true)]
     public enum SignedType
     {
         /// <summary>
