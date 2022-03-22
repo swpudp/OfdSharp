@@ -1,4 +1,5 @@
-﻿using System;
+﻿using OfdSharp.Primitives;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Xml;
@@ -255,6 +256,137 @@ namespace OfdSharp.Extensions
             XNamespace rootNamespace = document.Document?.Root?.Name.Namespace;
             XName xName = rootNamespace == null ? XName.Get(nodeName) : XName.Get(nodeName, rootNamespace.NamespaceName);
             return document.Descendants(xName);
+        }
+
+        /// <summary>
+        /// 添加可选节点
+        /// </summary>
+        /// <param name="element"></param>
+        /// <param name="nodeName"></param>
+        /// <param name="value"></param>
+        public static void CreateOptionalElement(this XElement element, string nodeName, string value)
+        {
+            if (string.IsNullOrWhiteSpace(value))
+            {
+                return;
+            }
+            element.Add(new XElement(ConstDefined.OfdNamespace + nodeName, value));
+        }
+
+        /// <summary>
+        /// 添加可选节点
+        /// </summary>
+        /// <param name="element"></param>
+        /// <param name="nodeName"></param>
+        /// <param name="value"></param>
+        public static void CreateOptionalElement(this XElement element, string nodeName, DateTime? value, string format = null)
+        {
+            if (!value.HasValue)
+            {
+                return;
+            }
+            element.Add(new XElement(ConstDefined.OfdNamespace + nodeName, value.Value.ToString(format ?? ConstDefined.DatetimeFormatter)));
+        }
+
+        /// <summary>
+        /// 添加必选节点
+        /// </summary>
+        /// <param name="element"></param>
+        /// <param name="nodeName"></param>
+        /// <param name="value"></param>
+        public static void CreateRequiredElement(this XElement element, string nodeName, string value)
+        {
+            element.Add(new XElement(ConstDefined.OfdNamespace + nodeName, value));
+        }
+
+        /// <summary>
+        /// 添加必选节点
+        /// </summary>
+        /// <param name="element"></param>
+        /// <param name="nodeName"></param>
+        /// <param name="value"></param>
+        public static void CreateRequiredElement(this XElement element, string nodeName, XElement value)
+        {
+            element.Add(new XElement(ConstDefined.OfdNamespace + nodeName, value));
+        }
+
+        /// <summary>
+        /// 添加必选节点
+        /// </summary>
+        /// <param name="element"></param>
+        /// <param name="nodeName"></param>
+        /// <param name="value"></param>
+        public static void CreateRequiredElement(this XElement element, string nodeName, Id value)
+        {
+            element.Add(new XElement(ConstDefined.OfdNamespace + nodeName, value));
+        }
+
+        /// <summary>
+        /// 添加必选节点
+        /// </summary>
+        /// <param name="element"></param>
+        /// <param name="nodeName"></param>
+        /// <param name="value"></param>
+        public static void CreateRequiredElement(this XElement element, string nodeName, string value, params XAttribute[] attributes)
+        {
+            XElement nodeElement = new XElement(ConstDefined.OfdNamespace + nodeName, value);
+            foreach (XAttribute attribute in attributes)
+            {
+                nodeElement.Add(attribute);
+            }
+            element.Add(nodeElement);
+        }
+
+        /// <summary>
+        /// 添加必选节点
+        /// </summary>
+        /// <param name="element"></param>
+        /// <param name="nodeName"></param>
+        /// <param name="value"></param>
+        public static void CreateRequiredElement(this XElement element, string nodeName, params XAttribute[] attributes)
+        {
+            XElement nodeElement = new XElement(ConstDefined.OfdNamespace + nodeName);
+            foreach (XAttribute attribute in attributes)
+            {
+                nodeElement.Add(attribute);
+            }
+            element.Add(nodeElement);
+        }
+
+        /// <summary>
+        /// 添加必选节点
+        /// </summary>
+        /// <param name="nodeName"></param>
+        public static XElement CreateElement(string nodeName)
+        {
+            return new XElement(ConstDefined.OfdNamespace + nodeName);
+        }
+
+        /// <summary>
+        /// 添加必选节点
+        /// </summary>
+        /// <param name="nodeName"></param>
+        public static XElement CreateElement(string nodeName, string value)
+        {
+            return new XElement(ConstDefined.OfdNamespace + nodeName, value);
+        }
+
+        /// <summary>
+        /// 添加必选节点
+        /// </summary>
+        /// <param name="nodeName"></param>
+        public static XElement CreateElement(string nodeName, XElement value, params XAttribute[] attributes)
+        {
+            return new XElement(ConstDefined.OfdNamespace + nodeName, attributes, value);
+        }
+
+        /// <summary>
+        /// 添加必选节点
+        /// </summary>
+        /// <param name="nodeName"></param>
+        public static XElement CreateElement(string nodeName, params XAttribute[] attributes)
+        {
+            return new XElement(ConstDefined.OfdNamespace + nodeName, attributes);
         }
     }
 }

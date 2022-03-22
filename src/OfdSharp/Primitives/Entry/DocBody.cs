@@ -8,7 +8,7 @@
         /// <summary>
         /// 文档信息
         /// </summary>
-        public DocInfo DocInfo { get; set; }
+        public CtDocInfo DocInfo { get; set; }
 
         /// <summary>
         /// 文档入口文件

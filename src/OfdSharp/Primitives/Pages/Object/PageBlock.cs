@@ -24,7 +24,7 @@ namespace OfdSharp.Primitives.Pages.Object
         /// <summary>
         /// 图形对象
         /// </summary>
-        public Path PathObject { get; set; }
+        public CtPath PathObject { get; set; }
 
         /// <summary>
         /// 图像对象,见第10章,

@@ -17,16 +17,17 @@ using OfdSharp.Primitives.Entry;
 using OfdSharp.Crypto;
 using OfdSharp.Ses;
 using OfdSharp.Primitives.Signature;
-//using Org.BouncyCastle.Asn1.GM;
 using System.Text;
 using System;
 using OfdSharp.Sign;
+using OfdSharp.Primitives.Doc;
 
 namespace OfdSharp.Writer
 {
     public class OfdWriter
     {
         private readonly bool _isFormat;
+        private readonly OfdDocument _ofdDocument;
         private XElement _rootElement;
         private XElement _documentElement;
         private XElement _documentResElement;
@@ -34,269 +35,216 @@ namespace OfdSharp.Writer
         private XElement _pageElement;
         private XElement _attachmentElement;
         private XElement _customerTagsElement;
-
         private XElement _annotationsElement;
         private XElement _signaturesElement;
         private XElement _signatureElement;
 
         //页面
-        private readonly List<PageNode> _pageNodes = new List<PageNode>();
-        private readonly List<PageObject> _pageObjects = new List<PageObject>();
+        //private readonly List<PageNode> _pageNodes = new List<PageNode>();
+        //private readonly List<PageObject> _pageObjects = new List<PageObject>();
 
         //附件
         private List<Attachment> _attachments = new List<Attachment>();
         private List<XElement> _attachmentElements = new List<XElement>();
 
         //多媒体
-        private List<CtMultiMedia> _ctMultiMedias = new List<CtMultiMedia>();
+        //private List<CtMultiMedia> _ctMultiMedias = new List<CtMultiMedia>();
 
         //模板
-        private List<PageObject> _templatePages = new List<PageObject>();
+        //private List<PageObject> _templatePages = new List<PageObject>();
         private List<XElement> _templateElements = new List<XElement>();
 
         //customerTag
-        private List<CustomTag> _customTags = new List<CustomTag>();
+        //private List<CustomTag> _customTags = new List<CustomTag>();
         private List<XElement> _customTagElements = new List<XElement>();
 
         private XElement _annotationElement;
         private Org.BouncyCastle.X509.X509Certificate _sealCert, _signerCert;
         private CipherKeyPair _sealKey, _signerKey;
-
-        public OfdWriter()
+        public OfdWriter(OfdDocument ofdDocument, bool isFormating)
         {
-            _isFormat = false;
-        }
-
-        public OfdWriter(bool isFormating)
-        {
+            _ofdDocument = ofdDocument;
             _isFormat = isFormating;
         }
 
-        public void WriteOfdRoot()
+        /// <summary>
+        /// 入口文件写入
+        /// </summary>
+        /// <param name="docInfo">文档描述信息</param>
+        /// <param name="docIndex">文档</param>
+        public void WriteOfdRoot(CtDocInfo docInfo, int docIndex)
         {
-            XElement docInfo = new XElement(ConstDefined.OfdNamespace + "DocInfo");
-            docInfo.Add(new XElement(ConstDefined.OfdNamespace + "DocID", "c9a4ced42f284320964bf1e630d1fa2a"));
-            docInfo.Add(new XElement(ConstDefined.OfdNamespace + "Author", "China Tax"));
-            docInfo.Add(new XElement(ConstDefined.OfdNamespace + "CreationDate", "2020-11-16"));
-            List<CustomData> customDatas = new List<CustomData>
+            XElement docInfoElement = XmlExtension.CreateElement("DocInfo");
+            docInfoElement.CreateOptionalElement("DocID", docInfo.DocId);
+            docInfoElement.CreateOptionalElement("Title", docInfo.Title);
+            docInfoElement.CreateOptionalElement("Author", docInfo.Author);
+            docInfoElement.CreateOptionalElement("Subject", docInfo.Subject);
+            docInfoElement.CreateOptionalElement("Abstract", docInfo.Abstract);
+            docInfoElement.CreateOptionalElement("CreationDate", docInfo.CreationDate);
+            docInfoElement.CreateOptionalElement("ModDate", docInfo.ModDate);
+            docInfoElement.CreateOptionalElement("DocUsage", docInfo.DocUsage);
+            docInfoElement.CreateOptionalElement("Cover", docInfo.Cover);
+            if (docInfo.Keywords.IsAny())
             {
-                new CustomData {Name = "template-version", Value = "1.0.20.0422"},
-                new CustomData {Name = "native-producer", Value = "SuwellFormSDK"},
-                new CustomData {Name = "producer-version", Value = "1.0.20.0603"},
-                new CustomData {Name = "发票代码", Value = "032001900311"},
-                new CustomData {Name = "发票号码", Value = "25577301"},
-                new CustomData {Name = "合计税额", Value = "***"},
-                new CustomData {Name = "合计金额", Value = "181.14"},
-                new CustomData {Name = "开票日期", Value = "2020年11月12日"},
-                new CustomData {Name = "校验码", Value = "58569 30272 33709 75117"},
-                new CustomData {Name = "购买方纳税人识别号", Value = "91510700205412308D"},
-                new CustomData {Name = "销售方纳税人识别号", Value = "91320111339366503A"}
-            };
-            XElement customDataElement = new XElement(ConstDefined.OfdNamespace + "CustomDatas");
-            foreach (var item in customDatas)
-            {
-                customDataElement.Add(new XElement(ConstDefined.OfdNamespace + "CustomData", new XAttribute("Name", item.Name), item.Value));
+                XElement keywordsElement = XmlExtension.CreateElement("Keywords");
+                docInfo.Keywords.ForEach(item => keywordsElement.CreateRequiredElement("Keyword", item));
+                docInfoElement.Add(keywordsElement);
             }
-
-            docInfo.Add(customDataElement);
-            XElement docBody = new XElement(ConstDefined.OfdNamespace + "DocBody", docInfo);
-            docBody.Add(new XElement(ConstDefined.OfdNamespace + "DocRoot", "Doc_0/Document.xml"));
-            docBody.Add(new XElement(ConstDefined.OfdNamespace + "Signatures", "Doc_0/Signs/Signatures.xml"));
-            _rootElement = new XElement(ConstDefined.OfdNamespace + "OFD", new XAttribute(XNamespace.Xmlns + "ofd", ConstDefined.OfdXmlns), new XAttribute("DocType", "OFD"), new XAttribute("Version", "1.1"), docBody);
+            docInfoElement.CreateOptionalElement("Creator", docInfo.Creator);
+            docInfoElement.CreateOptionalElement("CreatorVersion", docInfo.CreatorVersion);
+            if (docInfo.CustomDataList.IsAny())
+            {
+                XElement customDataElement = XmlExtension.CreateElement("CustomDatas");
+                docInfo.CustomDataList.ForEach(item => customDataElement.CreateRequiredElement("CustomData", item.Value, new XAttribute("Name", item.Name)));
+                docInfoElement.Add(customDataElement);
+            }
+            XElement docBody = XmlExtension.CreateElement("DocBody");
+            docBody.Add(docInfoElement);
+            docBody.CreateRequiredElement("DocRoot", $"Doc_{docIndex}/Document.xml");
+            docBody.CreateRequiredElement("Signatures", $"Doc_{docIndex}/Signs/Signatures.xml");
+            _rootElement = XmlExtension.CreateElement("OFD", docBody, new XAttribute(XNamespace.Xmlns + ConstDefined.OfdPrefix, ConstDefined.OfdXmlns), new XAttribute("DocType", ConstDefined.OfdDocType), new XAttribute("Version", ConstDefined.OfdVersion));
         }
 
-        public void WriteDocument()
+        public void WriteDocument(CommonData commonData, List<PageNode> pages, bool hasAttachment)
         {
-            XElement commonDataElement = new XElement(ConstDefined.OfdNamespace + "CommonData");
-            commonDataElement.Add(new XElement(ConstDefined.OfdNamespace + "MaxUnitID", "97"));
-            commonDataElement.Add(new XElement(ConstDefined.OfdNamespace + "TemplatePage", new XAttribute("ID", "2"), new XAttribute("BaseLoc", "Tpls/Tpl_0/Content.xml")));
-            commonDataElement.Add(new XElement(ConstDefined.OfdNamespace + "PageArea", new XElement(ConstDefined.OfdNamespace + "PhysicalBox", "0 0 210 140")));
-            commonDataElement.Add(new XElement(ConstDefined.OfdNamespace + "DocumentRes", "DocumentRes.xml"));
-            commonDataElement.Add(new XElement(ConstDefined.OfdNamespace + "PublicRes", "PublicRes.xml"));
+            XElement commonDataElement = XmlExtension.CreateElement("CommonData");
+            commonDataElement.CreateRequiredElement("MaxUnitID", commonData.MaxUnitId);
+            if (commonData.TemplatePages.IsAny())
+            {
+                commonData.TemplatePages.ForEach((item) => commonDataElement.CreateRequiredElement("TemplatePage", new XAttribute("ID", item.Id), new XAttribute("BaseLoc", item.BaseLoc.Value)));
+            }
+            commonDataElement.Add(XmlExtension.CreateElement("PageArea", XmlExtension.CreateElement("PhysicalBox", commonData.PageArea.Physical.ToString())));
+            commonDataElement.Add(XmlExtension.CreateElement("DocumentRes", commonData.DocumentRes.Value));
+            commonDataElement.Add(XmlExtension.CreateElement("PublicRes", commonData.PublicRes.Value));
 
-            _documentElement = new XElement(ConstDefined.OfdNamespace + "Document", new XAttribute(XNamespace.Xmlns + "ofd", ConstDefined.OfdXmlns));
+            _documentElement = XmlExtension.CreateElement("Document", new XAttribute(XNamespace.Xmlns + ConstDefined.OfdPrefix, ConstDefined.OfdXmlns));
             _documentElement.Add(commonDataElement);
 
             //Pages
-            XElement pagesElement = new XElement(ConstDefined.OfdNamespace + "Pages");
-            _pageObjects.Add(new PageObject
+            XElement pagesElement = XmlExtension.CreateElement("Pages");
+            foreach (var pg in pages)
             {
-                PageRes = new Location { Value = "Pages/Page_0/Content.xml" },
-                Area = new Primitives.Doc.PageArea { Physical = new Box(0, 0, 210, 297) },
-                Template = new Template { TemplateId = "2", ZOrder = LayerType.Background },
-                Content = new Content
-                {
-                    Layers = new List<Layer>
-                    {
-                        new Layer
-                        {
-                            Id = new Id(303),
-                            PageBlocks = new List<PageBlock>
-                            {
-                                new PageBlock
-                                {
-                                    TextObject = new CtText
-                                    {
-                                        Id = new Id(302),
-                                        Boundary = new Box(69, 7, 72, 7.6749),
-                                        Font = new RefId {Id = new Id(60)},
-                                        Size = 6.61,
-                                        FillColor = new Primitives.Pages.Description.Color.CtColor {Value = new Primitives.Array("156 82 35")},
-                                        TextCode = new TextCode {X = 0, Y = 5.683674, DeltaX = new Primitives.Array("10 6.61"), Value = "北京增值税电子普通发票"}
-                                    }
-                                },
-                                new PageBlock
-                                {
-                                    PathObject = new Primitives.Graph.Path
-                                    {
-                                        Id = new Id(304),
-                                        Boundary = new Box(68.5, 18, 73, 0.25),
-                                        LineWidth = 0.25,
-                                        StrokeColor = new Primitives.Pages.Description.Color.CtColor {Value = new Primitives.Array("156 82 35")},
-                                        AbbreviatedData = "M 0 0 L 73 0",
-                                    }
-                                },
-                                new PageBlock
-                                {
-                                    PathObject = new Primitives.Graph.Path
-                                    {
-                                        Id = new Id(305),
-                                        Boundary = new Box(68.5, 19, 73, 0.25),
-                                        LineWidth = 0.25,
-                                        StrokeColor = new Primitives.Pages.Description.Color.CtColor {Value = new Primitives.Array("156 82 35")},
-                                        AbbreviatedData = "M 0 0 L 73 0",
-                                    }
-                                },
-                                new PageBlock
-                                {
-                                    ImageObject = new Primitives.Image.CtImage
-                                    {
-                                        Id = new Id(310),
-                                        Ctm = new Primitives.Array("20 0 0 20 0 0"),
-                                        Boundary = new Box(8.5, 4, 20, 20),
-                                        ResourceId = new RefId {Id = new Id(311)}
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            });
-
-            foreach (var pageObject in _pageObjects)
-            {
-                _pageNodes.Add(new PageNode { Id = new Id(1), BaseLoc = pageObject.PageRes });
+                pagesElement.CreateRequiredElement("Page", new XAttribute("ID", pg.Id), new XAttribute("BaseLoc", pg.BaseLoc.Value));
             }
-
-            foreach (var pg in _pageNodes)
-            {
-                pagesElement.Add(new XElement(ConstDefined.OfdNamespace + "Page", new XAttribute("ID", pg.Id.ToString()), new XAttribute("BaseLoc", pg.BaseLoc.Value)));
-            }
-
             _documentElement.Add(pagesElement);
 
             //Annotations
-            XElement annotationsElement = new XElement(ConstDefined.OfdNamespace + "Annotations", "Annots/Annotations.xml");
+            XElement annotationsElement = XmlExtension.CreateElement("Annotations", "Annots/Annotations.xml");
             _documentElement.Add(annotationsElement);
 
-            //Attachments
-            XElement attachmentsElement = new XElement(ConstDefined.OfdNamespace + "Attachments", "Attachs/Attachments.xml");
-            _documentElement.Add(attachmentsElement);
+            if (hasAttachment)
+            {
+                //Attachments
+                XElement attachmentsElement = XmlExtension.CreateElement("Attachments", "Attachs/Attachments.xml");
+                _documentElement.Add(attachmentsElement);
+            }
 
             //CustomTags
             XElement customTagsElement = new XElement(ConstDefined.OfdNamespace + "CustomTags", "Tags/CustomTags.xml");
             _documentElement.Add(customTagsElement);
         }
 
-        public void WriteDocumentRes()
+        public void WriteDocumentRes(DocumentResource res)
         {
-            _documentResElement = new XElement(ConstDefined.OfdNamespace + "Res", new XAttribute(XNamespace.Xmlns + "ofd", ConstDefined.OfdXmlns), new XAttribute("BaseLoc", "Res"));
+            _documentResElement = XmlExtension.CreateElement("Res", new XAttribute(XNamespace.Xmlns + ConstDefined.OfdPrefix, ConstDefined.OfdXmlns), new XAttribute("BaseLoc", res.BaseLoc.Value));
             //DrawParams
-            XElement drawParams = new XElement(ConstDefined.OfdNamespace + "DrawParams");
-            XElement drawParam = new XElement(ConstDefined.OfdNamespace + "DrawParam", new XAttribute("ID", "4"), new XAttribute("LineWidth", "0.25"));
-            drawParam.Add(new XElement(ConstDefined.OfdNamespace + "FillColor", new XAttribute("Value", "156 82 35"), new XAttribute("ColorSpace", "5")));
-            drawParam.Add(new XElement(ConstDefined.OfdNamespace + "StrokeColor", new XAttribute("Value", "156 82 35"), new XAttribute("ColorSpace", "5")));
-            drawParams.Add(drawParam);
+            XElement drawParams = XmlExtension.CreateElement("DrawParams");
+
+            foreach (var item in res.DrawParams)
+            {
+                XElement drawParam = XmlExtension.CreateElement("DrawParam", new XAttribute("ID", item.Id), new XAttribute("LineWidth", item.LineWidth));
+
+                if (item.FillColor != null)
+                {
+                    drawParam.CreateRequiredElement("FillColor", new XAttribute("Value", item.FillColor.Value), new XAttribute("ColorSpace", item.FillColor.ColorSpace));
+                }
+                if (item.StrokeColor != null)
+                {
+                    drawParam.CreateRequiredElement("StrokeColor", new XAttribute("Value", item.StrokeColor.Value), new XAttribute("ColorSpace", item.StrokeColor.ColorSpace));
+                }
+                drawParams.Add(drawParam);
+            }
             _documentResElement.Add(drawParams);
 
-            _ctMultiMedias.Add(new CtMultiMedia { Format = "GBIG2", Type = MediaType.Image, Id = new Id(78), MediaFile = new Location { Value = "image_78.jb2" } });
-            _ctMultiMedias.Add(new CtMultiMedia { Format = "GBIG2", Type = MediaType.Image, Id = new Id(79), MediaFile = new Location { Value = "image_80.jb2" } });
             //MultiMedias
-            XElement multiMedias = new XElement(ConstDefined.OfdNamespace + "MultiMedias");
-            foreach (var ctMultiMedia in _ctMultiMedias)
+            if (res.MultiMedias.IsAny())
             {
-                XElement multiMedia = new XElement(ConstDefined.OfdNamespace + "MultiMedia", new XAttribute("ID", ctMultiMedia.Id), new XAttribute("Type", ctMultiMedia.Type), new XAttribute("Format", ctMultiMedia.Format));
-                multiMedia.Add(new XElement(ConstDefined.OfdNamespace + "MediaFile", ctMultiMedia.MediaFile.Value));
-                multiMedias.Add(multiMedia);
+                XElement multiMedias = XmlExtension.CreateElement("MultiMedias");
+                foreach (var ctMultiMedia in res.MultiMedias)
+                {
+                    XElement multiMedia = XmlExtension.CreateElement("MultiMedia", new XAttribute("ID", ctMultiMedia.Id), new XAttribute("Type", ctMultiMedia.Type), new XAttribute("Format", ctMultiMedia.Format));
+                    multiMedia.CreateRequiredElement("MediaFile", ctMultiMedia.MediaFile.Value);
+                    multiMedias.Add(multiMedia);
+                }
+                _documentResElement.Add(multiMedias);
             }
-
-            _documentResElement.Add(multiMedias);
         }
 
-        public void WritePublicRes()
+        public void WritePublicRes(DocumentResource res)
         {
-            _publicResElement = new XElement(ConstDefined.OfdNamespace + "Res", new XAttribute(XNamespace.Xmlns + "ofd", ConstDefined.OfdXmlns), new XAttribute("BaseLoc", "Res"));
-
-            XElement colorSpaces = new XElement(ConstDefined.OfdNamespace + "ColorSpaces");
-            colorSpaces.Add(new XElement(ConstDefined.OfdNamespace + "ColorSpace", new XAttribute("ID", "5"), new XAttribute("Type", "RGB"), new XAttribute("BitsPerComponent", "8")));
-            _publicResElement.Add(colorSpaces);
-
-            XElement fonts = new XElement(ConstDefined.OfdNamespace + "Fonts");
-            List<CtFont> ctFonts = new List<CtFont>
+            _publicResElement = XmlExtension.CreateElement("Res", new XAttribute(XNamespace.Xmlns + ConstDefined.OfdPrefix, ConstDefined.OfdXmlns), new XAttribute("BaseLoc", res.BaseLoc.Value));
+            if (res.ColorSpaces.IsAny())
             {
-                new CtFont {Id = new Id(29), FontName = "楷体", FamilyName = "楷体"},
-                new CtFont {Id = new Id(61), FontName = "KaiTi", FamilyName = "KaiTi"},
-                new CtFont {Id = new Id(63), FontName = "宋体", FamilyName = "宋体"},
-                new CtFont {Id = new Id(66), FontName = "Courier New", FamilyName = "Courier New"}
-            };
-            foreach (var ctFont in ctFonts)
-            {
-                fonts.Add(new XElement(ConstDefined.OfdNamespace + "Font", new XAttribute("ID", ctFont.Id.ToString()), new XAttribute("FontName", ctFont.FontName), new XAttribute("FamilyName", ctFont.FamilyName)));
+                XElement colorSpacesElement = new XElement(ConstDefined.OfdNamespace + "ColorSpaces");
+                foreach (var colorSpace in res.ColorSpaces)
+                {
+                    colorSpacesElement.CreateRequiredElement("ColorSpace", new XAttribute("ID", colorSpace.Id), new XAttribute("Type", colorSpace.Type), new XAttribute("BitsPerComponent", colorSpace.BitsPerComponent));
+                }
+                _publicResElement.Add(colorSpacesElement);
             }
-
-            _publicResElement.Add(fonts);
+            if (res.Fonts.IsAny())
+            {
+                XElement fontsElement = XmlExtension.CreateElement("Fonts");
+                foreach (var ctFont in res.Fonts)
+                {
+                    fontsElement.CreateRequiredElement("Font", new XAttribute("ID", ctFont.Id.ToString()), new XAttribute("FontName", ctFont.FontName), new XAttribute("FamilyName", ctFont.FamilyName));
+                }
+                _publicResElement.Add(fontsElement);
+            }
         }
 
-        public void WritePages()
+        /// <summary>
+        /// todo pageobjects如何组织？
+        /// </summary>
+        /// <param name="pageObjects"></param>
+        public void WritePages(List<PageObject> pageObjects)
         {
-            _pageElement = new XElement(ConstDefined.OfdNamespace + "Page", new XAttribute(XNamespace.Xmlns + "ofd", ConstDefined.OfdXmlns));
-            foreach (var po in _pageObjects)
+            _pageElement = XmlExtension.CreateElement("Page", new XAttribute(XNamespace.Xmlns + ConstDefined.OfdPrefix, ConstDefined.OfdXmlns));
+            foreach (var po in pageObjects)
             {
-                _pageElement.Add(new XElement(ConstDefined.OfdNamespace + "Area", new XElement(ConstDefined.OfdNamespace + "PhysicalBox", po.Area.Physical.ToString())));
-                _pageElement.Add(new XElement(ConstDefined.OfdNamespace + "Template", new XAttribute("TemplateID", po.Template.TemplateId), new XAttribute("ZOrder", po.Template.ZOrder)));
-
-                XElement contentElement = new XElement(ConstDefined.OfdNamespace + "Content");
+                _pageElement.CreateRequiredElement("Area", XmlExtension.CreateElement("PhysicalBox", po.Area.Physical.ToString()));
+                if (po.Template != null)
+                {
+                    _pageElement.CreateRequiredElement("Template", new XAttribute("TemplateID", po.Template.TemplateId), new XAttribute("ZOrder", po.Template.ZOrder));
+                }
+                XElement contentElement = XmlExtension.CreateElement("Content");
                 foreach (var layer in po.Content.Layers)
                 {
-                    XElement layerElement = new XElement(ConstDefined.OfdNamespace + "Layer", new XAttribute("ID", layer.Id.ToString()));
+                    XElement layerElement = XmlExtension.CreateElement("Layer", new XAttribute("ID", layer.Id));
 
                     foreach (var pb in layer.PageBlocks)
                     {
                         if (pb.TextObject != null)
                         {
-                            XElement textObjectElement = new XElement(ConstDefined.OfdNamespace + "TextObject", new XAttribute("ID", pb.TextObject.Id.ToString()), new XAttribute("Boundary", pb.TextObject.Boundary.ToString()), new XAttribute("Font", pb.TextObject.Font.Id.ToString()), new XAttribute("Size", pb.TextObject.Size));
-                            textObjectElement.Add(new XElement(ConstDefined.OfdNamespace + "FillColor", new XAttribute("Value", pb.TextObject.FillColor.Value.ToString())));
-                            textObjectElement.Add(new XElement(ConstDefined.OfdNamespace + "TextCode", pb.TextObject.TextCode.Value, new XAttribute("X", pb.TextObject.TextCode.X), new XAttribute("Y", pb.TextObject.TextCode.Y), new XAttribute("DeltaX", "g " + pb.TextObject.TextCode.DeltaX)));
+                            XElement textObjectElement = XmlExtension.CreateElement("TextObject", new XAttribute("ID", pb.TextObject.Id), new XAttribute("Boundary", pb.TextObject.Boundary.ToString()), new XAttribute("Font", pb.TextObject.Font.Id), new XAttribute("Size", pb.TextObject.Size));
+                            textObjectElement.CreateRequiredElement("FillColor", new XAttribute("Value", pb.TextObject.FillColor.Value.ToString()));
+                            textObjectElement.CreateRequiredElement("TextCode", pb.TextObject.TextCode.Value, new XAttribute("X", pb.TextObject.TextCode.X), new XAttribute("Y", pb.TextObject.TextCode.Y), new XAttribute("DeltaX", "g " + pb.TextObject.TextCode.DeltaX));
                             layerElement.Add(textObjectElement);
                         }
-
                         if (pb.PathObject != null)
                         {
-                            XElement pathObjectElement = new XElement(ConstDefined.OfdNamespace + "PathObject", new XAttribute("ID", pb.PathObject.Id.ToString()), new XAttribute("Boundary", pb.PathObject.Boundary.ToString()), new XAttribute("LineWidth", pb.PathObject.LineWidth));
-                            pathObjectElement.Add(new XElement(ConstDefined.OfdNamespace + "StrokeColor", new XAttribute("Value", pb.PathObject.StrokeColor.Value.ToString())));
-                            pathObjectElement.Add(new XElement(ConstDefined.OfdNamespace + "AbbreviatedData", pb.PathObject.AbbreviatedData));
+                            XElement pathObjectElement = XmlExtension.CreateElement("PathObject", new XAttribute("ID", pb.PathObject.Id), new XAttribute("Boundary", pb.PathObject.Boundary.ToString()), new XAttribute("LineWidth", pb.PathObject.LineWidth));
+                            pathObjectElement.CreateRequiredElement("StrokeColor", new XAttribute("Value", pb.PathObject.StrokeColor.Value.ToString()));
+                            pathObjectElement.CreateRequiredElement("AbbreviatedData", pb.PathObject.AbbreviatedData);
                             layerElement.Add(pathObjectElement);
                         }
-
                         if (pb.ImageObject != null)
                         {
-                            layerElement.Add(new XElement(ConstDefined.OfdNamespace + "ImageObject", new XAttribute("ID", pb.ImageObject.Id), new XAttribute("Boundary", pb.ImageObject.Boundary), new XAttribute("CTM", pb.ImageObject.Ctm), new XAttribute("ResourceID", pb.ImageObject.ResourceId)));
+                            layerElement.CreateRequiredElement("ImageObject", new XAttribute("ID", pb.ImageObject.Id), new XAttribute("Boundary", pb.ImageObject.Boundary), new XAttribute("CTM", pb.ImageObject.Ctm), new XAttribute("ResourceID", pb.ImageObject.ResourceId));
                         }
                     }
-
                     contentElement.Add(layerElement);
                 }
-
                 _pageElement.Add(contentElement);
             }
         }
@@ -337,197 +285,51 @@ namespace OfdSharp.Writer
             }
         }
 
-        public void WriteTemplate()
+        public void WriteTemplate(List<PageObject> templatePages)
         {
-            _templatePages.Add(new PageObject
+            foreach (var pageObject in templatePages)
             {
-                Content = new Content
-                {
-                    Layers = new List<Layer>
-                    {
-                        new Layer
-                        {
-                            Id = new Id(303),
-                            DrawParam = new RefId
-                            {
-                                Id = new Id(4)
-                            },
-                            PageBlocks = new List<PageBlock>
-                            {
-                                new PageBlock
-                                {
-                                    PathObject = new Primitives.Graph.Path
-                                    {
-                                        Id = new Id(6),
-                                        Boundary = new Box(68.5, 17.8, 73, 0.4),
-                                        LineWidth = 0.25,
-                                        FillColor = new Primitives.Pages.Description.Color.CtColor
-                                        {
-                                            Value = new Primitives.Array("156 82 35"),
-                                            ColorSpace = new RefId
-                                            {
-                                                Id = new Id(5)
-                                            }
-                                        },
-                                        StrokeColor = new Primitives.Pages.Description.Color.CtColor
-                                        {
-                                            Value = new Primitives.Array("156 82 35"),
-                                            ColorSpace = new RefId
-                                            {
-                                                Id = new Id(5)
-                                            }
-                                        },
-                                        AbbreviatedData = "M 0 0.2 L 73 0.2",
-                                    }
-                                },
-                                new PageBlock
-                                {
-                                    PathObject = new Primitives.Graph.Path
-                                    {
-                                        Id = new Id(7),
-                                        Boundary = new Box(68.5, 18.8, 73, 0.4),
-                                        LineWidth = 0.25,
-                                        FillColor = new Primitives.Pages.Description.Color.CtColor
-                                        {
-                                            Value = new Primitives.Array("156 82 35"),
-                                            ColorSpace = new RefId
-                                            {
-                                                Id = new Id(5)
-                                            }
-                                        },
-                                        StrokeColor = new Primitives.Pages.Description.Color.CtColor
-                                        {
-                                            Value = new Primitives.Array("156 82 35"),
-                                            ColorSpace = new RefId
-                                            {
-                                                Id = new Id(5)
-                                            }
-                                        },
-                                        AbbreviatedData = "M 0 0.2 L 73 0.2",
-                                    }
-                                },
-                                new PageBlock
-                                {
-                                    PathObject = new Primitives.Graph.Path
-                                    {
-                                        Id = new Id(8),
-                                        Boundary = new Box(4.5, 29.8, 201, 0.4),
-                                        LineWidth = 0.25,
-                                        FillColor = new Primitives.Pages.Description.Color.CtColor
-                                        {
-                                            Value = new Primitives.Array("156 82 35"),
-                                            ColorSpace = new RefId
-                                            {
-                                                Id = new Id(5)
-                                            }
-                                        },
-                                        StrokeColor = new Primitives.Pages.Description.Color.CtColor
-                                        {
-                                            Value = new Primitives.Array("156 82 35"),
-                                            ColorSpace = new RefId
-                                            {
-                                                Id = new Id(5)
-                                            }
-                                        },
-                                        AbbreviatedData = "M 0 0.2 L 201 0.2",
-                                    }
-                                },
-                                new PageBlock
-                                {
-                                    TextObject = new CtText
-                                    {
-                                        Id = new Id(32),
-                                        Boundary = new Box(148.5, 18.5, 16, 3.6),
-                                        Font = new RefId {Id = new Id(29)},
-                                        Size = 3.175,
-                                        FillColor = new Primitives.Pages.Description.Color.CtColor
-                                        {
-                                            Value = new Primitives.Array("156 82 35")
-                                        },
-                                        TextCode = new TextCode
-                                        {
-                                            X = 0.1,
-                                            Y = 2.734,
-                                            DeltaX = new Primitives.Array("3.175 3.175 3.175 3.175"),
-                                            Value = "开票日期："
-                                        }
-                                    }
-                                },
-                                new PageBlock
-                                {
-                                    TextObject = new CtText
-                                    {
-                                        Id = new Id(33),
-                                        Boundary = new Box(148.5, 24, 16, 3.6),
-                                        Font = new RefId {Id = new Id(29)},
-                                        Size = 3.175,
-                                        FillColor = new Primitives.Pages.Description.Color.CtColor
-                                        {
-                                            Value = new Primitives.Array("156 82 35")
-                                        },
-                                        TextCode = new TextCode
-                                        {
-                                            X = 0.1,
-                                            Y = 2.734,
-                                            DeltaX = new Primitives.Array("4.86 4.87 3.175"),
-                                            Value = "校验码："
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            });
-
-            foreach (var pageObject in _templatePages)
-            {
-                XElement pageElement = new XElement(ConstDefined.OfdNamespace + "Page", new XAttribute(XNamespace.Xmlns + "ofd", ConstDefined.OfdXmlns));
-                XElement contentElement = new XElement(ConstDefined.OfdNamespace + "Content");
+                XElement pageElement = XmlExtension.CreateElement("Page", new XAttribute(XNamespace.Xmlns + ConstDefined.OfdPrefix, ConstDefined.OfdXmlns));
+                XElement contentElement = XmlExtension.CreateElement("Content");
                 foreach (var layer in pageObject.Content.Layers)
                 {
-                    XElement layerElement = new XElement(ConstDefined.OfdNamespace + "Layer", new XAttribute("DrawParam", layer.DrawParam), new XAttribute("ID", layer.Id));
+                    XElement layerElement = XmlExtension.CreateElement("Layer", new XAttribute("DrawParam", layer.DrawParam), new XAttribute("ID", layer.Id));
                     foreach (var pageBlock in layer.PageBlocks)
                     {
                         if (pageBlock.PathObject != null)
                         {
-                            XElement pathElement = new XElement(ConstDefined.OfdNamespace + "PathObject", new XAttribute("ID", pageBlock.PathObject.Id), new XAttribute("Boundary", pageBlock.PathObject.Boundary), new XAttribute("LineWidth", pageBlock.PathObject.LineWidth));
-                            pathElement.Add(new XElement(ConstDefined.OfdNamespace + "FillColor", new XAttribute("Value", pageBlock.PathObject.FillColor.Value), new XAttribute("ColorSpace", pageBlock.PathObject.FillColor.ColorSpace)));
-                            pathElement.Add(new XElement(ConstDefined.OfdNamespace + "StrokeColor", new XAttribute("Value", pageBlock.PathObject.StrokeColor.Value), new XAttribute("ColorSpace", pageBlock.PathObject.StrokeColor.ColorSpace)));
-                            pathElement.Add(new XElement(ConstDefined.OfdNamespace + "AbbreviatedData", new XAttribute("Value", pageBlock.PathObject.AbbreviatedData)));
+                            XElement pathElement = XmlExtension.CreateElement("PathObject", new XAttribute("ID", pageBlock.PathObject.Id), new XAttribute("Boundary", pageBlock.PathObject.Boundary), new XAttribute("LineWidth", pageBlock.PathObject.LineWidth));
+                            pathElement.CreateRequiredElement("FillColor", new XAttribute("Value", pageBlock.PathObject.FillColor.Value), new XAttribute("ColorSpace", pageBlock.PathObject.FillColor.ColorSpace));
+                            pathElement.CreateRequiredElement("StrokeColor", new XAttribute("Value", pageBlock.PathObject.StrokeColor.Value), new XAttribute("ColorSpace", pageBlock.PathObject.StrokeColor.ColorSpace));
+                            pathElement.CreateRequiredElement("AbbreviatedData", new XAttribute("Value", pageBlock.PathObject.AbbreviatedData));
                             layerElement.Add(pathElement);
                         }
 
                         if (pageBlock.TextObject != null)
                         {
-                            XElement textObjectElement = new XElement(ConstDefined.OfdNamespace + "TextObject", new XAttribute("ID", pageBlock.TextObject.Id.ToString()), new XAttribute("Boundary", pageBlock.TextObject.Boundary.ToString()), new XAttribute("Font", pageBlock.TextObject.Font.Id.ToString()), new XAttribute("Size", pageBlock.TextObject.Size));
-                            textObjectElement.Add(new XElement(ConstDefined.OfdNamespace + "FillColor", new XAttribute("Value", pageBlock.TextObject.FillColor.Value.ToString())));
-                            textObjectElement.Add(new XElement(ConstDefined.OfdNamespace + "TextCode", pageBlock.TextObject.TextCode.Value, new XAttribute("X", pageBlock.TextObject.TextCode.X), new XAttribute("Y", pageBlock.TextObject.TextCode.Y), new XAttribute("DeltaX", pageBlock.TextObject.TextCode.DeltaX)));
+                            XElement textObjectElement = XmlExtension.CreateElement("TextObject", new XAttribute("ID", pageBlock.TextObject.Id.ToString()), new XAttribute("Boundary", pageBlock.TextObject.Boundary.ToString()), new XAttribute("Font", pageBlock.TextObject.Font.Id.ToString()), new XAttribute("Size", pageBlock.TextObject.Size));
+                            textObjectElement.CreateRequiredElement("FillColor", new XAttribute("Value", pageBlock.TextObject.FillColor.Value.ToString()));
+                            textObjectElement.CreateRequiredElement("TextCode", pageBlock.TextObject.TextCode.Value, new XAttribute("X", pageBlock.TextObject.TextCode.X), new XAttribute("Y", pageBlock.TextObject.TextCode.Y), new XAttribute("DeltaX", pageBlock.TextObject.TextCode.DeltaX));
                             layerElement.Add(textObjectElement);
                         }
                     }
-
                     contentElement.Add(layerElement);
                 }
-
                 pageElement.Add(contentElement);
                 _templateElements.Add(pageElement);
             }
         }
 
-        public void WriteCustomerTag(XElement content)
+        public void WriteCustomerTag(List<CustomTag> customTags, XElement content)
         {
             _customerTagsElement = new XElement(ConstDefined.OfdNamespace + "CustomTags", new XAttribute(XNamespace.Xmlns + "ofd", ConstDefined.OfdXmlns));
-            CustomTag customTag = new CustomTag { FileLoc = new Location { Value = "CustomTag.xml" }, TypeId = "0" };
-            _customTags.Add(customTag);
-            foreach (var tg in _customTags)
+            foreach (var tg in customTags)
             {
                 XElement customerTagElement = new XElement(ConstDefined.OfdNamespace + "CustomTag");
                 customerTagElement.Add(new XAttribute("TypeID", tg.TypeId));
                 customerTagElement.Add(new XElement(ConstDefined.OfdNamespace + "FileLoc", tg.FileLoc));
                 _customerTagsElement.Add(customerTagElement);
             }
-
             //tags内容
             _customTagElements.Add(content);
         }
@@ -550,7 +352,7 @@ namespace OfdSharp.Writer
                 },
                 Appearance = new PageBlock
                 {
-                    PathObject = new Primitives.Graph.Path
+                    PathObject = new Primitives.Graph.CtPath
                     {
                         Boundary = new Box(4.5, 104, 115, 20)
                     }
@@ -716,11 +518,11 @@ namespace OfdSharp.Writer
                     XElement attachmentElement = _attachmentElements.ElementAt(_attachments.IndexOf(attachment));
                     zipArchive.CreateEntry("Doc_0/Attachs/" + attachment.FileLoc.Value, attachmentElement, _isFormat);
                 }
-
-                foreach (var multiMedia in _ctMultiMedias)
+                DocumentResource res = _ofdDocument.GetDocumentResource();
+                foreach (var multiMedia in res.MultiMedias)
                 {
                     string path = Path.Combine(Directory.GetCurrentDirectory(), "Files", multiMedia.MediaFile.Value);
-                    if (_ctMultiMedias.IndexOf(multiMedia) == 0)
+                    if (res.MultiMedias.IndexOf(multiMedia) == 0)
                     {
                         byte[] fileBytes = File.ReadAllBytes(path);
                         zipArchive.CreateEntry("Doc_0/Res/" + multiMedia.MediaFile.Value, fileBytes);
@@ -733,7 +535,6 @@ namespace OfdSharp.Writer
                         }
                     }
                 }
-
                 foreach (var tplElement in _templateElements)
                 {
                     zipArchive.CreateEntry("Doc_0/Tpls/Tpls_" + _templateElements.IndexOf(tplElement) + "/Content.xml", tplElement, _isFormat);

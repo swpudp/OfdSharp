@@ -1,4 +1,5 @@
 ﻿using System.Collections;
+using System.Collections.Generic;
 
 namespace OfdSharp.Extensions
 {
@@ -16,6 +17,17 @@ namespace OfdSharp.Extensions
         {
             enumerator.MoveNext();
             return enumerator.Current;
+        }
+
+        /// <summary>
+        /// 包含任何元素
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="collection"></param>
+        /// <returns></returns>
+        public static bool IsAny<T>(this ICollection<T> collection)
+        {
+            return collection != null && collection.Count > 0;
         }
     }
 }

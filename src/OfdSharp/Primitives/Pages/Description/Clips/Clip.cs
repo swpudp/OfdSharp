@@ -21,7 +21,7 @@ namespace OfdSharp.Primitives.Pages.Description.Clips
         /// <summary>
         /// 用于裁剪的图形
         /// </summary>
-        public Path Path { get; set; }
+        public CtPath Path { get; set; }
 
         /// <summary>
         /// 用于裁剪的文本

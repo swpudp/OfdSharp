@@ -178,7 +178,7 @@ namespace OfdSharp.Reader
                 {
                     DocBody = new DocBody
                     {
-                        DocInfo = new DocInfo
+                        DocInfo = new CtDocInfo
                         {
                             DocId = document.FirstValueOrDefault("DocID"),
                             CustomDataList = document.GetDescendants("CustomData").Select(f => new CustomData { Name = f.AttributeValueOrDefault("Name"), Value = f.Value }).ToList()

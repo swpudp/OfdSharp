@@ -19,6 +19,16 @@ namespace OfdSharp
         public const string OfdPrefix = "ofd";
 
         /// <summary>
+        /// 文档类型
+        /// </summary>
+        public const string OfdDocType = "OFD";
+
+        /// <summary>
+        /// 文档版本号
+        /// </summary>
+        public const string OfdVersion = "1.1";
+
+        /// <summary>
         /// 日期格式化
         /// </summary>
         public const string DateFormatter = "yyyy-MM-dd";
