@@ -66,7 +66,7 @@ namespace OfdSharp.Font
         /// 获取字体全名
         /// </summary>
         /// <returns></returns>
-        public String GetFullFontName()
+        public string GetFullFontName()
         {
             if (FamilyName == null)
             {

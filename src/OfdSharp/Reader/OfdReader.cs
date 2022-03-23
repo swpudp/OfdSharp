@@ -183,8 +183,8 @@ namespace OfdSharp.Reader
                             DocId = document.FirstValueOrDefault("DocID"),
                             CustomDataList = document.GetDescendants("CustomData").Select(f => new CustomData { Name = f.AttributeValueOrDefault("Name"), Value = f.Value }).ToList()
                         },
-                        DocRoot = new Location { Value = document.FirstValueOrDefault("DocRoot") },
-                        Signatures = new Location { Value = document.FirstValueOrDefault("Signatures") }
+                        DocRoot = new Location(document.FirstValueOrDefault("DocRoot")),
+                        Signatures = new Location(document.FirstValueOrDefault("Signatures"))
                     }
                 };
                 _docRoot = _ofdRoot.DocBody.DocRoot.Value.Split('/')[0];
@@ -195,13 +195,13 @@ namespace OfdSharp.Reader
         /// <summary>
         /// 主文档文件
         /// </summary>
-        private Document _document;
+        private CtDocument _document;
 
         /// <summary>
         /// 文档主入口Document.xml读取
         /// </summary>
         /// <returns></returns>
-        public Document GetDocument()
+        public CtDocument GetDocument()
         {
             if (_document != null)
             {
@@ -213,25 +213,25 @@ namespace OfdSharp.Reader
             using (MemoryStream memory = ReadEntry(entry))
             {
                 var document = XDocument.Load(memory);
-                _document = new Document
+                _document = new CtDocument
                 {
                     CommonData = new CommonData
                     {
                         MaxUnitId = new Id(document.FirstValueOrDefault("MaxUnitID")),
                         PageArea = new PageArea { Physical = Box.Parse(document.FirstValueOrDefault("PhysicalBox")) },
-                        PublicRes = new Location { Value = document.FirstValueOrDefault("PublicRes") },
-                        DocumentRes = new Location { Value = document.FirstValueOrDefault("DocumentRes") },
+                        PublicRes = new Location(document.FirstValueOrDefault("PublicRes")),
+                        DocumentRes = new Location(document.FirstValueOrDefault("DocumentRes")),
                         TemplatePages = document.GetDescendants("TemplatePage").Select(f => new TemplatePage
                         {
                             Id = new Id(f.AttributeValueOrDefault("ID")),
-                            BaseLoc = new Location { Value = f.AttributeValueOrDefault("BaseLoc") },
+                            BaseLoc = new Location(f.AttributeValueOrDefault("BaseLoc")),
                             ZOrder = f.AttributeValueOrDefault("ZOrder").ParseEnum<LayerType>()
                         }).ToList()
                     },
-                    Pages = document.GetDescendants("Page").Select(f => new Primitives.Pages.Tree.PageNode { Id = new Id(f.AttributeValueOrDefault("ID")), BaseLoc = new Location { Value = f.AttributeValueOrDefault("BaseLoc") } }).ToList(),
-                    Annotations = new List<Location> { new Location { Value = document.FirstValueOrDefault("Annotations") } },
-                    Attachments = new List<Location> { new Location { Value = document.FirstValueOrDefault("Attachments") } },
-                    CustomTags = new List<Location> { new Location { Value = document.FirstValueOrDefault("CustomTags") } }
+                    Pages = document.GetDescendants("Page").Select(f => new Primitives.Pages.Tree.PageNode { Id = new Id(f.AttributeValueOrDefault("ID")), BaseLoc = new Location(f.AttributeValueOrDefault("BaseLoc")) }).ToList(),
+                    Annotations = new List<Location> { new Location(document.FirstValueOrDefault("Annotations")) },
+                    Attachments = new List<Location> { new Location(document.FirstValueOrDefault("Attachments")) },
+                    CustomTags = new List<Location> { new Location(document.FirstValueOrDefault("CustomTags")) }
                 };
                 return _document;
             }
@@ -253,7 +253,7 @@ namespace OfdSharp.Reader
                 return _documentResource;
             }
 
-            Document document = GetDocument();
+            CtDocument document = GetDocument();
             ZipArchiveEntry entry = GetEntry(document.CommonData.DocumentRes.Value);
             if (entry == null)
             {
@@ -279,7 +279,7 @@ namespace OfdSharp.Reader
                 return _documentResource;
             }
 
-            Document document = GetDocument();
+            CtDocument document = GetDocument();
             ZipArchiveEntry entry = GetEntry(document.CommonData.PublicRes.Value);
             if (entry == null)
             {
@@ -303,7 +303,7 @@ namespace OfdSharp.Reader
         {
             return new DocumentResource
             {
-                BaseLoc = new Location { Value = xDocument.Root.AttributeValueOrDefault("BaseLoc") },
+                BaseLoc = new Location(xDocument.Root.AttributeValueOrDefault("BaseLoc")),
                 ColorSpaces = xDocument.GetDescendants("ColorSpace").Select(f => new CtColorSpace
                 {
                     Type = f.AttributeValueOrDefault("Type").ParseEnum<ColorSpaceType>(),
@@ -320,22 +320,20 @@ namespace OfdSharp.Reader
                 {
                     Id = new Id(f.AttributeValueOrDefault("ID")),
                     LineWidth = Convert.ToDouble(f.AttributeValueOrDefault("LineWidth")),
-                    FillColor = new CtColor
+                    FillColor = new CtColor(f.AttributeValueForElementOrDefault("FillColor", "Value"))
                     {
-                        Value = Primitives.Array.Parse(f.AttributeValueForElementOrDefault("FillColor", "Value")),
-                        ColorSpace = new RefId { Id = new Id(f.AttributeValueForElementOrDefault("FillColor", "ColorSpace")) }
+                        ColorSpace = new RefId(f.AttributeValueForElementOrDefault("FillColor", "ColorSpace"))
                     },
-                    StrokeColor = new CtColor
+                    StrokeColor = new CtColor(f.AttributeValueForElementOrDefault("StrokeColor", "Value"))
                     {
-                        Value = Primitives.Array.Parse(f.AttributeValueForElementOrDefault("StrokeColor", "Value")),
-                        ColorSpace = new RefId { Id = new Id(f.AttributeValueForElementOrDefault("StrokeColor", "ColorSpace")) }
+                        ColorSpace = new RefId(f.AttributeValueForElementOrDefault("StrokeColor", "ColorSpace"))
                     }
                 }).ToList(),
                 MultiMedias = xDocument.GetDescendants("MultiMedia").Select(f => new CtMultiMedia
                 {
                     Type = f.AttributeValueOrDefault("Type").ParseEnum<MediaType>(),
                     Id = new Id(f.AttributeValueOrDefault("ID")),
-                    MediaFile = new Location { Value = f.ElementValueOrDefault("MediaFile") }
+                    MediaFile = new Location(f.ElementValueOrDefault("MediaFile"))
                 }).ToList()
             };
         }
@@ -356,7 +354,7 @@ namespace OfdSharp.Reader
                 return _attachments;
             }
 
-            Document document = GetDocument();
+            CtDocument document = GetDocument();
             _attachments = new List<Attachment>();
             foreach (var attachLocation in document.Attachments)
             {
@@ -375,7 +373,7 @@ namespace OfdSharp.Reader
                         Name = f.AttributeValueOrDefault("Name"),
                         Format = f.AttributeValueOrDefault("Format"),
                         Visible = bool.TryParse(f.AttributeValueOrDefault("Visible"), out bool visible) && visible,
-                        FileLoc = new Location { Value = string.Concat(Path.GetDirectoryName(attachLocation.Value), "/", Path.GetFileName(f.ElementValueOrDefault("FileLoc"))) }
+                        FileLoc = new Location(string.Concat(Path.GetDirectoryName(attachLocation.Value), "/", Path.GetFileName(f.ElementValueOrDefault("FileLoc"))))
                     }).ToList();
                     _attachments.AddRange(currentAttachments);
                 }
@@ -400,7 +398,7 @@ namespace OfdSharp.Reader
                 return _customTags;
             }
 
-            Document document = GetDocument();
+            CtDocument document = GetDocument();
             _customTags = new List<CustomTag>();
             foreach (var customTag in document.CustomTags)
             {
@@ -416,7 +414,7 @@ namespace OfdSharp.Reader
                     var currentCustomTag = xDocument.GetDescendants("CustomTag").Select(f => new CustomTag
                     {
                         TypeId = f.AttributeValueOrDefault("TypeID"),
-                        FileLoc = new Location { Value = f.ElementValueOrDefault("FileLoc") }
+                        FileLoc = new Location(f.ElementValueOrDefault("FileLoc"))
                     });
                     _customTags.AddRange(currentCustomTag);
                 }
@@ -513,7 +511,7 @@ namespace OfdSharp.Reader
                         StampAnnot = new StampAnnot
                         {
                             Id = new Id(signedInfoElement.AttributeValueForElementOrDefault("StampAnnot", "ID")),
-                            PageRef = new RefId { Id = new Id(signedInfoElement.AttributeValueForElementOrDefault("StampAnnot", "PageRef")) },
+                            PageRef = new RefId(signedInfoElement.AttributeValueForElementOrDefault("StampAnnot", "PageRef")),
                             Boundary = Box.Parse(signedInfoElement.AttributeValueForElementOrDefault("StampAnnot", "Boundary"))
                         },
                         Seal = GetSeal(signedInfoElement)
@@ -533,7 +531,7 @@ namespace OfdSharp.Reader
         private static Seal GetSeal(XElement e)
         {
             string loc = e.ElementValueForElementOrDefault("Seal", "BaseLoc");
-            return string.IsNullOrWhiteSpace(loc) ? null : new Seal { BaseLoc = new Location { Value = loc } };
+            return string.IsNullOrWhiteSpace(loc) ? null : new Seal { BaseLoc = new Location(loc) };
         }
 
         /// <summary>

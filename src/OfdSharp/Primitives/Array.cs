@@ -124,12 +124,12 @@ namespace OfdSharp.Primitives
 
         public static bool operator ==(Array a1, Array a2)
         {
-            return a1._elements.SequenceEqual(a2._elements);
+            return !(ReferenceEquals(a1, null) || ReferenceEquals(a2, null)) && a1._elements.SequenceEqual(a2._elements);
         }
 
         public static bool operator !=(Array a1, Array a2)
         {
-            return !(a1 == a2);
+            return !(ReferenceEquals(a1, null) || ReferenceEquals(a2, null) || a1 == a2);
         }
 
         public override int GetHashCode()

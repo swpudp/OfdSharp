@@ -5,7 +5,17 @@
     /// </summary>
     public class RefId
     {
-        public Id Id { get; set; }
+        public RefId(int id)
+        {
+            Id = new Id(id);
+        }
+
+        public RefId(string id)
+        {
+            Id = new Id(id);
+        }
+
+        public Id Id { get; }
 
         public override string ToString()
         {

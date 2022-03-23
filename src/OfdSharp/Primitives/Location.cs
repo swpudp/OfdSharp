@@ -9,10 +9,14 @@
     /// </summary>
     public class Location
     {
+        public Location(string value)
+        {
+            Value = value;
+        }
         /// <summary>
         /// 路径
         /// </summary>
-        public string Value { get; set; }
+        public string Value { get; }
 
         public override string ToString()
         {

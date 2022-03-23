@@ -264,7 +264,7 @@ namespace OfdSharp.Extensions
         /// <param name="element"></param>
         /// <param name="nodeName"></param>
         /// <param name="value"></param>
-        public static void CreateOptionalElement(this XElement element, string nodeName, string value)
+        public static void AddOptionalElement(this XElement element, string nodeName, string value)
         {
             if (string.IsNullOrWhiteSpace(value))
             {
@@ -279,7 +279,7 @@ namespace OfdSharp.Extensions
         /// <param name="element"></param>
         /// <param name="nodeName"></param>
         /// <param name="value"></param>
-        public static void CreateOptionalElement(this XElement element, string nodeName, DateTime? value, string format = null)
+        public static void AddOptionalElement(this XElement element, string nodeName, DateTime? value, string format = null)
         {
             if (!value.HasValue)
             {
@@ -294,7 +294,7 @@ namespace OfdSharp.Extensions
         /// <param name="element"></param>
         /// <param name="nodeName"></param>
         /// <param name="value"></param>
-        public static void CreateRequiredElement(this XElement element, string nodeName, string value)
+        public static void AddRequiredElement(this XElement element, string nodeName, string value)
         {
             element.Add(new XElement(ConstDefined.OfdNamespace + nodeName, value));
         }
@@ -305,7 +305,7 @@ namespace OfdSharp.Extensions
         /// <param name="element"></param>
         /// <param name="nodeName"></param>
         /// <param name="value"></param>
-        public static void CreateRequiredElement(this XElement element, string nodeName, XElement value)
+        public static void AddRequiredElement(this XElement element, string nodeName, XElement value)
         {
             element.Add(new XElement(ConstDefined.OfdNamespace + nodeName, value));
         }
@@ -316,7 +316,7 @@ namespace OfdSharp.Extensions
         /// <param name="element"></param>
         /// <param name="nodeName"></param>
         /// <param name="value"></param>
-        public static void CreateRequiredElement(this XElement element, string nodeName, Id value)
+        public static void AddRequiredElement(this XElement element, string nodeName, Id value)
         {
             element.Add(new XElement(ConstDefined.OfdNamespace + nodeName, value));
         }
@@ -327,7 +327,7 @@ namespace OfdSharp.Extensions
         /// <param name="element"></param>
         /// <param name="nodeName"></param>
         /// <param name="value"></param>
-        public static void CreateRequiredElement(this XElement element, string nodeName, string value, params XAttribute[] attributes)
+        public static void AddRequiredElement(this XElement element, string nodeName, string value, params XAttribute[] attributes)
         {
             XElement nodeElement = new XElement(ConstDefined.OfdNamespace + nodeName, value);
             foreach (XAttribute attribute in attributes)
@@ -343,7 +343,7 @@ namespace OfdSharp.Extensions
         /// <param name="element"></param>
         /// <param name="nodeName"></param>
         /// <param name="value"></param>
-        public static void CreateRequiredElement(this XElement element, string nodeName, params XAttribute[] attributes)
+        public static void AddRequiredElement(this XElement element, string nodeName, params XAttribute[] attributes)
         {
             XElement nodeElement = new XElement(ConstDefined.OfdNamespace + nodeName);
             foreach (XAttribute attribute in attributes)
@@ -354,7 +354,7 @@ namespace OfdSharp.Extensions
         }
 
         /// <summary>
-        /// 添加必选节点
+        /// 创建节点
         /// </summary>
         /// <param name="nodeName"></param>
         public static XElement CreateElement(string nodeName)
@@ -363,7 +363,7 @@ namespace OfdSharp.Extensions
         }
 
         /// <summary>
-        /// 添加必选节点
+        /// 创建节点
         /// </summary>
         /// <param name="nodeName"></param>
         public static XElement CreateElement(string nodeName, string value)
@@ -372,7 +372,7 @@ namespace OfdSharp.Extensions
         }
 
         /// <summary>
-        /// 添加必选节点
+        /// 创建节点
         /// </summary>
         /// <param name="nodeName"></param>
         public static XElement CreateElement(string nodeName, XElement value, params XAttribute[] attributes)
@@ -381,7 +381,7 @@ namespace OfdSharp.Extensions
         }
 
         /// <summary>
-        /// 添加必选节点
+        /// 创建节点
         /// </summary>
         /// <param name="nodeName"></param>
         public static XElement CreateElement(string nodeName, params XAttribute[] attributes)

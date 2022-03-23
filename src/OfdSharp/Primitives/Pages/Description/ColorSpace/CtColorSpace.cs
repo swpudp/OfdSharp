@@ -17,7 +17,7 @@
         /// <summary>
         /// 颜色空间的类型
         /// </summary>
-        public ColorSpaceType Type { get; set; }
+        public ColorSpaceType Type { get; set; } = ColorSpaceType.RGB;
 
         /// <summary>
         /// 每个颜色通道使用的位数

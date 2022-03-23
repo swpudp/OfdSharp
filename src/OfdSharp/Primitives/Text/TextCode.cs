@@ -6,6 +6,11 @@
     /// </summary>
     public class TextCode
     {
+        public TextCode(string value)
+        {
+            Value = value;
+        }
+
         /// <summary>
         /// 第一个文字的字形在对象坐标系下的 X 坐标
         /// 当 X 不出现，则采用上一个 TextCode 的 X 值，文字对象中的一个
@@ -39,6 +44,6 @@
         /// <summary>
         /// 文字内容
         /// </summary>
-        public string Value { get; set; }
+        public string Value { get; }
     }
 }

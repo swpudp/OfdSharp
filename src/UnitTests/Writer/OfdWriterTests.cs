@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Security.Cryptography;
 using System.Xml.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using OfdSharp;
@@ -18,8 +17,11 @@ using OfdSharp.Primitives.Image;
 using OfdSharp.Primitives.Pages.Description.Color;
 using OfdSharp.Primitives.Pages.Object;
 using OfdSharp.Primitives.Resources;
+using OfdSharp.Primitives.Signature;
+using OfdSharp.Primitives.Signatures;
 using OfdSharp.Primitives.Text;
 using OfdSharp.Reader;
+using OfdSharp.Sign;
 using OfdSharp.Verify;
 using OfdSharp.Writer;
 
@@ -66,50 +68,62 @@ namespace UnitTests.Writer
                     new CustomData {Name = "销售方纳税人识别号", Value = "91320111339366503A"}
                 }
             };
-            writer.WriteOfdRoot(docInfo, 0);
+            var ofdRoot = new OfdRoot
+            {
+                DocBody = new DocBody
+                {
+                    DocInfo = docInfo,
+                    DocRoot = new Location($"Doc_{0}/Document.xml"),
+                    Signatures = new Location($"Doc_{0}/Signs/Signatures.xml")
+                }
+            };
+            writer.WriteOfdRoot(ofdRoot);
 
             CommonData commonData = new CommonData
             {
-                ColorSpace = new RefId { Id = new Id(0) },
-                DocumentRes = new Location { Value = "DocumentRes.xml" },
                 MaxUnitId = new Id(100),
-                PublicRes = new Location { Value = "PublicRes.xml" },
-                PageArea = new PageArea { Application = new Box(0, 0, 1000, 100) },
+                PageArea = new PageArea { Application = new Box(0, 0, 1000, 100), Physical = new Box(0, 0, 100, 100) },
+                ColorSpace = new RefId(190),
+                DocumentRes = new Location("DocumentRes.xml"),
+                //MaxUnitId = new Id(100),
+                PublicRes = new Location("PublicRes.xml"),
+                //PageArea = new PageArea { Application = new Box(0, 0, 1000, 100), Physical = new Box(0, 0, 100, 100) },
                 TemplatePages = new List<TemplatePage>(),
             };
             var pageNodes = new List<OfdSharp.Primitives.Pages.Tree.PageNode>
             {
-                new OfdSharp.Primitives.Pages.Tree.PageNode { Id = new Id(20), BaseLoc = new Location { Value = "Pages/Page_0/Content.xml" } }
+                new OfdSharp.Primitives.Pages.Tree.PageNode { Id = new Id(20), BaseLoc = new Location ( "Pages/Page_0/Content.xml" ) }
             };
-            writer.WriteDocument(commonData, pageNodes, true);
-
-
+            CtDocument ctDocument = new CtDocument
+            {
+                CommonData = commonData,
+                Pages = pageNodes
+            };
+            writer.WriteDocument(ctDocument);
 
             DocumentResource res = new DocumentResource
             {
-                BaseLoc = new Location { Value = "Res" },
+                BaseLoc = new Location("Res"),
                 DrawParams = new List<OfdSharp.Primitives.Pages.Description.DrawParam.CtDrawParam> {
 
                     new OfdSharp.Primitives.Pages.Description.DrawParam.CtDrawParam
                     {
                         Id = new Id(20),
                         LineWidth = 0.25,
-                        FillColor = new OfdSharp.Primitives.Pages.Description.Color.CtColor
+                        FillColor = new OfdSharp.Primitives.Pages.Description.Color.CtColor("10 10 10 20")
                         {
-                            Value=new OfdSharp.Primitives.Array("10 10 10 20"),
-                            ColorSpace=new RefId { Id = new Id(25) },
+                            ColorSpace=new RefId (25) ,
                         },
-                        StrokeColor = new OfdSharp.Primitives.Pages.Description.Color.CtColor
+                        StrokeColor = new OfdSharp.Primitives.Pages.Description.Color.CtColor("10 20 10 20")
                         {
-                            Value=new OfdSharp.Primitives.Array("10 20 10 20"),
-                            ColorSpace=new RefId { Id = new Id(25) },
+                            ColorSpace=new RefId (25) ,
                         }
                     }
                 },
                 MultiMedias = new List<CtMultiMedia>
                 {
-                   new CtMultiMedia { Format = "GBIG2", Type = MediaType.Image, Id = new Id(78), MediaFile = new Location { Value = "image_78.jb2" } },
-                   new CtMultiMedia { Format = "GBIG2", Type = MediaType.Image, Id = new Id(79), MediaFile = new Location { Value = "image_80.jb2" } }
+                   new CtMultiMedia { Format = "GBIG2", Type = MediaType.Image, Id = new Id(78), MediaFile = new Location ( "image_78.jb2" ) },
+                   new CtMultiMedia { Format = "GBIG2", Type = MediaType.Image, Id = new Id(79), MediaFile = new Location ( "image_80.jb2" ) }
                 },
                 ColorSpaces = new List<OfdSharp.Primitives.Pages.Description.ColorSpace.CtColorSpace>
                 {
@@ -131,21 +145,82 @@ namespace UnitTests.Writer
             writer.WriteDocumentRes(res);
             writer.WritePublicRes(res);
             writer.WritePages(GetPageObjects());
-            InvoiceInfo invoiceInfo = CreateInvoiceInfo();
-            XElement attachment = CreateInvoiceElement(invoiceInfo);
-            XElement tag = CreateInvoiceTagElement();
 
-            writer.AddAttachment("original_invoice", "original_invoice.xml", "xml", false, attachment);
+            InvoiceInfo invoiceInfo = CreateInvoiceInfo();
+
+
+            //XElement attachment = InvoiceInfoBuilder.CreateInvoiceElement(invoiceInfo);
+            //writer.AddAttachment("original_invoice", "original_invoice.xml", "xml", false, attachment);
+
             writer.WriteTemplate(GetTemplatePageObjects());
 
-            var customTags = new List<CustomTag>();
-            CustomTag customTag = new CustomTag { FileLoc = new Location { Value = "CustomTag.xml" }, TypeId = "0" };
-            customTags.Add(customTag);
-            writer.WriteCustomerTag(customTags, tag);
-            writer.WriteAnnotation();
+            CustomTag customTag = new CustomTag { FileLoc = new Location("CustomTag.xml"), TypeId = "0" };
+            XElement tag = InvoiceInfoBuilder.CreateInvoiceTagElement();
+            writer.WriteCustomerTag(customTag, tag);
 
 
-            writer.WriteCert(sealKey, signerKey).WriteSignature();
+
+            writer.WriteAnnotation(new OfdSharp.Primitives.Annotations.AnnotationInfo
+            {
+                Id = new Id(1000),
+                Type = OfdSharp.Primitives.Annotations.AnnotationType.Link,
+                Parameters = new List<OfdSharp.Primitives.Annotations.Parameter>
+                {
+                    new OfdSharp.Primitives.Annotations.Parameter
+                    {
+                        Name=Guid.NewGuid().ToString("N"),
+                        Value=Guid.NewGuid().ToString()
+                    }
+                },
+                Appearance = new PageBlock
+                {
+                    PathObject = new CtPath
+                    {
+                        Boundary = new Box(10, 10, 10, 10),
+                        Id = new Id(109)
+                    },
+                }
+
+
+
+            }, new OfdSharp.Primitives.Annotations.RefPage { PageId = new RefId(100), FileLoc = new Location("Doc_0/Annots/Page_0/Annotation.xml") });
+
+            var signInfo = new SignedInfo
+            {
+                Provider = new Provider { Company = "gomain", ProviderName = "gomain_eseal", Version = "2.0" },
+                SignatureMethod = SesSigner.SignatureMethod.Id,
+                SignatureDateTime = DateTime.Now.ToString("yyyyMMddhh:mm:ss.fffz"),
+                ReferenceCollect = new ReferenceCollect
+                {
+                    CheckMethod = SesSigner.DigestMethod.Id,
+                    Items = new List<Reference>()
+                },
+                StampAnnot = new StampAnnot { Boundary = new Box(10, 10, 10, 10), Id = new Id(100), PageRef = new RefId(1001) }
+            };
+            writer.WriteSignature(signInfo);
+
+
+            //印章
+            var sealCert = Sm2Utils.MakeCert(sealKey.PublicKey, sealKey.PrivateKey, "yzw", "tax");
+
+            //签章者
+            var signerCert = Sm2Utils.MakeCert(signerKey.PublicKey, signerKey.PrivateKey, "yzw", "tax");
+
+            SesSealConfig config = new SesSealConfig
+            {
+                Manufacturer = "GOMAIN",
+                SealName = "测试全国统一发票监制章国家税务总局重庆市税务局",
+                EsId = "50011200000001",
+                SealCert = sealCert.GetEncoded(),
+                SealPrivateKey = sealKey.PrivateKey,
+                SealPicture = File.ReadAllBytes(Path.Combine(Directory.GetCurrentDirectory(), "Files", "image_78.jb2")),
+                SealType = "ofd",
+                SealWidth = 30,
+                SealHeight = 20,
+                SignerPrivateKey = signerKey.PrivateKey,
+                SignerCert = signerCert.GetEncoded()
+            };
+            writer.ExecuteSign(config);
 
             byte[] content = writer.Flush();
             string fileName = Path.Combine(Directory.GetCurrentDirectory(), "test-root.ofd");
@@ -165,10 +240,7 @@ namespace UnitTests.Writer
                         new Layer
                         {
                             Id = new Id(303),
-                            DrawParam = new RefId
-                            {
-                                Id = new Id(4)
-                            },
+                            DrawParam = new RefId(4),
                             PageBlocks = new List<PageBlock>
                             {
                                 new PageBlock
@@ -178,21 +250,13 @@ namespace UnitTests.Writer
                                         Id = new Id(6),
                                         Boundary = new Box(68.5, 17.8, 73, 0.4),
                                         LineWidth = 0.25,
-                                        FillColor = new OfdSharp.Primitives.Pages.Description.Color.CtColor
+                                        FillColor = new OfdSharp.Primitives.Pages.Description.Color.CtColor("156 82 35")
                                         {
-                                            Value = new OfdSharp.Primitives.Array("156 82 35"),
-                                            ColorSpace = new RefId
-                                            {
-                                                Id = new Id(5)
-                                            }
+                                            ColorSpace = new RefId(5)
                                         },
-                                        StrokeColor = new OfdSharp.Primitives.Pages.Description.Color.CtColor
+                                        StrokeColor = new OfdSharp.Primitives.Pages.Description.Color.CtColor("156 82 35")
                                         {
-                                            Value = new OfdSharp.Primitives.Array("156 82 35"),
-                                            ColorSpace = new RefId
-                                            {
-                                                Id = new Id(5)
-                                            }
+                                            ColorSpace = new RefId(5)
                                         },
                                         AbbreviatedData = "M 0 0.2 L 73 0.2",
                                     }
@@ -204,21 +268,13 @@ namespace UnitTests.Writer
                                         Id = new Id(7),
                                         Boundary = new Box(68.5, 18.8, 73, 0.4),
                                         LineWidth = 0.25,
-                                        FillColor = new OfdSharp.Primitives.Pages.Description.Color.CtColor
+                                        FillColor = new OfdSharp.Primitives.Pages.Description.Color.CtColor("156 82 35")
                                         {
-                                            Value = new OfdSharp.Primitives.Array("156 82 35"),
-                                            ColorSpace = new RefId
-                                            {
-                                                Id = new Id(5)
-                                            }
+                                            ColorSpace = new RefId                                            (5)
                                         },
-                                        StrokeColor = new OfdSharp.Primitives.Pages.Description.Color.CtColor
+                                        StrokeColor = new OfdSharp.Primitives.Pages.Description.Color.CtColor("156 82 35")
                                         {
-                                            Value = new OfdSharp.Primitives.Array("156 82 35"),
-                                            ColorSpace = new RefId
-                                            {
-                                                Id = new Id(5)
-                                            }
+                                            ColorSpace = new RefId(5)
                                         },
                                         AbbreviatedData = "M 0 0.2 L 73 0.2",
                                     }
@@ -230,21 +286,15 @@ namespace UnitTests.Writer
                                         Id = new Id(8),
                                         Boundary = new Box(4.5, 29.8, 201, 0.4),
                                         LineWidth = 0.25,
-                                        FillColor = new OfdSharp.Primitives.Pages.Description.Color.CtColor
+                                        FillColor = new OfdSharp.Primitives.Pages.Description.Color.CtColor("156 82 35")
                                         {
-                                            Value = new OfdSharp.Primitives.Array("156 82 35"),
-                                            ColorSpace = new RefId
-                                            {
-                                                Id = new Id(5)
-                                            }
+                                            ColorSpace = new RefId(5)
+
                                         },
-                                        StrokeColor = new OfdSharp.Primitives.Pages.Description.Color.CtColor
+                                        StrokeColor = new OfdSharp.Primitives.Pages.Description.Color.CtColor("156 82 35")
                                         {
-                                            Value = new OfdSharp.Primitives.Array("156 82 35"),
-                                            ColorSpace = new RefId
-                                            {
-                                                Id = new Id(5)
-                                            }
+                                            ColorSpace = new RefId(5)
+
                                         },
                                         AbbreviatedData = "M 0 0.2 L 201 0.2",
                                     }
@@ -255,18 +305,16 @@ namespace UnitTests.Writer
                                     {
                                         Id = new Id(32),
                                         Boundary = new Box(148.5, 18.5, 16, 3.6),
-                                        Font = new RefId {Id = new Id(29)},
+                                        Font = new RefId (29),
                                         Size = 3.175,
-                                        FillColor = new OfdSharp.Primitives.Pages.Description.Color.CtColor
+                                        FillColor = new OfdSharp.Primitives.Pages.Description.Color.CtColor("156 82 35")
                                         {
-                                            Value = new OfdSharp.Primitives.Array("156 82 35")
                                         },
-                                        TextCode = new TextCode
+                                        TextCode = new TextCode("开票日期：")
                                         {
                                             X = 0.1,
                                             Y = 2.734,
                                             DeltaX = new OfdSharp.Primitives.Array("3.175 3.175 3.175 3.175"),
-                                            Value = "开票日期："
                                         }
                                     }
                                 },
@@ -276,18 +324,16 @@ namespace UnitTests.Writer
                                     {
                                         Id = new Id(33),
                                         Boundary = new Box(148.5, 24, 16, 3.6),
-                                        Font = new RefId {Id = new Id(29)},
+                                        Font = new RefId (29),
                                         Size = 3.175,
-                                        FillColor = new OfdSharp.Primitives.Pages.Description.Color.CtColor
+                                        FillColor = new OfdSharp.Primitives.Pages.Description.Color.CtColor("156 82 35")
                                         {
-                                            Value = new OfdSharp.Primitives.Array("156 82 35")
                                         },
-                                        TextCode = new TextCode
+                                        TextCode = new TextCode("校验码：")
                                         {
                                             X = 0.1,
                                             Y = 2.734,
                                             DeltaX = new OfdSharp.Primitives.Array("4.86 4.87 3.175"),
-                                            Value = "校验码："
                                         }
                                     }
                                 }
@@ -304,7 +350,7 @@ namespace UnitTests.Writer
             List<PageObject> pageObjects = new List<PageObject>();
             pageObjects.Add(new PageObject
             {
-                PageRes = new Location { Value = "Pages/Page_0/Content.xml" },
+                PageRes = new Location("Pages/Page_0/Content.xml"),
                 Area = new PageArea { Physical = new Box(0, 0, 210, 297) },
                 Template = new Template { TemplateId = "2", ZOrder = LayerType.Background },
                 Content = new Content
@@ -322,10 +368,10 @@ namespace UnitTests.Writer
                                     {
                                         Id = new Id(302),
                                         Boundary = new Box(69, 7, 72, 7.6749),
-                                        Font = new RefId {Id = new Id(60)},
+                                        Font = new RefId (60),
                                         Size = 6.61,
-                                        FillColor = new CtColor {Value = new OfdSharp.Primitives.Array("156 82 35")},
-                                        TextCode = new TextCode {X = 0, Y = 5.683674, DeltaX = new OfdSharp.Primitives.Array("10 6.61"), Value = "北京增值税电子普通发票"}
+                                        FillColor = new CtColor("156 82 35") ,
+                                        TextCode = new TextCode("北京增值税电子普通发票") {X = 0, Y = 5.683674, DeltaX = new OfdSharp.Primitives.Array("10 6.61")}
                                     }
                                 },
                                 new PageBlock
@@ -335,7 +381,7 @@ namespace UnitTests.Writer
                                         Id = new Id(304),
                                         Boundary = new Box(68.5, 18, 73, 0.25),
                                         LineWidth = 0.25,
-                                        StrokeColor = new CtColor {Value = new OfdSharp.Primitives.Array("156 82 35")},
+                                        StrokeColor = new CtColor("156 82 35"),
                                         AbbreviatedData = "M 0 0 L 73 0",
                                     }
                                 },
@@ -346,7 +392,7 @@ namespace UnitTests.Writer
                                         Id = new Id(305),
                                         Boundary = new Box(68.5, 19, 73, 0.25),
                                         LineWidth = 0.25,
-                                        StrokeColor = new CtColor {Value = new OfdSharp.Primitives.Array("156 82 35")},
+                                        StrokeColor = new CtColor("156 82 35") ,
                                         AbbreviatedData = "M 0 0 L 73 0",
                                     }
                                 },
@@ -357,7 +403,7 @@ namespace UnitTests.Writer
                                         Id = new Id(310),
                                         Ctm = new OfdSharp.Primitives.Array("20 0 0 20 0 0"),
                                         Boundary = new Box(8.5, 4, 20, 20),
-                                        ResourceId = new RefId {Id = new Id(311)}
+                                        ResourceId = new RefId(311)
                                     }
                                 }
                             }
@@ -437,111 +483,20 @@ namespace UnitTests.Writer
                     PreferentialMark = string.Empty,
                     FreeTaxMark = string.Empty,
                     VATSpecialManagement = string.Empty
-                }).ToList()
+                }).ToList(),
+                SystemInfo = new SystemInfo
+                {
+                    SystemCode = "bw",
+                    SystemName = "百望",
+                    SystemType = "2"
+                }
             };
             return invoiceInfo;
         }
 
 
-        private static XElement CreateInvoiceElement(InvoiceInfo invoiceInfo)
-        {
-            XNamespace invoiceNamespace = "http://www.edrm.org.cn/schema/e-invoice/2019";
-            string invoiceXmls = "http://www.edrm.org.cn/schema/e-invoice/2019";
-            XElement element = new XElement("eInvoice", new XAttribute(XNamespace.Xmlns + "fp", invoiceXmls), new XAttribute("Version", "1.0"));
 
-            element.Add(new XElement(invoiceNamespace + "DocID", invoiceInfo.DocId));
-            element.Add(new XElement(invoiceNamespace + "AreaCode", invoiceInfo.AreaCode));
-            element.Add(new XElement(invoiceNamespace + "TypeCode", invoiceInfo.TypeCode));
-            element.Add(new XElement(invoiceNamespace + "InvoiceSIA2", invoiceInfo.InvoiceSIA2));
-            element.Add(new XElement(invoiceNamespace + "InvoiceSIA1", invoiceInfo.InvoiceSIA1));
-            element.Add(new XElement(invoiceNamespace + "InvoiceCode", invoiceInfo.InvoiceCode));
-            element.Add(new XElement(invoiceNamespace + "InvoiceNo", invoiceInfo.InvoiceNo));
-            element.Add(new XElement(invoiceNamespace + "IssueDate", new XCData(invoiceInfo.IssueDate)));
-            element.Add(new XElement(invoiceNamespace + "InvoiceCheckCode", new XCData(invoiceInfo.InvoiceCheckCode)));
-            element.Add(new XElement(invoiceNamespace + "MachineNo", invoiceInfo.MachineNo));
-            element.Add(new XElement(invoiceNamespace + "GraphCode", new XCData(invoiceInfo.GraphCode)));
-            element.Add(new XElement(invoiceNamespace + "TaxControlCode", new XCData(invoiceInfo.TaxControlCode)));
 
-            XElement buyerElement = new XElement(invoiceNamespace + "Buyer");
-            buyerElement.Add(new XElement("BuyerName", new XCData(invoiceInfo.Buyer.BuyerName)));
-            buyerElement.Add(new XElement("BuyerTaxID", invoiceInfo.Buyer.BuyerTaxNo));
-            buyerElement.Add(new XElement("BuyerAddrTel", new XCData(invoiceInfo.Buyer.BuyerAddressTel)));
-            buyerElement.Add(new XElement("BuyerFinancialAccount", new XCData(invoiceInfo.Buyer.BuyerBankAccount)));
-            element.Add(buyerElement);
 
-            XElement sellerElement = new XElement(invoiceNamespace + "Seller");
-            sellerElement.Add(new XElement("SellerName", new XCData(invoiceInfo.Seller.SellerName)));
-            sellerElement.Add(new XElement("SellerTaxID", invoiceInfo.Seller.SellerTaxNo));
-            sellerElement.Add(new XElement("SellerAddrTel", new XCData(invoiceInfo.Seller.SellerAddressTel)));
-            sellerElement.Add(new XElement("SellerFinancialAccount", new XCData(invoiceInfo.Seller.SellerBankAccount)));
-            element.Add(sellerElement);
-
-            element.Add(new XElement(invoiceNamespace + "TaxInclusiveTotalAmount", invoiceInfo.TaxInclusiveTotalAmount));
-            element.Add(new XElement(invoiceNamespace + "TaxInclusiveTotalAmountWithWords", invoiceInfo.TaxInclusiveTotalAmountWithWords));
-            element.Add(new XElement(invoiceNamespace + "TaxExclusiveTotalAmount", invoiceInfo.TaxExclusiveTotalAmount));
-            element.Add(new XElement(invoiceNamespace + "TaxTotalAmount", invoiceInfo.TaxTotalAmount));
-            element.Add(new XElement(invoiceNamespace + "Note", new XCData(invoiceInfo.Note)));
-            element.Add(new XElement(invoiceNamespace + "InvoiceClerk", new XCData(invoiceInfo.InvoiceClerk)));
-            element.Add(new XElement(invoiceNamespace + "Payee", new XCData(invoiceInfo.Payee)));
-            element.Add(new XElement(invoiceNamespace + "Checker", new XCData(invoiceInfo.Checker)));
-            element.Add(new XElement(invoiceNamespace + "Signature", invoiceInfo.Signature));
-            element.Add(new XElement(invoiceNamespace + "DeductibleAmount", invoiceInfo.DeductibleAmount));
-            element.Add(new XElement(invoiceNamespace + "OriginalInvoiceCode", invoiceInfo.OriginalInvoiceCode));
-            element.Add(new XElement(invoiceNamespace + "OriginalInvoiceNo", invoiceInfo.OriginalInvoiceNo));
-
-            XElement goodsElement = new XElement(invoiceNamespace + "GoodsInfos");
-            foreach (GoodsInfo goods in invoiceInfo.GoodsInfos)
-            {
-                XElement goodsInfoElement = new XElement(invoiceNamespace + "GoodsInfo");
-                goodsInfoElement.Add(new XElement(invoiceNamespace + "LineNo", goods.LineNo));
-                goodsInfoElement.Add(new XElement(invoiceNamespace + "LineNature", goods.LineNature));
-                goodsInfoElement.Add(new XElement(invoiceNamespace + "Item", new XCData(goods.Item)));
-                goodsInfoElement.Add(new XElement(invoiceNamespace + "Code", goods.Code));
-                goodsInfoElement.Add(new XElement(invoiceNamespace + "Specification", goods.Specification));
-                goodsInfoElement.Add(new XElement(invoiceNamespace + "MeasurementDimension", new XCData(goods.MeasurementDimension)));
-                goodsInfoElement.Add(new XElement(invoiceNamespace + "Price", goods.Price));
-                goodsInfoElement.Add(new XElement(invoiceNamespace + "Quantity", goods.Quantity));
-                goodsInfoElement.Add(new XElement(invoiceNamespace + "Amount", goods.Amount));
-                goodsInfoElement.Add(new XElement(invoiceNamespace + "TaxScheme", goods.TaxScheme));
-                goodsInfoElement.Add(new XElement(invoiceNamespace + "TaxAmount", goods.TaxAmount));
-                goodsInfoElement.Add(new XElement(invoiceNamespace + "PreferentialMark", goods.PreferentialMark));
-                goodsInfoElement.Add(new XElement(invoiceNamespace + "FreeTaxMark", goods.FreeTaxMark));
-                goodsInfoElement.Add(new XElement(invoiceNamespace + "VATSpecialManagement", goods.VATSpecialManagement));
-                goodsElement.Add(goodsInfoElement);
-            }
-            element.Add(goodsElement);
-
-            XElement systemInfoElement = new XElement(invoiceNamespace + "SystemInfos");
-            systemInfoElement.Add(new XElement(invoiceNamespace + "SystemCode", "bw"));
-            systemInfoElement.Add(new XElement(invoiceNamespace + "SystemName", "百望云"));
-            systemInfoElement.Add(new XElement(invoiceNamespace + "SystemType", "2"));
-            element.Add(systemInfoElement);
-
-            return element;
-        }
-
-        private static XElement CreateInvoiceTagElement()
-        {
-            XNamespace invoiceNamespace = "http://www.edrm.org.cn/schema/e-invoice/2019";
-            string invoiceXmls = "http://www.edrm.org.cn/schema/e-invoice/2019";
-            XElement element = new XElement("eInvoice", new XAttribute(XNamespace.Xmlns + "fp", invoiceXmls));
-            element.Add(new XElement("InvoiceCode", new XElement(invoiceNamespace + "ObjectRef", "64", new XAttribute("PageRef", "1"))));
-
-            XElement buyerElement = new XElement("Buyer");
-            buyerElement.Add(new XElement("BuyerName", new XElement(invoiceNamespace + "ObjectRef", "65", new XAttribute("PageRef", "1"))));
-            buyerElement.Add(new XElement("BuyerTaxID", new XElement(invoiceNamespace + "ObjectRef", "66", new XAttribute("PageRef", "1"))));
-            buyerElement.Add(new XElement("BuyerAddrTel", new XElement(invoiceNamespace + "ObjectRef", "76", new XAttribute("PageRef", "1"))));
-            buyerElement.Add(new XElement("BuyerFinancialAccount", new XElement(invoiceNamespace + "ObjectRef", "79", new XAttribute("PageRef", "1"))));
-            element.Add(buyerElement);
-
-            XElement sellerElement = new XElement("Seller");
-            sellerElement.Add(new XElement("SellerName", new XElement(invoiceNamespace + "ObjectRef", "68", new XAttribute("PageRef", "1"))));
-            sellerElement.Add(new XElement("SellerTaxID", new XElement(invoiceNamespace + "ObjectRef", "69", new XAttribute("PageRef", "1"))));
-            sellerElement.Add(new XElement("SellerAddrTel", new XElement(invoiceNamespace + "ObjectRef", "73", new XAttribute("PageRef", "1"))));
-            sellerElement.Add(new XElement("SellerFinancialAccount", new XElement(invoiceNamespace + "ObjectRef", "77", new XAttribute("PageRef", "1"))));
-            element.Add(sellerElement);
-
-            return element;
-        }
     }
 }

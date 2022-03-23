@@ -134,7 +134,7 @@ namespace UnitTests.Reader
             string filePath = Path.Combine(Directory.GetCurrentDirectory(), "Files", "test.ofd");
             OfdReader reader = new OfdReader(filePath);
             Assert.IsNotNull(reader);
-            Document document = reader.GetDocument();
+            CtDocument document = reader.GetDocument();
             Assert.IsNotNull(document);
             Assert.IsNotNull(document.CommonData);
             Assert.AreEqual(new Id("2000"), document.CommonData.MaxUnitId);

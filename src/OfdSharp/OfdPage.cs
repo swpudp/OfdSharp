@@ -14,6 +14,13 @@ namespace OfdSharp
 {
     public class OfdPage
     {
+
+
+        private readonly PageSize _pageSize;
+
+        private readonly PageNode _pageNode;
+
+
         public List<CtText> Texts { get; }
 
         public List<CtPath> Paths { get; }
@@ -25,20 +32,31 @@ namespace OfdSharp
         /// </summary>
         public List<CompositeObject> CompositeObjects { get; }
 
-        public PageNode PageNode { get; }
+        public PageSize PageSize => _pageSize;
 
-        public OfdPage(PageNode pageNode)
+        public PageNode PageNode => _pageNode;
+
+        public OfdPage(PageNode pageNode, PageSize pageSize)
         {
             Paths = new List<CtPath>();
             Texts = new List<CtText>();
             Images = new List<CtImage>();
             CompositeObjects = new List<CompositeObject>();
-            PageNode = pageNode;
+            _pageNode = pageNode;
+            _pageSize = pageSize;
         }
 
-        public void AddText(CtText text)
+        public void AddText(string text)
         {
-            Texts.Add(text);
+            CtText ctText = new CtText
+            {
+                Id = new Id(2002),
+                Boundary = new Box(0, 0, 100, 100),
+                FillColor = new Primitives.Pages.Description.Color.CtColor("0", "0", "0"),
+                TextCode = new TextCode(text) { X = 0, Y = 0 },
+                Font = new RefId(200)//todo font在哪里定义
+            };
+            Texts.Add(ctText);
         }
 
         public void AddPath(CtPath ctPath)
@@ -72,6 +90,10 @@ namespace OfdSharp
             }
             return new PageObject
             {
+                Area = new Primitives.Doc.PageArea
+                {
+                    Physical = new Box(_pageSize.X, _pageSize.Y, _pageSize.Width, _pageSize.Height)
+                },
                 Content = new Content
                 {
                     Layers = new List<Layer>

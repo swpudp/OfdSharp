@@ -67,5 +67,10 @@ namespace OfdSharp
         /// 签章版本v4
         /// </summary>
         public const int SesV4 = 4;
+
+        /// <summary>
+        /// 默认xmnl声明
+        /// </summary>
+        public static readonly XDeclaration DefaultDeclaration = new XDeclaration("1.0", "UTF-8", null);
     }
 }

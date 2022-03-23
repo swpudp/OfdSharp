@@ -69,11 +69,11 @@ namespace UnitTests.Utils
                 {
                     Type = f.AttributeValueOrDefault("Type").ParseEnum<MediaType>(),
                     Id = new Id(f.AttributeValueOrDefault("ID")),
-                    MediaFile = new Location { Value = f.ElementValue("MediaFile") }
+                    MediaFile = new Location(f.ElementValue("MediaFile"))
                 }).ToList()
             };
             Assert.IsNotNull(documentResource);
-        }     
+        }
     }
 
     [XmlType(AnonymousType = false, IncludeInSchema = false, Namespace = "http://www.ofdspec.org/2016", TypeName = "id-test")]

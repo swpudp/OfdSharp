@@ -15,13 +15,29 @@ namespace OfdSharp.Primitives.Pages.Description.Color
     /// </summary>
     public class CtColor
     {
+
+        public CtColor()
+        {
+            Value = new Array("0 0 0");
+        }
+
+        public CtColor(string value)
+        {
+            Value = Array.Parse(value);
+        }
+
+        public CtColor(string r, string b, string g)
+        {
+            Value = new Array(r, g, b);
+        }
+
         /// <summary>
         /// 颜色值,指定了当前颜色空间下各通道的取值。
         /// Value的取值应符合"通道1通道2通道3..."格式。
         /// 此属性不出现时,应采用Index属性从颜色空间的调色板中的取值。
         /// 当二者都不出现时,该颜色各通道的值全部为0
         /// </summary>
-        public Array Value { get; set; }
+        public Array Value { get; }
 
         /// <summary>
         /// 调色板中颜色的编号,非负整数,将从当前颜色空间的调色板中取出相应索引的预定义颜色用来绘制。索引从0开始

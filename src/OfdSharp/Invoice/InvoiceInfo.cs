@@ -141,5 +141,10 @@ namespace OfdSharp.Invoice
         /// 商品信息
         /// </summary>
         public List<GoodsInfo> GoodsInfos { get; set; }
+
+        /// <summary>
+        /// 系统信息
+        /// </summary>
+        public SystemInfo SystemInfo { get; set; }
     }
 }

@@ -9,7 +9,7 @@ namespace OfdSharp.Primitives.Doc
     /// <summary>
     /// 文档根节点
     /// </summary>
-    public class Document
+    public class CtDocument
     {
         /// <summary>
         /// 文档公共数据,定义了页面区域、公共资源等数据
