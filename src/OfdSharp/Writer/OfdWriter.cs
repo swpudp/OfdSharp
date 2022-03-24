@@ -521,19 +521,10 @@ namespace OfdSharp.Writer
             }
             finally
             {
-                zipArchive.Dispose(); //LeaveOpen为true是，释放该资源，stream才不是空
+                zipArchive.Dispose();
                 stream.Seek(0, SeekOrigin.Begin);
-                stream.Flush(); //强制刷新缓冲区 这句话很关键
+                stream.Flush();
             }
-            //using (MemoryStream compressStream = new MemoryStream())
-            //{
-            //    using (DeflateStream deflateStream = new DeflateStream(compressStream, CompressionLevel.Optimal))
-            //    {
-            //        stream.CopyTo(deflateStream);
-            //        deflateStream.Close();
-            //        return compressStream.ToArray();
-            //    }
-            //}
             return stream.ToArray();
         }
     }
@@ -553,7 +544,7 @@ namespace OfdSharp.Writer
                 return;
             }
 
-            ZipArchiveEntry ofd = zipArchive.CreateEntry(entryName);
+            ZipArchiveEntry ofd = zipArchive.CreateEntry(entryName, CompressionLevel.Optimal);
             using (StreamWriter sw = new StreamWriter(ofd.Open()))
             {
                 sw.WriteLine(ConstDefined.DefaultDeclaration.ToString());
@@ -581,7 +572,7 @@ namespace OfdSharp.Writer
                 return;
             }
 
-            ZipArchiveEntry ofd = zipArchive.CreateEntry(entryName);
+            ZipArchiveEntry ofd = zipArchive.CreateEntry(entryName, CompressionLevel.Optimal);
             byte[] input = content.ReadToEnd();
             using (BinaryWriter writer = new BinaryWriter(ofd.Open()))
             {
@@ -603,7 +594,7 @@ namespace OfdSharp.Writer
                 return;
             }
 
-            ZipArchiveEntry ofd = zipArchive.CreateEntry(entryName);
+            ZipArchiveEntry ofd = zipArchive.CreateEntry(entryName, CompressionLevel.Optimal);
             using (BinaryWriter writer = new BinaryWriter(ofd.Open()))
             {
                 writer.Write(content);
