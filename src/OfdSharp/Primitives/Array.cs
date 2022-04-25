@@ -46,7 +46,8 @@ namespace OfdSharp.Primitives
         /// <summary>
         /// 矩阵相乘
         /// </summary>
-        /// <param name="array"></param>
+        /// <param name="a1"></param>
+        /// <param name="a2"></param>
         /// <returns></returns>
         public static Array operator *(Array a1, Array a2)
         {
@@ -129,7 +130,17 @@ namespace OfdSharp.Primitives
 
         public static bool operator !=(Array a1, Array a2)
         {
-            return !(ReferenceEquals(a1, null) || ReferenceEquals(a2, null) || a1 == a2);
+            //都是null
+            if (ReferenceEquals(a1, null) && ReferenceEquals(a2, null))
+            {
+                return false;
+            }
+            //其中一个null
+            if (ReferenceEquals(a1, null) || ReferenceEquals(a2, null))
+            {
+                return true;
+            }
+            return !(a1 == a2);
         }
 
         public override int GetHashCode()

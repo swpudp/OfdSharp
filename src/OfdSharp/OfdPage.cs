@@ -14,14 +14,18 @@ namespace OfdSharp
 {
     public class OfdPage
     {
+        private static readonly IDictionary<PageSize, Margin> MarginMapping = new Dictionary<PageSize, Margin>
+        {
+            [PageSize.A4] = Margin.A4
+        };
 
-
+        private readonly LinkedList<Paragraph> _paragraphs;
         private readonly PageSize _pageSize;
+        private readonly IdGen _idGen;
 
         private readonly PageNode _pageNode;
-
-
-        public List<CtText> Texts { get; }
+        private readonly int _index;
+        private readonly Margin _margin;
 
         public List<CtPath> Paths { get; }
 
@@ -36,27 +40,39 @@ namespace OfdSharp
 
         public PageNode PageNode => _pageNode;
 
-        public OfdPage(PageNode pageNode, PageSize pageSize)
+        public int Index => _index;
+
+        internal OfdPage(int index, IdGen idGen, PageSize pageSize)
         {
+            _idGen = idGen;
             Paths = new List<CtPath>();
-            Texts = new List<CtText>();
             Images = new List<CtImage>();
             CompositeObjects = new List<CompositeObject>();
-            _pageNode = pageNode;
+            _pageNode = new PageNode
+            {
+                Id = idGen.NewId(),
+                BaseLoc = new Location($"Pages/Page_{index}/Content.xml")
+            };
             _pageSize = pageSize;
+            _margin = GetMargin(pageSize);
+            _index = index;
+            _paragraphs = new LinkedList<Paragraph>();
         }
 
-        public void AddText(string text)
+        private static Margin GetMargin(PageSize pageSize)
         {
-            CtText ctText = new CtText
-            {
-                Id = new Id(2002),
-                Boundary = new Box(0, 0, 100, 100),
-                FillColor = new Primitives.Pages.Description.Color.CtColor("0", "0", "0"),
-                TextCode = new TextCode(text) { X = 0, Y = 0 },
-                Font = new RefId(200)//todo font在哪里定义
-            };
-            Texts.Add(ctText);
+            return MarginMapping.TryGetValue(pageSize, out Margin margin) ? margin : Margin.None;
+        }
+
+        /// <summary>
+        /// 新增一个段落
+        /// </summary>
+        /// <returns></returns>
+        public Paragraph AddParagraph()
+        {
+            Paragraph paragraph = new Paragraph(_idGen);
+            _paragraphs.AddLast(paragraph);
+            return paragraph;
         }
 
         public void AddPath(CtPath ctPath)
@@ -69,25 +85,60 @@ namespace OfdSharp
             Images.Add(image);
         }
 
+        public void AddCompositeObject(CompositeObject compositeObject)
+        {
+            CompositeObjects.Add(compositeObject);
+        }
+
         public PageObject CreatePageObject()
         {
             var layer = new Layer
             {
-                Id = new Id(303),
+                Id = _idGen.NewId(),
                 PageBlocks = new List<PageBlock>()
             };
-            int count = Math.Max(Math.Max(Math.Max(Texts.Count, Paths.Count), Images.Count), CompositeObjects.Count);
-            for (int i = 0; i < count; i++)
+            int pIndex = 0;
+            foreach (Paragraph p in _paragraphs)
+            {
+                pIndex++;
+                List<CtText> ctTexts = p.GetCtTexts(_margin, pIndex);
+                foreach (CtText ctText in ctTexts)
+                {
+                    PageBlock pg = new PageBlock
+                    {
+                        TextObject = ctText
+                    };
+                    layer.PageBlocks.Add(pg);
+                }
+            }
+
+            foreach (CtPath ctPath in Paths)
             {
                 PageBlock pg = new PageBlock
                 {
-                    TextObject = Texts.ElementAtOrDefault(i),
-                    PathObject = Paths.ElementAtOrDefault(i),
-                    ImageObject = Images.ElementAtOrDefault(i),
-                    CompositeObject = CompositeObjects.ElementAtOrDefault(i)
+                    PathObject = ctPath
                 };
                 layer.PageBlocks.Add(pg);
             }
+
+            foreach (CtImage ctImage in Images)
+            {
+                PageBlock pg = new PageBlock
+                {
+                    ImageObject = ctImage
+                };
+                layer.PageBlocks.Add(pg);
+            }
+
+            foreach (CompositeObject compositeObject in CompositeObjects)
+            {
+                PageBlock pg = new PageBlock
+                {
+                    CompositeObject = compositeObject
+                };
+                layer.PageBlocks.Add(pg);
+            }
+
             return new PageObject
             {
                 Area = new Primitives.Doc.PageArea

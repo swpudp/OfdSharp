@@ -5,7 +5,6 @@ using System.Linq;
 using System.Xml.Linq;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using OfdSharp;
-using OfdSharp.Crypto;
 using OfdSharp.Invoice;
 using OfdSharp.Primitives;
 using OfdSharp.Primitives.CustomTags;
@@ -24,6 +23,7 @@ using OfdSharp.Reader;
 using OfdSharp.Sign;
 using OfdSharp.Verify;
 using OfdSharp.Writer;
+using OpenSsl.Crypto.Utility;
 
 namespace UnitTests.Writer
 {
@@ -41,8 +41,8 @@ namespace UnitTests.Writer
         [TestMethod]
         public void WriteOfdRootTest()
         {
-            OfdDocument ofdDocument = new OfdDocument(new OfdDocumentInfo());
-            OfdWriter writer = new OfdWriter(ofdDocument, false);
+            OfdDocument ofdDocument = new OfdBuilder().AddDocument(new OfdDocumentInfo());
+            OfdWriter writer = new OfdWriter(ofdDocument);
             CtDocInfo docInfo = new CtDocInfo
             {
                 DocId = Guid.NewGuid().ToString("N"),
@@ -52,7 +52,7 @@ namespace UnitTests.Writer
                 Subject = "开发ofd测试",
                 Abstract = "测试123",
                 DocUsage = DocUsage.Normal.ToString(),
-                Keywords = new List<string> { "invoice" },
+                Keywords = new List<string> {"invoice"},
                 CustomDataList = new List<CustomData>
                 {
                     new CustomData {Name = "template-version", Value = "1.0.20.0422"},
@@ -68,22 +68,20 @@ namespace UnitTests.Writer
                     new CustomData {Name = "销售方纳税人识别号", Value = "91320111339366503A"}
                 }
             };
-            var ofdRoot = new OfdRoot
+            var ofdRoot = new OfdRoot();
+            ofdRoot.DocBodyList.Add(new DocBody
             {
-                DocBody = new DocBody
-                {
-                    DocInfo = docInfo,
-                    DocRoot = new Location($"Doc_{0}/Document.xml"),
-                    Signatures = new Location($"Doc_{0}/Signs/Signatures.xml")
-                }
-            };
+                DocInfo = docInfo,
+                DocRoot = new Location($"Doc_{0}/Document.xml"),
+                Signatures = new Location($"Doc_{0}/Signs/Signatures.xml")
+            });
             writer.WriteOfdRoot(ofdRoot);
 
             CommonData commonData = new CommonData
             {
                 MaxUnitId = new Id(100),
-                PageArea = new PageArea { Application = new Box(0, 0, 1000, 100), Physical = new Box(0, 0, 100, 100) },
-                ColorSpace = new RefId(190),
+                PageArea = new PageArea {Application = new Box(0, 0, 1000, 100), Physical = new Box(0, 0, 100, 100)},
+                //ColorSpace = new RefId(190),
                 DocumentRes = new Location("DocumentRes.xml"),
                 //MaxUnitId = new Id(100),
                 PublicRes = new Location("PublicRes.xml"),
@@ -92,7 +90,7 @@ namespace UnitTests.Writer
             };
             var pageNodes = new List<OfdSharp.Primitives.Pages.Tree.PageNode>
             {
-                new OfdSharp.Primitives.Pages.Tree.PageNode { Id = new Id(20), BaseLoc = new Location ( "Pages/Page_0/Content.xml" ) }
+                new OfdSharp.Primitives.Pages.Tree.PageNode {Id = new Id(20), BaseLoc = new Location("Pages/Page_0/Content.xml")}
             };
             CtDocument ctDocument = new CtDocument
             {
@@ -104,34 +102,34 @@ namespace UnitTests.Writer
             DocumentResource res = new DocumentResource
             {
                 BaseLoc = new Location("Res"),
-                DrawParams = new List<OfdSharp.Primitives.Pages.Description.DrawParam.CtDrawParam> {
-
+                DrawParams = new List<OfdSharp.Primitives.Pages.Description.DrawParam.CtDrawParam>
+                {
                     new OfdSharp.Primitives.Pages.Description.DrawParam.CtDrawParam
                     {
                         Id = new Id(20),
                         LineWidth = 0.25,
-                        FillColor = new OfdSharp.Primitives.Pages.Description.Color.CtColor("10 10 10 20")
+                        FillColor = new CtColor("10 10 10 20")
                         {
-                            ColorSpace=new RefId (25) ,
+                            ColorSpace = new RefId(25),
                         },
-                        StrokeColor = new OfdSharp.Primitives.Pages.Description.Color.CtColor("10 20 10 20")
+                        StrokeColor = new CtColor("10 20 10 20")
                         {
-                            ColorSpace=new RefId (25) ,
+                            ColorSpace = new RefId(25),
                         }
                     }
                 },
                 MultiMedias = new List<CtMultiMedia>
                 {
-                   new CtMultiMedia { Format = "GBIG2", Type = MediaType.Image, Id = new Id(78), MediaFile = new Location ( "image_78.jb2" ) },
-                   new CtMultiMedia { Format = "GBIG2", Type = MediaType.Image, Id = new Id(79), MediaFile = new Location ( "image_80.jb2" ) }
+                    new CtMultiMedia {Format = "GBIG2", Type = MediaType.Image, Id = new Id(78), MediaFile = new Location("image_78.jb2")},
+                    new CtMultiMedia {Format = "GBIG2", Type = MediaType.Image, Id = new Id(79), MediaFile = new Location("image_80.jb2")}
                 },
                 ColorSpaces = new List<OfdSharp.Primitives.Pages.Description.ColorSpace.CtColorSpace>
                 {
                     new OfdSharp.Primitives.Pages.Description.ColorSpace.CtColorSpace
                     {
                         Id = new Id(20),
-                        BitsPerComponent=OfdSharp.Primitives.Pages.Description.ColorSpace.BitsPerComponent.Bit8,
-                        Type= OfdSharp.Primitives.Pages.Description.ColorSpace.ColorSpaceType.RGB
+                        BitsPerComponent = OfdSharp.Primitives.Pages.Description.ColorSpace.BitsPerComponent.Bit8,
+                        Type = OfdSharp.Primitives.Pages.Description.ColorSpace.ColorSpaceType.RGB
                     }
                 },
                 Fonts = new List<CtFont>
@@ -148,17 +146,14 @@ namespace UnitTests.Writer
 
             InvoiceInfo invoiceInfo = CreateInvoiceInfo();
 
-
             //XElement attachment = InvoiceInfoBuilder.CreateInvoiceElement(invoiceInfo);
             //writer.AddAttachment("original_invoice", "original_invoice.xml", "xml", false, attachment);
 
             writer.WriteTemplate(GetTemplatePageObjects());
 
-            CustomTag customTag = new CustomTag { FileLoc = new Location("CustomTag.xml"), TypeId = "0" };
+            CustomTag customTag = new CustomTag {FileLoc = new Location("CustomTag.xml"), TypeId = "0"};
             XElement tag = InvoiceInfoBuilder.CreateInvoiceTagElement();
             writer.WriteCustomerTag(customTag, tag);
-
-
 
             writer.WriteAnnotation(new OfdSharp.Primitives.Annotations.AnnotationInfo
             {
@@ -168,8 +163,8 @@ namespace UnitTests.Writer
                 {
                     new OfdSharp.Primitives.Annotations.Parameter
                     {
-                        Name=Guid.NewGuid().ToString("N"),
-                        Value=Guid.NewGuid().ToString()
+                        Name = Guid.NewGuid().ToString("N"),
+                        Value = Guid.NewGuid().ToString()
                     }
                 },
                 Appearance = new PageBlock
@@ -180,14 +175,11 @@ namespace UnitTests.Writer
                         Id = new Id(109)
                     },
                 }
-
-
-
-            }, new OfdSharp.Primitives.Annotations.RefPage { PageId = new RefId(100), FileLoc = new Location("Doc_0/Annots/Page_0/Annotation.xml") });
+            }, new OfdSharp.Primitives.Annotations.RefPage {PageId = new RefId(100), FileLoc = new Location("Doc_0/Annots/Page_0/Annotation.xml")});
 
             var signInfo = new SignedInfo
             {
-                Provider = new Provider { Company = "gomain", ProviderName = "gomain_eseal", Version = "2.0" },
+                Provider = new Provider {Company = "gomain", ProviderName = "gomain_eseal", Version = "2.0"},
                 SignatureMethod = SesSigner.SignatureMethod.Id,
                 SignatureDateTime = DateTime.Now.ToString("yyyyMMddhh:mm:ss.fffz"),
                 ReferenceCollect = new ReferenceCollect
@@ -195,16 +187,15 @@ namespace UnitTests.Writer
                     CheckMethod = SesSigner.DigestMethod.Id,
                     Items = new List<Reference>()
                 },
-                StampAnnot = new StampAnnot { Boundary = new Box(10, 10, 10, 10), Id = new Id(100), PageRef = new RefId(1001) }
+                StampAnnot = new StampAnnot {Boundary = new Box(10, 10, 10, 10), Id = new Id(100), PageRef = new RefId(1001)}
             };
             writer.WriteSignature(signInfo);
 
-
             //印章
-            var sealCert = Sm2Utils.MakeCert(sealKey.PublicKey, sealKey.PrivateKey, "yzw", "tax");
+            var sealCert = SmCertUtils.MakeCert(HexUtils.ToByteArray(sealKey.Public), HexUtils.ToByteArray(sealKey.Private), "yzw", "tax");
 
             //签章者
-            var signerCert = Sm2Utils.MakeCert(signerKey.PublicKey, signerKey.PrivateKey, "yzw", "tax");
+            var signerCert = SmCertUtils.MakeCert(HexUtils.ToByteArray(signerKey.Public), HexUtils.ToByteArray(signerKey.Private), "yzw", "tax");
 
             SesSealConfig config = new SesSealConfig
             {
@@ -212,12 +203,12 @@ namespace UnitTests.Writer
                 SealName = "测试全国统一发票监制章国家税务总局重庆市税务局",
                 EsId = "50011200000001",
                 SealCert = sealCert.GetEncoded(),
-                SealPrivateKey = sealKey.PrivateKey,
+                SealPrivateKey = sealKey.Private,
                 SealPicture = File.ReadAllBytes(Path.Combine(Directory.GetCurrentDirectory(), "Files", "image_78.jb2")),
                 SealType = "ofd",
                 SealWidth = 30,
                 SealHeight = 20,
-                SignerPrivateKey = signerKey.PrivateKey,
+                SignerPrivateKey = signerKey.Private,
                 SignerCert = signerCert.GetEncoded()
             };
             writer.ExecuteSign(config);
@@ -245,16 +236,16 @@ namespace UnitTests.Writer
                             {
                                 new PageBlock
                                 {
-                                    PathObject = new OfdSharp.Primitives.Graph.CtPath
+                                    PathObject = new CtPath
                                     {
                                         Id = new Id(6),
                                         Boundary = new Box(68.5, 17.8, 73, 0.4),
                                         LineWidth = 0.25,
-                                        FillColor = new OfdSharp.Primitives.Pages.Description.Color.CtColor("156 82 35")
+                                        FillColor = new CtColor("156 82 35")
                                         {
                                             ColorSpace = new RefId(5)
                                         },
-                                        StrokeColor = new OfdSharp.Primitives.Pages.Description.Color.CtColor("156 82 35")
+                                        StrokeColor = new CtColor("156 82 35")
                                         {
                                             ColorSpace = new RefId(5)
                                         },
@@ -263,16 +254,16 @@ namespace UnitTests.Writer
                                 },
                                 new PageBlock
                                 {
-                                    PathObject = new OfdSharp.Primitives.Graph.CtPath
+                                    PathObject = new CtPath
                                     {
                                         Id = new Id(7),
                                         Boundary = new Box(68.5, 18.8, 73, 0.4),
                                         LineWidth = 0.25,
-                                        FillColor = new OfdSharp.Primitives.Pages.Description.Color.CtColor("156 82 35")
+                                        FillColor = new CtColor("156 82 35")
                                         {
-                                            ColorSpace = new RefId                                            (5)
+                                            ColorSpace = new RefId(5)
                                         },
-                                        StrokeColor = new OfdSharp.Primitives.Pages.Description.Color.CtColor("156 82 35")
+                                        StrokeColor = new CtColor("156 82 35")
                                         {
                                             ColorSpace = new RefId(5)
                                         },
@@ -281,20 +272,18 @@ namespace UnitTests.Writer
                                 },
                                 new PageBlock
                                 {
-                                    PathObject = new OfdSharp.Primitives.Graph.CtPath
+                                    PathObject = new CtPath
                                     {
                                         Id = new Id(8),
                                         Boundary = new Box(4.5, 29.8, 201, 0.4),
                                         LineWidth = 0.25,
-                                        FillColor = new OfdSharp.Primitives.Pages.Description.Color.CtColor("156 82 35")
+                                        FillColor = new CtColor("156 82 35")
                                         {
                                             ColorSpace = new RefId(5)
-
                                         },
-                                        StrokeColor = new OfdSharp.Primitives.Pages.Description.Color.CtColor("156 82 35")
+                                        StrokeColor = new CtColor("156 82 35")
                                         {
                                             ColorSpace = new RefId(5)
-
                                         },
                                         AbbreviatedData = "M 0 0.2 L 201 0.2",
                                     }
@@ -305,9 +294,9 @@ namespace UnitTests.Writer
                                     {
                                         Id = new Id(32),
                                         Boundary = new Box(148.5, 18.5, 16, 3.6),
-                                        Font = new RefId (29),
+                                        Font = new RefId(29),
                                         Size = 3.175,
-                                        FillColor = new OfdSharp.Primitives.Pages.Description.Color.CtColor("156 82 35")
+                                        FillColor = new CtColor("156 82 35")
                                         {
                                         },
                                         TextCode = new TextCode("开票日期：")
@@ -324,9 +313,9 @@ namespace UnitTests.Writer
                                     {
                                         Id = new Id(33),
                                         Boundary = new Box(148.5, 24, 16, 3.6),
-                                        Font = new RefId (29),
+                                        Font = new RefId(29),
                                         Size = 3.175,
-                                        FillColor = new OfdSharp.Primitives.Pages.Description.Color.CtColor("156 82 35")
+                                        FillColor = new CtColor("156 82 35")
                                         {
                                         },
                                         TextCode = new TextCode("校验码：")
@@ -351,8 +340,8 @@ namespace UnitTests.Writer
             pageObjects.Add(new PageObject
             {
                 PageRes = new Location("Pages/Page_0/Content.xml"),
-                Area = new PageArea { Physical = new Box(0, 0, 210, 297) },
-                Template = new Template { TemplateId = "2", ZOrder = LayerType.Background },
+                Area = new PageArea {Physical = new Box(0, 0, 210, 297)},
+                Template = new Template {TemplateId = "2", ZOrder = LayerType.Background},
                 Content = new Content
                 {
                     Layers = new List<Layer>
@@ -368,9 +357,9 @@ namespace UnitTests.Writer
                                     {
                                         Id = new Id(302),
                                         Boundary = new Box(69, 7, 72, 7.6749),
-                                        Font = new RefId (60),
+                                        Font = new RefId(60),
                                         Size = 6.61,
-                                        FillColor = new CtColor("156 82 35") ,
+                                        FillColor = new CtColor("156 82 35"),
                                         TextCode = new TextCode("北京增值税电子普通发票") {X = 0, Y = 5.683674, DeltaX = new OfdSharp.Primitives.Array("10 6.61")}
                                     }
                                 },
@@ -392,7 +381,7 @@ namespace UnitTests.Writer
                                         Id = new Id(305),
                                         Boundary = new Box(68.5, 19, 73, 0.25),
                                         LineWidth = 0.25,
-                                        StrokeColor = new CtColor("156 82 35") ,
+                                        StrokeColor = new CtColor("156 82 35"),
                                         AbbreviatedData = "M 0 0 L 73 0",
                                     }
                                 },
@@ -493,10 +482,5 @@ namespace UnitTests.Writer
             };
             return invoiceInfo;
         }
-
-
-
-
-
     }
 }

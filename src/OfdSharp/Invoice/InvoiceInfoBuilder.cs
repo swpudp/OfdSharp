@@ -10,12 +10,12 @@ namespace OfdSharp.Invoice
         /// <summary>
         /// 发票命名空间
         /// </summary>
-        private static readonly XNamespace invoiceNamespace = "http://www.edrm.org.cn/schema/e-invoice/2019";
+        private static readonly XNamespace InvoiceNamespace = "http://www.edrm.org.cn/schema/e-invoice/2019";
 
         /// <summary>
         /// 发票xmlns地址
         /// </summary>
-        private const string invoiceXmlns = "http://www.edrm.org.cn/schema/e-invoice/2019";
+        private const string InvoiceXmlns = "http://www.edrm.org.cn/schema/e-invoice/2019";
 
         /// <summary>
         /// 创建发票元素
@@ -24,7 +24,7 @@ namespace OfdSharp.Invoice
         /// <returns></returns>
         public static XElement CreateInvoiceElement(InvoiceInfo invoiceInfo)
         {
-            XElement element = new XElement("eInvoice", new XAttribute(XNamespace.Xmlns + "fp", invoiceXmlns), new XAttribute("Version", "1.0"));
+            XElement element = new XElement("eInvoice", new XAttribute(XNamespace.Xmlns + "fp", InvoiceXmlns), new XAttribute("Version", "1.0"));
             element.AddElement("DocID", invoiceInfo.DocId);
             element.AddElement("AreaCode", invoiceInfo.AreaCode);
             element.AddElement("TypeCode", invoiceInfo.TypeCode);
@@ -105,21 +105,21 @@ namespace OfdSharp.Invoice
         /// <returns></returns>
         public static XElement CreateInvoiceTagElement()
         {
-            XElement element = new XElement("eInvoice", new XAttribute(XNamespace.Xmlns + "fp", invoiceXmlns));
-            element.Add(new XElement("InvoiceCode", new XElement(invoiceNamespace + "ObjectRef", "64", new XAttribute("PageRef", "1"))));
+            XElement element = new XElement("eInvoice", new XAttribute(XNamespace.Xmlns + "fp", InvoiceXmlns));
+            element.Add(new XElement("InvoiceCode", new XElement(InvoiceNamespace + "ObjectRef", "64", new XAttribute("PageRef", "1"))));
 
             XElement buyerElement = new XElement("Buyer");
-            buyerElement.Add(new XElement("BuyerName", new XElement(invoiceNamespace + "ObjectRef", "65", new XAttribute("PageRef", "1"))));
-            buyerElement.Add(new XElement("BuyerTaxID", new XElement(invoiceNamespace + "ObjectRef", "66", new XAttribute("PageRef", "1"))));
-            buyerElement.Add(new XElement("BuyerAddrTel", new XElement(invoiceNamespace + "ObjectRef", "76", new XAttribute("PageRef", "1"))));
-            buyerElement.Add(new XElement("BuyerFinancialAccount", new XElement(invoiceNamespace + "ObjectRef", "79", new XAttribute("PageRef", "1"))));
+            buyerElement.Add(new XElement("BuyerName", new XElement(InvoiceNamespace + "ObjectRef", "65", new XAttribute("PageRef", "1"))));
+            buyerElement.Add(new XElement("BuyerTaxID", new XElement(InvoiceNamespace + "ObjectRef", "66", new XAttribute("PageRef", "1"))));
+            buyerElement.Add(new XElement("BuyerAddrTel", new XElement(InvoiceNamespace + "ObjectRef", "76", new XAttribute("PageRef", "1"))));
+            buyerElement.Add(new XElement("BuyerFinancialAccount", new XElement(InvoiceNamespace + "ObjectRef", "79", new XAttribute("PageRef", "1"))));
             element.Add(buyerElement);
 
             XElement sellerElement = new XElement("Seller");
-            sellerElement.Add(new XElement("SellerName", new XElement(invoiceNamespace + "ObjectRef", "68", new XAttribute("PageRef", "1"))));
-            sellerElement.Add(new XElement("SellerTaxID", new XElement(invoiceNamespace + "ObjectRef", "69", new XAttribute("PageRef", "1"))));
-            sellerElement.Add(new XElement("SellerAddrTel", new XElement(invoiceNamespace + "ObjectRef", "73", new XAttribute("PageRef", "1"))));
-            sellerElement.Add(new XElement("SellerFinancialAccount", new XElement(invoiceNamespace + "ObjectRef", "77", new XAttribute("PageRef", "1"))));
+            sellerElement.Add(new XElement("SellerName", new XElement(InvoiceNamespace + "ObjectRef", "68", new XAttribute("PageRef", "1"))));
+            sellerElement.Add(new XElement("SellerTaxID", new XElement(InvoiceNamespace + "ObjectRef", "69", new XAttribute("PageRef", "1"))));
+            sellerElement.Add(new XElement("SellerAddrTel", new XElement(InvoiceNamespace + "ObjectRef", "73", new XAttribute("PageRef", "1"))));
+            sellerElement.Add(new XElement("SellerFinancialAccount", new XElement(InvoiceNamespace + "ObjectRef", "77", new XAttribute("PageRef", "1"))));
             element.Add(sellerElement);
 
             return element;
@@ -127,22 +127,22 @@ namespace OfdSharp.Invoice
 
         private static XElement CreateElement(string nodeName)
         {
-            return new XElement(invoiceNamespace + nodeName);
+            return new XElement(InvoiceNamespace + nodeName);
         }
 
         private static void AddElement(this XElement e, string nodeName, string value)
         {
-            e.Add(new XElement(invoiceNamespace + nodeName, value));
+            e.Add(new XElement(InvoiceNamespace + nodeName, value));
         }
 
         private static void AddElement(this XElement e, string nodeName, int value)
         {
-            e.Add(new XElement(invoiceNamespace + nodeName, value));
+            e.Add(new XElement(InvoiceNamespace + nodeName, value));
         }
 
         private static void AddCDataElement(this XElement e, string nodeName, string value)
         {
-            e.Add(new XElement(invoiceNamespace + nodeName, new XCData(value)));
+            e.Add(new XElement(InvoiceNamespace + nodeName, new XCData(value)));
         }
     }
 }

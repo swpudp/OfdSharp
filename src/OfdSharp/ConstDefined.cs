@@ -69,8 +69,13 @@ namespace OfdSharp
         public const int SesV4 = 4;
 
         /// <summary>
-        /// 默认xmnl声明
+        /// 默认声明
         /// </summary>
         public static readonly XDeclaration DefaultDeclaration = new XDeclaration("1.0", "UTF-8", null);
+
+        /// <summary>
+        /// pt转mm比率
+        /// </summary>
+        public const float PtToMmRatio = 0.3527f;
     }
 }

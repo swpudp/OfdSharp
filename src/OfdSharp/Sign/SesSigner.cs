@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-using OfdSharp.Crypto;
 using OfdSharp.Ses;
 using OfdSharp.Ses.V4;
+using OpenSsl.Crypto.Utility;
 using Org.BouncyCastle.Asn1;
 using Org.BouncyCastle.Asn1.GM;
 
@@ -14,21 +14,20 @@ namespace OfdSharp.Sign
     /// </summary>
     public class SesSigner
     {
-        /// <summary>
-        /// 签名使用的私钥
-        /// </summary>
+        // <summary>
+        // 签名使用的私钥
+        // </summary>
         //private readonly string _privateKey;
 
-        /// <summary>
-        /// 电子印章
-        /// </summary>
+        // <summary>
+        // 电子印章
+        // </summary>
         //private SeSeal _seal;
 
         /// <summary>
         /// 签章使用的证书
         /// </summary>
         //public readonly X509Certificate _certificate;
-
         private readonly SesSealConfig _sealConfig;
 
         /// <summary>
@@ -55,7 +54,7 @@ namespace OfdSharp.Sign
         public byte[] Sign(byte[] input, string propertyInfo)
         {
             SeSeal seal = CreateSeal();
-            byte[] output = Sm2Utils.Digest(input);
+            byte[] output = DigestUtils.Sm3(input);
             TbsSign tbsSign = new TbsSign
             {
                 Version = new DerInteger(ConstDefined.SesV4),
@@ -65,7 +64,7 @@ namespace OfdSharp.Sign
                 PropertyInfo = new DerIA5String(propertyInfo)
             };
             byte[] toSign = tbsSign.GetDerEncoded();
-            byte[] signed = Sm2Utils.Sign(_sealConfig.SignerPrivateKey, toSign);
+            byte[] signed = SignatureUtils.Sm2Sign(HexUtils.ToByteArray(_sealConfig.SignerPrivateKey), toSign);
             SesSignature sesSignature = new SesSignature
             {
                 TbsSign = tbsSign,
@@ -100,7 +99,7 @@ namespace OfdSharp.Sign
                 Type = new DerInteger(3),
                 Name = new DerUtf8String(_sealConfig.SealName),
                 CertListType = SesPropertyInfo.CertType,
-                CertList = new SesCertCollect(new CertInfoCollect(new List<Asn1OctetString> { new DerOctetString(_sealConfig.SignerCert) })),
+                CertList = new SesCertCollect(new CertInfoCollect(new List<Asn1OctetString> {new DerOctetString(_sealConfig.SignerCert)})),
                 CreateDate = new DerGeneralizedTime(DateTime.Now),
                 ValidStart = new DerGeneralizedTime(DateTime.Now),
                 ValidEnd = new DerGeneralizedTime(DateTime.Now.AddYears(1))
@@ -125,7 +124,7 @@ namespace OfdSharp.Sign
                 SealInfo = sealInfo,
                 Cert = new DerOctetString(_sealConfig.SealCert),
                 SignAlgId = GMObjectIdentifiers.sm2sign_with_sm3,
-                SignedValue = new DerBitString(Sm2Utils.Sign(_sealConfig.SealPrivateKey, sealInfo.GetEncoded())),
+                SignedValue = new DerBitString(SignatureUtils.Sm2Sign(HexUtils.ToByteArray(_sealConfig.SealPrivateKey), sealInfo.GetEncoded()))
             };
         }
     }

@@ -120,9 +120,9 @@ namespace UnitTests.Reader
             Assert.IsNotNull(reader);
             OfdRoot ofdRoot = reader.GetOfdRoot();
             Assert.IsNotNull(ofdRoot);
-            Assert.IsNotNull(ofdRoot.DocBody);
-            Assert.IsNotNull(ofdRoot.DocBody.DocInfo);
-            Assert.AreEqual("90baf370c9dc11e980000b7700000a77", ofdRoot.DocBody.DocInfo.DocId);
+            Assert.IsNotNull(ofdRoot.DocBodyList);
+            Assert.IsNotNull(ofdRoot.DocBodyList[0].DocInfo);
+            Assert.AreEqual("90baf370c9dc11e980000b7700000a77", ofdRoot.DocBodyList[0].DocInfo.DocId);
         }
 
         /// <summary>

@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ofd:OFD xmlns:ofd="http://www.ofdspec.org/2016" DocType="OFD" Version="1.1">
+	<ofd:DocBody>
+		<ofd:DocInfo>
+			<ofd:DocID>f224ded0f08511e980003b2000003b20</ofd:DocID>
+			<ofd:Title>OFD 帮助文档</ofd:Title>
+			<ofd:CreationDate>2019-10-17</ofd:CreationDate>
+			<ofd:ModDate>2019-10-17</ofd:ModDate>
+		</ofd:DocInfo>
+		<ofd:DocRoot>Doc_0/Document.xml</ofd:DocRoot>
+	</ofd:DocBody>
+</ofd:OFD>

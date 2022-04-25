@@ -1,4 +1,6 @@
-﻿namespace OfdSharp.Primitives.Entry
+﻿using System.Collections.Generic;
+
+namespace OfdSharp.Primitives.Entry
 {
     /// <summary>
     /// xml序列化
@@ -17,8 +19,8 @@
         public string DocType => "OFD";
 
         /// <summary>
-        /// 文档正文
+        /// 文档正文，文件对象入口,可以存在多个,以便在一个文档中包含多个版式文档
         /// </summary>
-        public DocBody DocBody { get; set; }
+        public List<DocBody> DocBodyList { get; } = new List<DocBody>();
     }
 }

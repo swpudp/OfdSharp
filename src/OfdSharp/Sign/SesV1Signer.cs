@@ -1,6 +1,6 @@
 ﻿using System;
-using OfdSharp.Crypto;
 using OfdSharp.Ses.V1;
+using OpenSsl.Crypto.Utility;
 using Org.BouncyCastle.Asn1;
 using Org.BouncyCastle.Asn1.GM;
 using Org.BouncyCastle.X509;
@@ -43,7 +43,7 @@ namespace OfdSharp.Sign
         public byte[] Sign(byte[] input, string propertyInfo)
         {
             //原文杂凑值计算
-            byte[] outBytes = Sm2Utils.Digest(input);
+            byte[] outBytes = DigestUtils.Sm3(input);
             DerUtcTime signTime = new DerUtcTime(DateTime.Now);
             TbsSign tbsSign = new TbsSign
             {
@@ -56,7 +56,7 @@ namespace OfdSharp.Sign
                 SignatureAlgorithm = GMObjectIdentifiers.sm2sign_with_sm3
             };
             byte[] signBytes = tbsSign.GetDerEncoded();
-            byte[] sign = Sm2Utils.Sign(_privateKey, signBytes);
+            byte[] sign = SignatureUtils.Sm2Sign(HexUtils.ToByteArray(_privateKey), signBytes);
             SesSignature sesSignature = new SesSignature(tbsSign, new DerBitString(sign));
             return sesSignature.GetDerEncoded();
         }

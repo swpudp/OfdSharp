@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ofd:OFD xmlns:ofd="http://www.ofdspec.org/2016" DocType="OFD" Version="1.1">
+	<ofd:DocBody>
+		<ofd:DocInfo>
+			<ofd:DocID>1d345f6b279642ee8007748eae4593f3</ofd:DocID>
+			<ofd:Author>China Tax</ofd:Author>
+			<ofd:CreationDate>2022-01-24</ofd:CreationDate>
+			<ofd:CustomDatas>
+				<ofd:CustomData Name="template-version">1.0.20.0422</ofd:CustomData>
+				<ofd:CustomData Name="native-producer">SuwellFormSDK</ofd:CustomData>
+				<ofd:CustomData Name="producer-version">1.0.20.0603</ofd:CustomData>
+				<ofd:CustomData Name="发票代码">051002000113</ofd:CustomData>
+				<ofd:CustomData Name="发票号码">18925756</ofd:CustomData>
+				<ofd:CustomData Name="合计税额">153.25</ofd:CustomData>
+				<ofd:CustomData Name="合计金额">15324.75</ofd:CustomData>
+				<ofd:CustomData Name="开票日期">2022年01月24日</ofd:CustomData>
+				<ofd:CustomData Name="校验码">13562 75680 41114 07976</ofd:CustomData>
+				<ofd:CustomData Name="购买方纳税人识别号">915107006823699713</ofd:CustomData>
+				<ofd:CustomData Name="销售方纳税人识别号">91510104MA6BWXBB27</ofd:CustomData>
+			</ofd:CustomDatas>
+		</ofd:DocInfo>
+		<ofd:DocRoot>Doc_0/Document.xml</ofd:DocRoot>
+		<ofd:Signatures>Doc_0/Signs/Signatures.xml</ofd:Signatures>
+	</ofd:DocBody>
+</ofd:OFD>

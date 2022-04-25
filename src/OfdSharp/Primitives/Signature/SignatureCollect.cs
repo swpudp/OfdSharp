@@ -14,7 +14,7 @@ namespace OfdSharp.Primitives.Signature
         /// 作用与文档入口文件 Document.xml 中的 MaxID相同，为了避免在签名时影响文档入口文件，采用了与ST_ID不一样的ID编码方式，
         /// 推荐使用“sNNN”的编码方式，NNN从1开始
         /// </summary>
-        public Id MaxSignId { get; set; }
+        public string MaxSignId { get; set; }
 
         /// <summary>
         /// 数字签名或安全签章在类表中的注册信息

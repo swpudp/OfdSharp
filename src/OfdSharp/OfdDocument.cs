@@ -1,25 +1,22 @@
-﻿using OfdSharp.Crypto;
-using OfdSharp.Primitives;
+﻿using OfdSharp.Primitives;
 using OfdSharp.Primitives.Annotations;
 using OfdSharp.Primitives.Attachments;
 using OfdSharp.Primitives.CustomTags;
 using OfdSharp.Primitives.Doc;
 using OfdSharp.Primitives.Entry;
-using OfdSharp.Primitives.Graph;
-using OfdSharp.Primitives.Image;
-using OfdSharp.Primitives.Pages.Description.Color;
 using OfdSharp.Primitives.Pages.Object;
 using OfdSharp.Primitives.Resources;
 using OfdSharp.Primitives.Signature;
-using OfdSharp.Primitives.Text;
 using OfdSharp.Sign;
 using OfdSharp.Writer;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading;
 using System.Xml.Linq;
+using OfdSharp.Primitives.Composite;
+using OfdSharp.Primitives.Fonts;
+using OfdSharp.Primitives.Pages.Description.ColorSpace;
+using OfdSharp.Primitives.Pages.Description.DrawParam;
 
 namespace OfdSharp
 {
@@ -29,16 +26,10 @@ namespace OfdSharp
     public class OfdDocument
     {
         private readonly DocumentResource _resource;
-        private int _unitId;
-        private static readonly Dictionary<DocUsage, string> DocUsages = new Dictionary<DocUsage, string>
-        {
-            [DocUsage.Normal] = "Normal",
-            [DocUsage.EBook] = "EBook",
-            [DocUsage.ENewsPaper] = "EMagazine",
-            [DocUsage.EMagazine] = "EMagazine"
-        };
         private readonly List<CustomTag> _customTags;
+
         private readonly List<XElement> _tagElements;
+
         //附件
         private readonly List<Attachment> _attachments;
         private readonly List<XElement> _attachmentElements;
@@ -46,49 +37,25 @@ namespace OfdSharp
         private AnnotationInfo _annotationInfo;
         private RefPage _refPage;
         private SignedInfo _signedInfo;
+
         private SesSealConfig _sesSealConfig;
+
         //private CommonData _commonData;
-        private readonly OfdRoot _ofdRoot;
         private readonly CtDocument _ctDocument;
+        private readonly int _index;
+        private readonly IdGen _idGen = new IdGen();
 
-
-        public OfdDocument(OfdDocumentInfo documentInfo)
+        internal OfdDocument(int index)
         {
+            _index = index;
             _resource = new DocumentResource
             {
                 BaseLoc = new Location("Res"),
-                DrawParams = new List<Primitives.Pages.Description.DrawParam.CtDrawParam>
-                {
-                    new Primitives.Pages.Description.DrawParam.CtDrawParam
-                    {
-                        StrokeColor = new CtColor
-                        {
-                            ColorSpace = new RefId(10)
-                        },
-                        FillColor = new CtColor
-                        {
-                            ColorSpace = new RefId(10)
-                        }
-                    }
-                },//todo DrawParams从哪里来？
-                ColorSpaces = new List<Primitives.Pages.Description.ColorSpace.CtColorSpace>
-                {
-                    new Primitives.Pages.Description.ColorSpace.CtColorSpace
-                    {
-                        Type = Primitives.Pages.Description.ColorSpace.ColorSpaceType.RGB,
-                        BitsPerComponent = Primitives.Pages.Description.ColorSpace.BitsPerComponent.Bit8
-                    }
-                },//todo CtColorSpace从哪里来？
-                CompositeGraphicUnits = new List<Primitives.Composite.VectorGraph>(),//todo CompositeGraphicUnits从哪里来？
-                Fonts = new List<Primitives.Fonts.CtFont>
-                {
-                    new Primitives.Fonts.CtFont
-                    {
-                        Id = new Id(200),
-                        FontName="宋体"
-                    }
-                },//todo Fonts从哪里来？
-                MultiMedias = new List<CtMultiMedia>()//todo MultiMedias从哪里来？
+                MultiMedias = new List<CtMultiMedia>(),
+                Fonts = new List<CtFont>(),
+                ColorSpaces = new List<CtColorSpace>(),
+                CompositeGraphicUnits = new List<VectorGraph>(),
+                DrawParams = new List<CtDrawParam>()
             };
             _customTags = new List<CustomTag>();
             _tagElements = new List<XElement>();
@@ -96,49 +63,24 @@ namespace OfdSharp
             _attachments = new List<Attachment>();
             _attachmentElements = new List<XElement>();
             _ofdPages = new List<OfdPage>();
-
-            _ofdRoot = new OfdRoot
-            {
-                DocBody = new DocBody
-                {
-                    DocInfo = new CtDocInfo
-                    {
-                        DocId = Guid.NewGuid().ToString("N"),
-                        Title = documentInfo.Title,
-                        Author = documentInfo.Author,
-                        Subject = documentInfo.Subject,
-                        Abstract = documentInfo.Abstract,
-                        CreationDate = DateTime.Now,
-                        DocUsage = GetDocUsageDesc(documentInfo.DocUsage),
-                        Cover = documentInfo.Cover,
-                        Keywords = documentInfo.Keywords,
-                        Creator = documentInfo.Creator,
-                        CreatorVersion = documentInfo.CreatorVersion,
-                        CustomDataList = documentInfo.CustomDataList
-                    }
-                }
-            };
             _ctDocument = new CtDocument
             {
                 CommonData = new CommonData
                 {
-                    ColorSpace = new RefId(180),//todo ColorSpace在哪里定义？
-                    DocumentRes = new Location("DocumentRes.xml"),
+                    //ColorSpace = new RefId(180), //todo ColorSpace在哪里定义？
+                    //DocumentRes = new Location("DocumentRes.xml"),//todo DocumentRes 如何判断要写入？
                     //PublicRes = new Location("PublicRes.xml"),
                     //TemplatePages = new List<TemplatePage>(),//todo 页面模板如何使用
                 }
             };
         }
 
-        private static string GetDocUsageDesc(DocUsage? docUsage)
-        {
-            return docUsage.HasValue ? DocUsages[docUsage.Value] : DocUsage.Normal.ToString();
-        }
         public DocumentResource DocumentResource => _resource;
         public List<OfdPage> Pages => _ofdPages;
         public List<Attachment> Attachments => _attachments;
         public List<XElement> AttachmentElements => _attachmentElements;
 
+        internal IdGen IdGen => _idGen;
 
         public OfdPage AddPage()
         {
@@ -147,32 +89,24 @@ namespace OfdSharp
 
         public OfdPage AddPage(PageSize pageSize)
         {
-            _ctDocument.CommonData.PageArea.Physical = new Box(pageSize.X, pageSize.Y, pageSize.Width, pageSize.Height);
-            Interlocked.Increment(ref _unitId);
-            var pageNode = new Primitives.Pages.Tree.PageNode
+            _ctDocument.CommonData.PageArea = new PageArea
             {
-                Id = new Id(_unitId),
-                BaseLoc = new Location($"Pages/Page_{Math.Max(0, _ofdPages.Count - 1)}/Content.xml")
+                Physical = new Box(pageSize.X, pageSize.Y, pageSize.Width, pageSize.Height)
             };
-            OfdPage ofdPage = new OfdPage(pageNode, pageSize);
+            int pageIndex = Math.Max(0, _ofdPages.Count - 1);
+            OfdPage ofdPage = new OfdPage(pageIndex, _idGen, pageSize);
             _ofdPages.Add(ofdPage);
 
-            _refPage = new RefPage { PageId = new RefId(100), FileLoc = new Location($"Page_{_ofdPages.Count - 1}/Annotation.xml") };
-
-            _ofdRoot.DocBody.DocRoot = new Location($"Doc_{0}/Document.xml");
-
+            _refPage = new RefPage
+            {
+                PageId = new RefId(100), FileLoc = new Location($"Page_{pageIndex}/Annotation.xml")
+            };
             return ofdPage;
         }
 
         private List<PageObject> GetPageObjects()
         {
-            List<PageObject> pageObjects = new List<PageObject>();
-            foreach (var page in _ofdPages)
-            {
-                PageObject pg = page.CreatePageObject();
-                pageObjects.Add(pg);
-            }
-            return pageObjects;
+            return _ofdPages.Select(page => page.CreatePageObject()).ToList();
         }
 
         public void AddCustomTag(CustomTag customTag, XElement tagElement)
@@ -185,7 +119,7 @@ namespace OfdSharp
         {
             Attachment attachment = new Attachment
             {
-                Id = new Id(10),
+                Id = _idGen.NewId(),
                 Name = name,
                 FileLoc = new Location(fileName),
                 Visible = visible,
@@ -202,7 +136,7 @@ namespace OfdSharp
             //_annotationInfo = new AnnotationInfo
             //{
             //    Type = AnnotationType.Stamp,
-            //    Id = new Id(93),
+            //    Id = _idGen.NewId(),
             //    Subtype = "SignatureInFile",
             //    Parameters = new List<Parameter>
             //    {
@@ -267,39 +201,51 @@ namespace OfdSharp
             //    SignedInfo = signedInfo,
             //    SignedValue = "/Doc_0/Signs/Sign_0/SignedValue.dat"
             //};
-            _ofdRoot.DocBody.Signatures = new Location($"Doc_{0}/Signs/Signatures.xml");
+            //_ofdRoot.DocBodyList[_index].Signatures = new Location($"Doc_{_index}/Signs/Signatures.xml");
         }
 
-        public byte[] Save()
+        internal byte[] Save(OfdRoot ofdRoot)
         {
-            OfdWriter writer = new OfdWriter(this, false);
+            OfdWriter writer = new OfdWriter(this);
 
-            _ctDocument.CommonData.MaxUnitId = new Id(1000);
-
-            writer.WriteOfdRoot(_ofdRoot);
-
-            _ctDocument.Pages = _ofdPages.Select(f => f.PageNode).ToList();
-
-
-            writer.WriteDocument(_ctDocument);
-
-
-            writer.WriteDocumentRes(_resource);
-
+            //先写底层xml
             var pageObjects = GetPageObjects();
             writer.WritePages(pageObjects);
 
-            _customTags.ForEach((item) => writer.WriteCustomerTag(item, _tagElements[_customTags.IndexOf(item)]));
+            _customTags.ForEach(item => writer.WriteCustomerTag(item, _tagElements[_customTags.IndexOf(item)]));
 
             if (_annotationInfo != null)
             {
                 writer.WriteAnnotation(_annotationInfo, _refPage);
             }
+
+            //DOC_N
+            _ctDocument.Pages = _ofdPages.Select(f => f.PageNode).ToList();
+            _resource.Fonts.AddRange(FontCache.GetCtFonts());
+
+            if (writer.WritePublicRes(_resource))
+            {
+                _ctDocument.CommonData.PublicRes = new Location("PublicRes.xml");
+            }
+
+            if (writer.WriteDocumentRes(_resource))
+            {
+                _ctDocument.CommonData.DocumentRes = new Location("DocumentRes.xml");
+            }
+
+            _ctDocument.CommonData.MaxUnitId = _idGen.MaxId;
+            writer.WriteDocument(_ctDocument);
+
+            //Root
+            writer.WriteOfdRoot(ofdRoot);
+
+            //sign
             if (_signedInfo != null)
             {
                 writer.WriteSignature(_signedInfo);
                 writer.ExecuteSign(_sesSealConfig);
             }
+
             return writer.Flush();
         }
     }

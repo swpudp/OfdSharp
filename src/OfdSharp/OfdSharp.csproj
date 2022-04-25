@@ -11,6 +11,7 @@
 		<PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
 		<PackageLicenseExpression>MIT</PackageLicenseExpression>
 		<PackageReleaseNotes>修复bug</PackageReleaseNotes>
+		<LangVersion>latest</LangVersion>
 	</PropertyGroup>
 
 	<ItemGroup>
@@ -24,6 +25,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
+		<PackageReference Include="OpenSsl.Crypto.Utility" Version="1.0.0.5" />
 		<PackageReference Include="Portable.BouncyCastle" Version="1.8.10" />
 	</ItemGroup>
 

@@ -21,7 +21,7 @@ namespace OfdSharp.Primitives.Text
         public RefId Font { get; set; }
 
         /// <summary>
-        /// 字号，单位为毫米
+        /// 字号，单位为毫米，常用字体单位是pt（磅），转换：1pt=0.3527mm
         /// </summary>
         public double Size { get; set; }
 

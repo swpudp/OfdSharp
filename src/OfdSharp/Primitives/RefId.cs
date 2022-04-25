@@ -10,6 +10,11 @@
             Id = new Id(id);
         }
 
+        public RefId(Id id)
+        {
+            Id = id;
+        }
+
         public RefId(string id)
         {
             Id = new Id(id);

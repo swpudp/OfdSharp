@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ofd:Res xmlns:ofd="http://www.ofdspec.org/2016" BaseLoc="Res">
+    <ofd:MultiMedias>
+        <ofd:MultiMedia ID="30" Type="Image">
+            <ofd:MediaFile>image_29.png</ofd:MediaFile>
+        </ofd:MultiMedia>
+        <ofd:MultiMedia ID="49" Type="Image">
+            <ofd:MediaFile>image_48.png</ofd:MediaFile>
+        </ofd:MultiMedia>
+        <ofd:MultiMedia ID="63" Type="Image">
+            <ofd:MediaFile>image_62.png</ofd:MediaFile>
+        </ofd:MultiMedia>
+        <ofd:MultiMedia ID="128" Type="Image">
+            <ofd:MediaFile>image_127.png</ofd:MediaFile>
+        </ofd:MultiMedia>
+        <ofd:MultiMedia ID="142" Type="Image">
+            <ofd:MediaFile>image_141.png</ofd:MediaFile>
+        </ofd:MultiMedia>
+        <ofd:MultiMedia ID="173" Type="Image">
+            <ofd:MediaFile>image_172.png</ofd:MediaFile>
+        </ofd:MultiMedia>
+    </ofd:MultiMedias>
+</ofd:Res>

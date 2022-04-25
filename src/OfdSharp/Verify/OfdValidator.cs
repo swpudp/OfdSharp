@@ -8,7 +8,7 @@ using Org.BouncyCastle.Security;
 using Org.BouncyCastle.Utilities;
 using System;
 using System.Linq;
-using OfdSharp.Crypto;
+using OpenSsl.Crypto.Utility;
 
 namespace OfdSharp.Verify
 {
@@ -61,16 +61,7 @@ namespace OfdSharp.Verify
         /// </summary>
         private static VerifyResult CheckFileIntegrity(OfdReader reader, DigestInfo signature, IDigest digest)
         {
-            foreach (Reference referenceItem in signature.SignedInfo.ReferenceCollect.Items)
-            {
-                VerifyResult verifyResult = CheckFileIntegrity(reader, digest, referenceItem);
-                if (verifyResult != VerifyResult.Success)
-                {
-                    return verifyResult;
-                }
-            }
-
-            return VerifyResult.Success;
+            return signature.SignedInfo.ReferenceCollect.Items.Select(referenceItem => CheckFileIntegrity(reader, digest, referenceItem)).FirstOrDefault(verifyResult => verifyResult != VerifyResult.Success);
         }
 
         /// <summary>
@@ -111,6 +102,7 @@ namespace OfdSharp.Verify
                     return VerifyResult.SealNotMatch;
                 }
             }
+
             return VerifyResult.Success;
         }
 
@@ -135,7 +127,7 @@ namespace OfdSharp.Verify
         private static VerifyResult Validate(byte[] tbsContent, byte[] signedValue)
         {
             //计算原文摘要
-            byte[] output = Sm2Utils.Digest(tbsContent);
+            byte[] output = DigestUtils.Sm3(tbsContent);
 
             SesSignature sesSignature = SesSignature.GetInstance(signedValue);
             TbsSign toSign = sesSignature.TbsSign;
@@ -145,6 +137,7 @@ namespace OfdSharp.Verify
             {
                 return VerifyResult.SignedNotMatch;
             }
+
             //加载证书
             byte[] certDer = sesSignature.Cert.GetOctets();
             Org.BouncyCastle.X509.X509CertificateParser parser = new Org.BouncyCastle.X509.X509CertificateParser();
@@ -154,11 +147,12 @@ namespace OfdSharp.Verify
             {
                 return VerifyResult.SealOutdated;
             }
+
             //预期的电子签章数据，签章值
             byte[] expect = sesSignature.Signature.GetOctets();
             //验证签名
             byte[] signed = toSign.GetDerEncoded();
-            bool result = Sm2Utils.Verify(sesSignature.SignatureAlgId.Id, cert, signed, expect);
+            bool result = SignatureUtils.Verify(sesSignature.SignatureAlgId.Id, cert, signed, expect);
             //验证签名
             return result ? VerifyResult.Success : VerifyResult.SealTampered;
         }

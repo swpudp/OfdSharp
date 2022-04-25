@@ -34,7 +34,7 @@ namespace OfdSharp.Reader
         /// <summary>
         /// 文档路径
         /// </summary>
-        private string _docRoot = string.Empty;
+        private string _docRoot;
 
         /// <summary>
         /// 构造函数
@@ -80,12 +80,9 @@ namespace OfdSharp.Reader
         private void UnZip(FileInfo fileInfo)
         {
             EnsureFileExist(fileInfo);
-            using (FileStream originalFileStream = fileInfo.OpenRead())
-            {
-                MemoryStream decompressedStream = new MemoryStream();
-                originalFileStream.CopyTo(decompressedStream);
-                UnZip(decompressedStream);
-            }
+            byte[] fileBytes = File.ReadAllBytes(fileInfo.FullName);
+            MemoryStream decompressedStream = new MemoryStream(fileBytes);
+            UnZip(decompressedStream);
         }
 
         /// <summary>
@@ -121,7 +118,8 @@ namespace OfdSharp.Reader
         /// <returns></returns>
         public byte[] ReadContent(string entryFile)
         {
-            ZipArchiveEntry entry = _archive.Entries.First(f => f.FullName == entryFile.TrimStart('/'));
+            ZipArchiveEntry entry = GetEntry(entryFile);
+            //_archive.Entries.First(f => f.FullName == entryFile.TrimStart('/'));
             using (Stream entryStream = entry.Open())
             {
                 using (MemoryStream memory = new MemoryStream())
@@ -145,13 +143,15 @@ namespace OfdSharp.Reader
                 return null;
             }
 
-            string fullName = entryName;
-            if (!string.IsNullOrWhiteSpace(_docRoot) && !entryName.StartsWith(_docRoot))
-            {
-                fullName = string.Concat(_docRoot, "/", entryName);
-            }
+            return _archive.Entries.FirstOrDefault(f => f.FullName.Contains(entryName.TrimStart('/')));
 
-            return _archive.Entries.FirstOrDefault(f => f.FullName == fullName);
+            // string fullName = entryName;
+            // if (!string.IsNullOrWhiteSpace(_docRoot) && !entryName.StartsWith(_docRoot))
+            // {
+            //     fullName = string.Concat(_docRoot, "/", entryName);
+            // }
+            //
+            // return _archive.Entries.FirstOrDefault(f => f.FullName == fullName);
         }
 
         /// <summary>
@@ -174,20 +174,24 @@ namespace OfdSharp.Reader
             using (MemoryStream memory = ReadEntry(entry))
             {
                 var document = XDocument.Load(memory);
-                _ofdRoot = new OfdRoot
+                _ofdRoot = new OfdRoot();
+                var docBody = new DocBody
                 {
-                    DocBody = new DocBody
+                    DocInfo = new CtDocInfo
                     {
-                        DocInfo = new CtDocInfo
+                        DocId = document.FirstValueOrDefault("DocID"),
+                        CustomDataList = document.GetDescendants("CustomData").Select(f => new CustomData
                         {
-                            DocId = document.FirstValueOrDefault("DocID"),
-                            CustomDataList = document.GetDescendants("CustomData").Select(f => new CustomData { Name = f.AttributeValueOrDefault("Name"), Value = f.Value }).ToList()
-                        },
-                        DocRoot = new Location(document.FirstValueOrDefault("DocRoot")),
-                        Signatures = new Location(document.FirstValueOrDefault("Signatures"))
-                    }
+                            Name = f.AttributeValueOrDefault("Name"),
+                            Value = f.Value
+                        }).ToList()
+                    },
+                    DocRoot = new Location(document.FirstValueOrDefault("DocRoot")?.Split('/')[0]),
+                    Signatures = new Location(document.FirstValueOrDefault("Signatures"))
                 };
-                _docRoot = _ofdRoot.DocBody.DocRoot.Value.Split('/')[0];
+                _ofdRoot.DocBodyList.Add(docBody);
+                //todo 多个文档读取怎么办？
+                _docRoot = _ofdRoot.DocBodyList[0].DocRoot.Value.Split('/')[0];
                 return _ofdRoot;
             }
         }
@@ -209,7 +213,8 @@ namespace OfdSharp.Reader
             }
 
             OfdRoot ofdRoot = GetOfdRoot();
-            ZipArchiveEntry entry = GetEntry(ofdRoot.DocBody.DocRoot.Value);
+            //todo 多个文档读取怎么办？
+            ZipArchiveEntry entry = GetEntry(ofdRoot.DocBodyList[0].DocRoot.Value);
             using (MemoryStream memory = ReadEntry(entry))
             {
                 var document = XDocument.Load(memory);
@@ -218,7 +223,7 @@ namespace OfdSharp.Reader
                     CommonData = new CommonData
                     {
                         MaxUnitId = new Id(document.FirstValueOrDefault("MaxUnitID")),
-                        PageArea = new PageArea { Physical = Box.Parse(document.FirstValueOrDefault("PhysicalBox")) },
+                        PageArea = new PageArea {Physical = Box.Parse(document.FirstValueOrDefault("PhysicalBox"))},
                         PublicRes = new Location(document.FirstValueOrDefault("PublicRes")),
                         DocumentRes = new Location(document.FirstValueOrDefault("DocumentRes")),
                         TemplatePages = document.GetDescendants("TemplatePage").Select(f => new TemplatePage
@@ -228,10 +233,10 @@ namespace OfdSharp.Reader
                             ZOrder = f.AttributeValueOrDefault("ZOrder").ParseEnum<LayerType>()
                         }).ToList()
                     },
-                    Pages = document.GetDescendants("Page").Select(f => new Primitives.Pages.Tree.PageNode { Id = new Id(f.AttributeValueOrDefault("ID")), BaseLoc = new Location(f.AttributeValueOrDefault("BaseLoc")) }).ToList(),
-                    Annotations = new List<Location> { new Location(document.FirstValueOrDefault("Annotations")) },
-                    Attachments = new List<Location> { new Location(document.FirstValueOrDefault("Attachments")) },
-                    CustomTags = new List<Location> { new Location(document.FirstValueOrDefault("CustomTags")) }
+                    Pages = document.GetDescendants("Page").Select(f => new Primitives.Pages.Tree.PageNode {Id = new Id(f.AttributeValueOrDefault("ID")), BaseLoc = new Location(f.AttributeValueOrDefault("BaseLoc"))}).ToList(),
+                    Annotations = new List<Location> {new Location(document.FirstValueOrDefault("Annotations"))},
+                    Attachments = new List<Location> {new Location(document.FirstValueOrDefault("Attachments"))},
+                    CustomTags = new List<Location> {new Location(document.FirstValueOrDefault("CustomTags"))}
                 };
                 return _document;
             }
@@ -440,7 +445,8 @@ namespace OfdSharp.Reader
             }
 
             OfdRoot ofdRoot = GetOfdRoot();
-            ZipArchiveEntry entry = GetEntry(ofdRoot.DocBody.Signatures.Value);
+            //todo GetSignatureInfo多个文档读取怎么办？
+            ZipArchiveEntry entry = GetEntry(ofdRoot.DocBodyList[0].Signatures.Value);
             if (entry == null)
             {
                 return null;
@@ -451,7 +457,7 @@ namespace OfdSharp.Reader
                 var xDocument = XDocument.Load(memory);
                 _signatureInfo = new SignatureCollect
                 {
-                    MaxSignId = new Id(xDocument.Root.ElementValueOrDefault("MaxSignId")),
+                    MaxSignId = xDocument.Root.ElementValueOrDefault("MaxSignId"),
                     Signatures = xDocument.GetDescendants("Signature").Select(f => new SignatureInfo
                     {
                         BaseLoc = f.AttributeValueOrDefault("BaseLoc"),
@@ -480,7 +486,8 @@ namespace OfdSharp.Reader
             }
 
             SignatureCollect signature = GetSignatureInfo();
-            ZipArchiveEntry signatureFile = _archive.Entries.First(f => f.FullName == signature.Signatures.First().BaseLoc.TrimStart('/'));
+
+            ZipArchiveEntry signatureFile = GetEntry(signature.Signatures.First().BaseLoc);
             using (MemoryStream memory = ReadEntry(signatureFile))
             {
                 XDocument xDocument = XDocument.Load(memory);
@@ -504,7 +511,7 @@ namespace OfdSharp.Reader
                             CheckMethod = signedInfoElement.AttributeValueForElementOrDefault("References", "CheckMethod"),
                             Items = signedInfoElement.GetDescendants("Reference").Select(f => new Primitives.Signatures.Reference
                             {
-                                CheckValue = new CheckValue { Value = f.ElementValueOrDefault("CheckValue") },
+                                CheckValue = new CheckValue {Value = f.ElementValueOrDefault("CheckValue")},
                                 FileRef = f.AttributeValueOrDefault("FileRef")
                             }).ToList()
                         },
@@ -531,7 +538,7 @@ namespace OfdSharp.Reader
         private static Seal GetSeal(XElement e)
         {
             string loc = e.ElementValueForElementOrDefault("Seal", "BaseLoc");
-            return string.IsNullOrWhiteSpace(loc) ? null : new Seal { BaseLoc = new Location(loc) };
+            return string.IsNullOrWhiteSpace(loc) ? null : new Seal {BaseLoc = new Location(loc)};
         }
 
         /// <summary>
@@ -582,8 +589,8 @@ namespace OfdSharp.Reader
                     MachineNo = root.ElementValueOrDefault(XName.Get("MachineNo", ConstDefined.InvoiceNamespaceUri)),
                     GraphCode = root.ElementValueOrDefault(XName.Get("GraphCode", ConstDefined.InvoiceNamespaceUri)),
                     TaxControlCode = root.ElementValueOrDefault(XName.Get("TaxControlCode", ConstDefined.InvoiceNamespaceUri)),
-                    Buyer = new BuyerInfo { BuyerName = root.ElementValueForElementOrDefault(XName.Get("Buyer", ConstDefined.InvoiceNamespaceUri), XName.Get("BuyerName", ConstDefined.InvoiceNamespaceUri)), BuyerTaxNo = root.ElementValueForElementOrDefault(XName.Get("Buyer", ConstDefined.InvoiceNamespaceUri), XName.Get("BuyerTaxID", ConstDefined.InvoiceNamespaceUri)), BuyerAddressTel = root.ElementValueForElementOrDefault(XName.Get("Buyer", ConstDefined.InvoiceNamespaceUri), XName.Get("BuyerAddrTel", ConstDefined.InvoiceNamespaceUri)), BuyerBankAccount = root.ElementValueForElementOrDefault(XName.Get("Buyer", ConstDefined.InvoiceNamespaceUri), XName.Get("BuyerFinancialAccount", ConstDefined.InvoiceNamespaceUri)) },
-                    Seller = new SellerInfo { SellerName = root.ElementValueForElementOrDefault(XName.Get("Seller", ConstDefined.InvoiceNamespaceUri), XName.Get("SellerName", ConstDefined.InvoiceNamespaceUri)), SellerTaxNo = root.ElementValueForElementOrDefault(XName.Get("Seller", ConstDefined.InvoiceNamespaceUri), XName.Get("SellerTaxID", ConstDefined.InvoiceNamespaceUri)), SellerAddressTel = root.ElementValueForElementOrDefault(XName.Get("Seller", ConstDefined.InvoiceNamespaceUri), XName.Get("SellerAddrTel", ConstDefined.InvoiceNamespaceUri)), SellerBankAccount = root.ElementValueForElementOrDefault(XName.Get("Seller", ConstDefined.InvoiceNamespaceUri), XName.Get("SellerFinancialAccount", ConstDefined.InvoiceNamespaceUri)) },
+                    Buyer = new BuyerInfo {BuyerName = root.ElementValueForElementOrDefault(XName.Get("Buyer", ConstDefined.InvoiceNamespaceUri), XName.Get("BuyerName", ConstDefined.InvoiceNamespaceUri)), BuyerTaxNo = root.ElementValueForElementOrDefault(XName.Get("Buyer", ConstDefined.InvoiceNamespaceUri), XName.Get("BuyerTaxID", ConstDefined.InvoiceNamespaceUri)), BuyerAddressTel = root.ElementValueForElementOrDefault(XName.Get("Buyer", ConstDefined.InvoiceNamespaceUri), XName.Get("BuyerAddrTel", ConstDefined.InvoiceNamespaceUri)), BuyerBankAccount = root.ElementValueForElementOrDefault(XName.Get("Buyer", ConstDefined.InvoiceNamespaceUri), XName.Get("BuyerFinancialAccount", ConstDefined.InvoiceNamespaceUri))},
+                    Seller = new SellerInfo {SellerName = root.ElementValueForElementOrDefault(XName.Get("Seller", ConstDefined.InvoiceNamespaceUri), XName.Get("SellerName", ConstDefined.InvoiceNamespaceUri)), SellerTaxNo = root.ElementValueForElementOrDefault(XName.Get("Seller", ConstDefined.InvoiceNamespaceUri), XName.Get("SellerTaxID", ConstDefined.InvoiceNamespaceUri)), SellerAddressTel = root.ElementValueForElementOrDefault(XName.Get("Seller", ConstDefined.InvoiceNamespaceUri), XName.Get("SellerAddrTel", ConstDefined.InvoiceNamespaceUri)), SellerBankAccount = root.ElementValueForElementOrDefault(XName.Get("Seller", ConstDefined.InvoiceNamespaceUri), XName.Get("SellerFinancialAccount", ConstDefined.InvoiceNamespaceUri))},
                     TaxInclusiveTotalAmount = root.ElementValueOrDefault(XName.Get("TaxInclusiveTotalAmount", ConstDefined.InvoiceNamespaceUri)),
                     TaxInclusiveTotalAmountWithWords = root.ElementValueOrDefault(XName.Get("TaxInclusiveTotalAmountWithWords", ConstDefined.InvoiceNamespaceUri)),
                     TaxExclusiveTotalAmount = root.ElementValueOrDefault(XName.Get("TaxExclusiveTotalAmount", ConstDefined.InvoiceNamespaceUri)),

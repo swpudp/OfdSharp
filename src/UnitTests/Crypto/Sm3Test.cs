@@ -1,7 +1,7 @@
 ﻿using System;
 using System.IO;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Org.BouncyCastle.Crypto.Digests;
+using OpenSsl.Crypto.Utility;
 using Org.BouncyCastle.Utilities;
 
 namespace UnitTests.Crypto
@@ -18,15 +18,9 @@ namespace UnitTests.Crypto
         [TestMethod]
         public void DigestTest()
         {
-            SM3Digest sm3Digest = new SM3Digest();
-
-            string ofdXml = Path.Combine(Directory.GetCurrentDirectory(), "Files", "OFD.xml");
+            string ofdXml = Path.Combine(Directory.GetCurrentDirectory(), "Files", "test", "OFD.xml");
             byte[] ofdXmlContent = File.ReadAllBytes(ofdXml);
-
-            sm3Digest.BlockUpdate(ofdXmlContent, 0, ofdXmlContent.Length);
-            byte[] output = new byte[32];
-            sm3Digest.DoFinal(output, 0);
-
+            byte[] output = DigestUtils.Sm3(ofdXmlContent);
             byte[] expect = Convert.FromBase64String("/Ew+hIIgEQwmbW71cvPmIjkT9S7ABpRZTUPHtNBwhZg=");
             Assert.AreEqual(true, Arrays.AreEqual(output, expect));
         }
