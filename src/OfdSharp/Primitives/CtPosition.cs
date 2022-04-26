@@ -3,7 +3,7 @@
     /// <summary>
     /// 点坐标，以空格分割，前者为x值，后者为y值，可以是整数或浮点数，如"0 0"
     /// </summary>
-    public class Position
+    public class CtPosition
     {
         /// <summary>
         /// X坐标
@@ -17,7 +17,7 @@
         /// </summary>
         public double YCoordinate { get; }
 
-        public Position(double xCoordinate, double yCoordinate)
+        public CtPosition(double xCoordinate, double yCoordinate)
         {
             XCoordinate = xCoordinate;
             YCoordinate = yCoordinate;
@@ -28,23 +28,29 @@
             return $"{XCoordinate} {YCoordinate}";
         }
 
-        public static bool operator ==(Position a, Position b)
+        public static bool operator ==(CtPosition a, CtPosition b)
         {
-            return a.XCoordinate == b.XCoordinate && a.YCoordinate == b.YCoordinate;
+            return !ReferenceEquals(a, null) && !ReferenceEquals(b, null) && a.XCoordinate - b.XCoordinate == 0d && a.YCoordinate - b.YCoordinate == 0d;
         }
 
-        public static bool operator !=(Position a, Position b)
+        public static bool operator !=(CtPosition a, CtPosition b)
         {
+            if (ReferenceEquals(a, null) && ReferenceEquals(b, null))
+            {
+                return false;
+            }
+
+            if (ReferenceEquals(a, null) || ReferenceEquals(b, null))
+            {
+                return true;
+            }
+
             return !(a == b);
         }
 
         public override bool Equals(object obj)
         {
-            if (obj == null || !(obj is Position position))
-            {
-                return false;
-            }
-            return position.XCoordinate == XCoordinate && position.YCoordinate == YCoordinate;
+            return obj is CtPosition position && position.XCoordinate - XCoordinate == 0d && position.YCoordinate - YCoordinate == 0d;
         }
 
         public override int GetHashCode()

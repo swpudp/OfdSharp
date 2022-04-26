@@ -13,11 +13,11 @@
         /// <summary>
         /// 二次贝塞尔曲线的控制点
         /// </summary>
-        public Position Point1 { get; set; }
+        public CtPosition Point1 { get; set; }
 
         /// <summary>
         /// 二次贝塞尔曲线的结束点,下一路径的起始点
         /// </summary>
-        public Position Point2 { get; set; }
+        public CtPosition Point2 { get; set; }
     }
 }

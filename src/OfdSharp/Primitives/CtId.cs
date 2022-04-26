@@ -9,25 +9,18 @@ namespace OfdSharp.Primitives
     /// </summary>
     [Serializable]
     [Browsable(false), EditorBrowsable(EditorBrowsableState.Never)]
-    public struct Id : IFormattable, IComparable
+    public struct CtId : IFormattable, IComparable
     {
         private readonly int _value;
-        private static int _newValue;
 
-        public Id(int value)
+        public CtId(int value)
         {
             _value = value;
         }
 
-        public Id(string value)
+        public CtId(string value)
         {
             _value = int.Parse(value);
-        }
-
-        public static Id NewId()
-        {
-            Interlocked.Increment(ref _newValue);
-            return new Id(_newValue);
         }
 
         public int CompareTo(object obj)
@@ -46,7 +39,7 @@ namespace OfdSharp.Primitives
 
         public override bool Equals(object obj)
         {
-            return obj is Id id && _value == id._value;
+            return obj is CtId id && _value == id._value;
         }
 
         public override int GetHashCode()
@@ -54,8 +47,8 @@ namespace OfdSharp.Primitives
             return _value.GetHashCode();
         }
 
-        public static bool operator ==(Id a, Id b) => a._value == b._value;
+        public static bool operator ==(CtId a, CtId b) => a._value == b._value;
 
-        public static bool operator !=(Id a, Id b) => a._value != b._value;
+        public static bool operator !=(CtId a, CtId b) => a._value != b._value;
     }
 }

@@ -35,12 +35,12 @@ namespace OfdSharp.Primitives.Pages.Description.Color
         /// <summary>
         /// 起始椭圆的的中心点
         /// </summary>
-        public Position StartPoint { get; set; }
+        public CtPosition StartPoint { get; set; }
 
         /// <summary>
         /// 结束椭圆的的中心点
         /// </summary>
-        public Position EndPoint { get; set; }
+        public CtPosition EndPoint { get; set; }
 
         /// <summary>
         /// 起始椭圆的长半轴

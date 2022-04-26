@@ -8,7 +8,7 @@
         /// <summary>
         /// 附件的标识
         /// </summary>
-        public RefId AttachId { get; set; }
+        public CtRefId AttachId { get; set; }
 
         /// <summary>
         /// 是否在新窗口中打开

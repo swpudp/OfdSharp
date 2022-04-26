@@ -42,7 +42,7 @@
         /// 用于某些需要对底纹单元进行平移旋转变换的场合，
         /// 默认为单位矩阵；底纹呈现时先做 XStep、YStep 排列，然后一起做变换矩阵处理
         /// </summary>
-        public Array TransformMatrix { get; set; }
+        public CtArray TransformMatrix { get; set; }
 
         /// <summary>
         /// 底纹单元

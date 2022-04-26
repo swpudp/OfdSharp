@@ -12,7 +12,7 @@
         /// <summary>
         /// 标识
         /// </summary>
-        public Id Id { get; set; }
+        public CtId Id { get; set; }
 
         /// <summary>
         /// 颜色空间的类型
@@ -27,7 +27,7 @@
         /// <summary>
         /// 指向包内颜色配置文件
         /// </summary>
-        public Location Profile { get; set; }
+        public CtLocation Profile { get; set; }
 
         /// <summary>
         /// 调色板

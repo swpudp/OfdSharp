@@ -1,5 +1,4 @@
 ﻿using OfdSharp.Primitives.Entry;
-using System;
 using System.Collections.Generic;
 
 namespace OfdSharp

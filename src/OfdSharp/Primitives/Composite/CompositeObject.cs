@@ -12,6 +12,6 @@ namespace OfdSharp.Primitives.Composite
         /// <summary>
         /// 引用资源文件中定义的矢量图像的标识
         /// </summary>
-        public RefId ResourceId { get; set; }
+        public CtRefId ResourceId { get; set; }
     }
 }

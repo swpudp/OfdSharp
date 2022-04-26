@@ -13,7 +13,7 @@
         /// <summary>
         /// 引用跳转目标页面的标识
         /// </summary>
-        public RefId PageId { get; set; }
+        public CtRefId PageId { get; set; }
 
         /// <summary>
         /// 目标区域左上角x坐标

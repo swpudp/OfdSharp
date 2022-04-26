@@ -8,7 +8,7 @@
         /// <summary>
         /// 版本标识
         /// </summary>
-        public Id Id { get; set; }
+        public CtId Id { get; set; }
 
         /// <summary>
         /// 版本号
@@ -23,6 +23,6 @@
         /// <summary>
         /// 指向包内的版本描述文件
         /// </summary>
-        public Location BaseLoc { get; set; }
+        public CtLocation BaseLoc { get; set; }
     }
 }

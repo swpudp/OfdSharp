@@ -31,7 +31,7 @@ namespace OfdSharp.Primitives.Extensions
         /// <summary>
         /// 引用扩展项针对的文档项目的标识
         /// </summary>
-        public RefId RefId { get; set; }
+        public CtRefId RefId { get; set; }
 
         /// <summary>
         /// 扩展属性,"NameTypeValue"的数值组,用于简单的扩展
@@ -46,6 +46,6 @@ namespace OfdSharp.Primitives.Extensions
         /// <summary>
         /// 扩展数据文件所在位置,用于扩展大量信息
         /// </summary>
-        public Location ExtendData { get; set; }
+        public CtLocation ExtendData { get; set; }
     }
 }

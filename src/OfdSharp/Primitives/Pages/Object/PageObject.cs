@@ -25,7 +25,7 @@ namespace OfdSharp.Primitives.Pages.Object
         /// <summary>
         /// 指向该页使用的资源文件
         /// </summary>
-        public Location PageRes { get; set; }
+        public CtLocation PageRes { get; set; }
 
         /// <summary>
         /// 页面内容描述，该节点不存在时，标识空白页

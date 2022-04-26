@@ -3,7 +3,6 @@ using OfdSharp.Primitives.Entry;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading;
 
 namespace OfdSharp
@@ -47,7 +46,7 @@ namespace OfdSharp
                     CreatorVersion = documentInfo.CreatorVersion,
                     CustomDataList = documentInfo.CustomDataList
                 },
-                DocRoot = new Location($"Doc_{_docIndex}/Document.xml")
+                DocRoot = new CtLocation($"Doc_{_docIndex}/Document.xml")
             };
             _ofdRoot.DocBodyList.Add(docBody);
             OfdDocument ofdDocument = new OfdDocument(_docIndex);

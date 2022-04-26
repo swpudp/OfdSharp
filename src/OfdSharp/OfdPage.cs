@@ -5,10 +5,7 @@ using OfdSharp.Primitives.Image;
 using OfdSharp.Primitives.Pages.Object;
 using OfdSharp.Primitives.Pages.Tree;
 using OfdSharp.Primitives.Text;
-using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
 namespace OfdSharp
 {
@@ -51,7 +48,7 @@ namespace OfdSharp
             _pageNode = new PageNode
             {
                 Id = idGen.NewId(),
-                BaseLoc = new Location($"Pages/Page_{index}/Content.xml")
+                BaseLoc = new CtLocation($"Pages/Page_{index}/Content.xml")
             };
             _pageSize = pageSize;
             _margin = GetMargin(pageSize);
@@ -101,7 +98,7 @@ namespace OfdSharp
             foreach (Paragraph p in _paragraphs)
             {
                 pIndex++;
-                List<CtText> ctTexts = p.GetCtTexts(_margin, pIndex);
+                List<CtText> ctTexts = p.GetCtTexts(_pageSize, _margin, pIndex);
                 foreach (CtText ctText in ctTexts)
                 {
                     PageBlock pg = new PageBlock
@@ -143,7 +140,7 @@ namespace OfdSharp
             {
                 Area = new Primitives.Doc.PageArea
                 {
-                    Physical = new Box(_pageSize.X, _pageSize.Y, _pageSize.Width, _pageSize.Height)
+                    Physical = new CtBox(_pageSize.X, _pageSize.Y, _pageSize.Width, _pageSize.Height)
                 },
                 Content = new Content
                 {

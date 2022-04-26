@@ -8,6 +8,6 @@
         /// <summary>
         /// 线段的结束点
         /// </summary>
-        public Position Point1 { get; set; }
+        public CtPosition Point1 { get; set; }
     }
 }

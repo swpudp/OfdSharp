@@ -13,16 +13,16 @@
         /// <summary>
         /// 三次贝塞尔曲线的第一个控制点
         /// </summary>
-        public Position Point1 { get; set; }
+        public CtPosition Point1 { get; set; }
 
         /// <summary>
         /// 三次贝塞尔曲线的第二个控制点
         /// </summary>
-        public Position Point2 { get; set; }
+        public CtPosition Point2 { get; set; }
 
         /// <summary>
         /// 三次贝塞尔曲线的结束点，下一路径的起始点
         /// </summary>
-        public Position Point3 { get; set; }
+        public CtPosition Point3 { get; set; }
     }
 }

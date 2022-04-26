@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace OfdSharp.Extensions
+﻿namespace OfdSharp.Extensions
 {
     internal static class StringExtensions
     {

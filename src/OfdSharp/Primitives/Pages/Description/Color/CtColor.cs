@@ -18,17 +18,17 @@ namespace OfdSharp.Primitives.Pages.Description.Color
 
         public CtColor()
         {
-            Value = new Array("0 0 0");
+            Value = new CtArray("0 0 0");
         }
 
         public CtColor(string value)
         {
-            Value = Array.Parse(value);
+            Value = CtArray.Parse(value);
         }
 
         public CtColor(string r, string b, string g)
         {
-            Value = new Array(r, g, b);
+            Value = new CtArray(r, g, b);
         }
 
         /// <summary>
@@ -37,7 +37,7 @@ namespace OfdSharp.Primitives.Pages.Description.Color
         /// 此属性不出现时,应采用Index属性从颜色空间的调色板中的取值。
         /// 当二者都不出现时,该颜色各通道的值全部为0
         /// </summary>
-        public Array Value { get; }
+        public CtArray Value { get; }
 
         /// <summary>
         /// 调色板中颜色的编号,非负整数,将从当前颜色空间的调色板中取出相应索引的预定义颜色用来绘制。索引从0开始
@@ -47,7 +47,7 @@ namespace OfdSharp.Primitives.Pages.Description.Color
         /// <summary>
         /// 引用资源文件中颜色空间的标识默认值为文档设定的颜色空间
         /// </summary>
-        public RefId ColorSpace { get; set; }
+        public CtRefId ColorSpace { get; set; }
 
         /// <summary>
         /// 颜色透明度,在0~255之间取值。默认为255,表示完全不透明。

@@ -7,12 +7,13 @@
     /// 2.未显式指定时代表当前路径
     /// 3.路径区分大小写
     /// </summary>
-    public class Location
+    public class CtLocation
     {
-        public Location(string value)
+        public CtLocation(string value)
         {
             Value = value;
         }
+
         /// <summary>
         /// 路径
         /// </summary>

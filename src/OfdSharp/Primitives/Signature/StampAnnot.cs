@@ -9,21 +9,21 @@
         /// <summary>
         /// 签章注释的标识
         /// </summary>
-        public Id Id { get; set; }
+        public CtId Id { get; set; }
 
         /// <summary>
         /// 引用外观注释所在的页面的标识符
         /// </summary>
-        public RefId PageRef { get; set; }
+        public CtRefId PageRef { get; set; }
 
         /// <summary>
         /// 签章注释的外观边框位置
         /// </summary>
-        public Box Boundary { get; set; }
+        public CtBox Boundary { get; set; }
 
         /// <summary>
         /// 签章注释的外观裁剪设置
         /// </summary>
-        public Box Clip { get; set; }
+        public CtBox Clip { get; set; }
     }
 }

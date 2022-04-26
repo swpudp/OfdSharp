@@ -8,7 +8,7 @@
         /// <summary>
         /// 引用资源文件中定义的视频资源标识
         /// </summary>
-        public RefId ResourceId { get; }
+        public CtRefId ResourceId { get; }
 
         /// <summary>
         /// 放映参数

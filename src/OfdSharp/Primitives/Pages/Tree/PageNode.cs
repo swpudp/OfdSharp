@@ -8,11 +8,11 @@
         /// <summary>
         /// 申明该页的标识，不能与已有标识重复
         /// </summary>
-        public Id Id { get; set; }
+        public CtId Id { get; set; }
 
         /// <summary>
         /// 指向页对象描述文件
         /// </summary>
-        public Location BaseLoc { get; set; }
+        public CtLocation BaseLoc { get; set; }
     }
 }

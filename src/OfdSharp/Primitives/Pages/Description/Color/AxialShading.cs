@@ -30,12 +30,12 @@ namespace OfdSharp.Primitives.Pages.Description.Color
         /// <summary>
         /// 轴线起始点
         /// </summary>
-        public Position StartPoint { get; set; }
+        public CtPosition StartPoint { get; set; }
 
         /// <summary>
         /// 轴线结束点
         /// </summary>
-        public Position EndPoint { get; set; }
+        public CtPosition EndPoint { get; set; }
 
         /// <summary>
         /// 颜色段,至少出现两个

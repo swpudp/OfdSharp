@@ -8,7 +8,7 @@
         /// <summary>
         /// 引用资源文件中的音频资源标识符
         /// </summary>
-        public RefId ResourceId { get; set; }
+        public CtRefId ResourceId { get; set; }
 
         /// <summary>
         /// 播放音量，取值范围[0,100]，默认100

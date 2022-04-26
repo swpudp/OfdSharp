@@ -12,12 +12,12 @@ namespace OfdSharp.Primitives.Pages.Description.DrawParam
         /// <summary>
         /// 标识
         /// </summary>
-        public Id Id { get; set; }
+        public CtId Id { get; set; }
 
         /// <summary>
         /// 基础绘制参数，引用资源文件中的绘制参数的标识符
         /// </summary>
-        public RefId Relative { get; set; }
+        public CtRefId Relative { get; set; }
 
         /// <summary>
         /// 线条连接样式
@@ -43,7 +43,7 @@ namespace OfdSharp.Primitives.Pages.Description.DrawParam
         /// 默认值为空。
         /// 线条虚线样式的控制效果见表23
         /// </summary>
-        public Array DashPattern { get; set; }
+        public CtArray DashPattern { get; set; }
 
         /// <summary>
         /// 线端点样式,枚举值,指定了一条线的端点样式

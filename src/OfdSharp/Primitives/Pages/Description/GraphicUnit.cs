@@ -13,7 +13,7 @@ namespace OfdSharp.Primitives.Pages.Description
         /// <summary>
         /// 外接矩形,采用当前空间坐标系(页面坐标或其他容器坐标),当图元绘制超出此矩形区域时进行裁剪
         /// </summary>
-        public Box Boundary { get; set; }
+        public CtBox Boundary { get; set; }
 
         /// <summary>
         /// 图元对象的名字，默认值为空
@@ -28,12 +28,12 @@ namespace OfdSharp.Primitives.Pages.Description
         /// <summary>
         /// 对象空间内的图元变换矩阵
         /// </summary>
-        public Array TransformMatrixs { get; set; }
+        public CtArray TransformMatrixs { get; set; }
 
         /// <summary>
         /// 引用资源文件中的绘制参数标识
         /// </summary>
-        public RefId DrawParam { get; set; }
+        public CtRefId DrawParam { get; set; }
 
         /// <summary>
         /// 绘制路径时使用的线宽。
@@ -64,7 +64,7 @@ namespace OfdSharp.Primitives.Pages.Description
         /// <summary>
         /// 线条虚线的重复样式,数组中共含两个值,第一个值代表虚线线段的长度,第二个值代表虚线间隔的长度。
         /// </summary>
-        public Array DashPattern { get; set; }
+        public CtArray DashPattern { get; set; }
 
         /// <summary>
         /// 图元对象的透明度,取值区间为[0,255]，0表示全透明,255表示完全不透明，默认为0

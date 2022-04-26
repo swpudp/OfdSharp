@@ -1,7 +1,4 @@
 ﻿using OfdSharp.Primitives;
-using System;
-using System.Collections.Generic;
-using System.Text;
 using System.Threading;
 
 namespace OfdSharp
@@ -11,16 +8,16 @@ namespace OfdSharp
         private volatile int _maxId;
         private volatile int _maxSignId;
 
-        public Id NewId()
+        public CtId NewId()
         {
             Interlocked.Increment(ref _maxId);
-            return new Id(_maxId);
+            return new CtId(_maxId);
         }
 
         /// <summary>
         /// 最大Id
         /// </summary>
-        public Id MaxId => new Id(_maxId);
+        public CtId MaxId => new CtId(_maxId);
 
         /// <summary>
         /// 生成新的签名id

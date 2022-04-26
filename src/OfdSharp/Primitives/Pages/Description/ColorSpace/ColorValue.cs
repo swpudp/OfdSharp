@@ -12,6 +12,6 @@
         /// RGB - 包含3个通道，一次是红、绿、蓝；例如 "#11 #22 #33"、"17 34 51"
         /// CMYK - 包含4个通道，依次是青、黄、品红、黑；例如 "#11 #22 #33 # 44"、"17 34 51 68"
         /// </summary>
-        public Array Color { get; set; }
+        public CtArray Color { get; set; }
     }
 }

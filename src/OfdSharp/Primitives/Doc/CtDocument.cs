@@ -49,21 +49,21 @@ namespace OfdSharp.Primitives.Doc
         /// <summary>
         /// 指向附件列表文件。
         /// </summary>
-        public List<Location> Attachments { get; set; }
+        public List<CtLocation> Attachments { get; set; }
 
         /// <summary>
         /// 指向注释列表文件
         /// </summary>
-        public List<Location> Annotations { get; set; }
+        public List<CtLocation> Annotations { get; set; }
 
         /// <summary>
         /// 指向自定义标引列表文件
         /// </summary>
-        public List<Location> CustomTags { get; set; }
+        public List<CtLocation> CustomTags { get; set; }
 
         /// <summary>
         /// 指向扩展列表文件
         /// </summary>
-        public List<Location> Extensions { get; set; }
+        public List<CtLocation> Extensions { get; set; }
     }
 }

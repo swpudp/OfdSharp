@@ -12,7 +12,7 @@ namespace OfdSharp.Primitives.Annotations
         /// <summary>
         /// 注释的标识
         /// </summary>
-        public Id Id { get; set; }
+        public CtId Id { get; set; }
 
         /// <summary>
         /// 注释类型

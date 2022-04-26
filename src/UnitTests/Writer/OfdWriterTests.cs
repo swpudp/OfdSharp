@@ -72,25 +72,25 @@ namespace UnitTests.Writer
             ofdRoot.DocBodyList.Add(new DocBody
             {
                 DocInfo = docInfo,
-                DocRoot = new Location($"Doc_{0}/Document.xml"),
-                Signatures = new Location($"Doc_{0}/Signs/Signatures.xml")
+                DocRoot = new CtLocation($"Doc_{0}/Document.xml"),
+                Signatures = new CtLocation($"Doc_{0}/Signs/Signatures.xml")
             });
             writer.WriteOfdRoot(ofdRoot);
 
             CommonData commonData = new CommonData
             {
-                MaxUnitId = new Id(100),
-                PageArea = new PageArea {Application = new Box(0, 0, 1000, 100), Physical = new Box(0, 0, 100, 100)},
+                MaxUnitId = new CtId(100),
+                PageArea = new PageArea {Application = new CtBox(0, 0, 1000, 100), Physical = new CtBox(0, 0, 100, 100)},
                 //ColorSpace = new RefId(190),
-                DocumentRes = new Location("DocumentRes.xml"),
+                DocumentRes = new CtLocation("DocumentRes.xml"),
                 //MaxUnitId = new Id(100),
-                PublicRes = new Location("PublicRes.xml"),
+                PublicRes = new CtLocation("PublicRes.xml"),
                 //PageArea = new PageArea { Application = new Box(0, 0, 1000, 100), Physical = new Box(0, 0, 100, 100) },
                 TemplatePages = new List<TemplatePage>(),
             };
             var pageNodes = new List<OfdSharp.Primitives.Pages.Tree.PageNode>
             {
-                new OfdSharp.Primitives.Pages.Tree.PageNode {Id = new Id(20), BaseLoc = new Location("Pages/Page_0/Content.xml")}
+                new OfdSharp.Primitives.Pages.Tree.PageNode {Id = new CtId(20), BaseLoc = new CtLocation("Pages/Page_0/Content.xml")}
             };
             CtDocument ctDocument = new CtDocument
             {
@@ -101,43 +101,43 @@ namespace UnitTests.Writer
 
             DocumentResource res = new DocumentResource
             {
-                BaseLoc = new Location("Res"),
+                BaseLoc = new CtLocation("Res"),
                 DrawParams = new List<OfdSharp.Primitives.Pages.Description.DrawParam.CtDrawParam>
                 {
                     new OfdSharp.Primitives.Pages.Description.DrawParam.CtDrawParam
                     {
-                        Id = new Id(20),
+                        Id = new CtId(20),
                         LineWidth = 0.25,
                         FillColor = new CtColor("10 10 10 20")
                         {
-                            ColorSpace = new RefId(25),
+                            ColorSpace = new CtRefId(25),
                         },
                         StrokeColor = new CtColor("10 20 10 20")
                         {
-                            ColorSpace = new RefId(25),
+                            ColorSpace = new CtRefId(25),
                         }
                     }
                 },
                 MultiMedias = new List<CtMultiMedia>
                 {
-                    new CtMultiMedia {Format = "GBIG2", Type = MediaType.Image, Id = new Id(78), MediaFile = new Location("image_78.jb2")},
-                    new CtMultiMedia {Format = "GBIG2", Type = MediaType.Image, Id = new Id(79), MediaFile = new Location("image_80.jb2")}
+                    new CtMultiMedia {Format = "GBIG2", Type = MediaType.Image, Id = new CtId(78), MediaFile = new CtLocation("image_78.jb2")},
+                    new CtMultiMedia {Format = "GBIG2", Type = MediaType.Image, Id = new CtId(79), MediaFile = new CtLocation("image_80.jb2")}
                 },
                 ColorSpaces = new List<OfdSharp.Primitives.Pages.Description.ColorSpace.CtColorSpace>
                 {
                     new OfdSharp.Primitives.Pages.Description.ColorSpace.CtColorSpace
                     {
-                        Id = new Id(20),
+                        Id = new CtId(20),
                         BitsPerComponent = OfdSharp.Primitives.Pages.Description.ColorSpace.BitsPerComponent.Bit8,
                         Type = OfdSharp.Primitives.Pages.Description.ColorSpace.ColorSpaceType.RGB
                     }
                 },
                 Fonts = new List<CtFont>
                 {
-                    new CtFont {Id = new Id(29), FontName = "楷体", FamilyName = "楷体"},
-                    new CtFont {Id = new Id(61), FontName = "KaiTi", FamilyName = "KaiTi"},
-                    new CtFont {Id = new Id(63), FontName = "宋体", FamilyName = "宋体"},
-                    new CtFont {Id = new Id(66), FontName = "Courier New", FamilyName = "Courier New"}
+                    new CtFont {Id = new CtId(29), FontName = "楷体", FamilyName = "楷体"},
+                    new CtFont {Id = new CtId(61), FontName = "KaiTi", FamilyName = "KaiTi"},
+                    new CtFont {Id = new CtId(63), FontName = "宋体", FamilyName = "宋体"},
+                    new CtFont {Id = new CtId(66), FontName = "Courier New", FamilyName = "Courier New"}
                 }
             };
             writer.WriteDocumentRes(res);
@@ -151,13 +151,13 @@ namespace UnitTests.Writer
 
             writer.WriteTemplate(GetTemplatePageObjects());
 
-            CustomTag customTag = new CustomTag {FileLoc = new Location("CustomTag.xml"), TypeId = "0"};
+            CustomTag customTag = new CustomTag {FileLoc = new CtLocation("CustomTag.xml"), TypeId = "0"};
             XElement tag = InvoiceInfoBuilder.CreateInvoiceTagElement();
             writer.WriteCustomerTag(customTag, tag);
 
             writer.WriteAnnotation(new OfdSharp.Primitives.Annotations.AnnotationInfo
             {
-                Id = new Id(1000),
+                Id = new CtId(1000),
                 Type = OfdSharp.Primitives.Annotations.AnnotationType.Link,
                 Parameters = new List<OfdSharp.Primitives.Annotations.Parameter>
                 {
@@ -171,11 +171,11 @@ namespace UnitTests.Writer
                 {
                     PathObject = new CtPath
                     {
-                        Boundary = new Box(10, 10, 10, 10),
-                        Id = new Id(109)
+                        Boundary = new CtBox(10, 10, 10, 10),
+                        Id = new CtId(109)
                     },
                 }
-            }, new OfdSharp.Primitives.Annotations.RefPage {PageId = new RefId(100), FileLoc = new Location("Doc_0/Annots/Page_0/Annotation.xml")});
+            }, new OfdSharp.Primitives.Annotations.RefPage {PageId = new CtRefId(100), FileLoc = new CtLocation("Doc_0/Annots/Page_0/Annotation.xml")});
 
             var signInfo = new SignedInfo
             {
@@ -187,7 +187,7 @@ namespace UnitTests.Writer
                     CheckMethod = SesSigner.DigestMethod.Id,
                     Items = new List<Reference>()
                 },
-                StampAnnot = new StampAnnot {Boundary = new Box(10, 10, 10, 10), Id = new Id(100), PageRef = new RefId(1001)}
+                StampAnnot = new StampAnnot {Boundary = new CtBox(10, 10, 10, 10), Id = new CtId(100), PageRef = new CtRefId(1001)}
             };
             writer.WriteSignature(signInfo);
 
@@ -230,24 +230,24 @@ namespace UnitTests.Writer
                     {
                         new Layer
                         {
-                            Id = new Id(303),
-                            DrawParam = new RefId(4),
+                            Id = new CtId(303),
+                            DrawParam = new CtRefId(4),
                             PageBlocks = new List<PageBlock>
                             {
                                 new PageBlock
                                 {
                                     PathObject = new CtPath
                                     {
-                                        Id = new Id(6),
-                                        Boundary = new Box(68.5, 17.8, 73, 0.4),
+                                        Id = new CtId(6),
+                                        Boundary = new CtBox(68.5, 17.8, 73, 0.4),
                                         LineWidth = 0.25,
                                         FillColor = new CtColor("156 82 35")
                                         {
-                                            ColorSpace = new RefId(5)
+                                            ColorSpace = new CtRefId(5)
                                         },
                                         StrokeColor = new CtColor("156 82 35")
                                         {
-                                            ColorSpace = new RefId(5)
+                                            ColorSpace = new CtRefId(5)
                                         },
                                         AbbreviatedData = "M 0 0.2 L 73 0.2",
                                     }
@@ -256,16 +256,16 @@ namespace UnitTests.Writer
                                 {
                                     PathObject = new CtPath
                                     {
-                                        Id = new Id(7),
-                                        Boundary = new Box(68.5, 18.8, 73, 0.4),
+                                        Id = new CtId(7),
+                                        Boundary = new CtBox(68.5, 18.8, 73, 0.4),
                                         LineWidth = 0.25,
                                         FillColor = new CtColor("156 82 35")
                                         {
-                                            ColorSpace = new RefId(5)
+                                            ColorSpace = new CtRefId(5)
                                         },
                                         StrokeColor = new CtColor("156 82 35")
                                         {
-                                            ColorSpace = new RefId(5)
+                                            ColorSpace = new CtRefId(5)
                                         },
                                         AbbreviatedData = "M 0 0.2 L 73 0.2",
                                     }
@@ -274,16 +274,16 @@ namespace UnitTests.Writer
                                 {
                                     PathObject = new CtPath
                                     {
-                                        Id = new Id(8),
-                                        Boundary = new Box(4.5, 29.8, 201, 0.4),
+                                        Id = new CtId(8),
+                                        Boundary = new CtBox(4.5, 29.8, 201, 0.4),
                                         LineWidth = 0.25,
                                         FillColor = new CtColor("156 82 35")
                                         {
-                                            ColorSpace = new RefId(5)
+                                            ColorSpace = new CtRefId(5)
                                         },
                                         StrokeColor = new CtColor("156 82 35")
                                         {
-                                            ColorSpace = new RefId(5)
+                                            ColorSpace = new CtRefId(5)
                                         },
                                         AbbreviatedData = "M 0 0.2 L 201 0.2",
                                     }
@@ -292,9 +292,9 @@ namespace UnitTests.Writer
                                 {
                                     TextObject = new CtText
                                     {
-                                        Id = new Id(32),
-                                        Boundary = new Box(148.5, 18.5, 16, 3.6),
-                                        Font = new RefId(29),
+                                        Id = new CtId(32),
+                                        Boundary = new CtBox(148.5, 18.5, 16, 3.6),
+                                        Font = new CtRefId(29),
                                         Size = 3.175,
                                         FillColor = new CtColor("156 82 35")
                                         {
@@ -303,7 +303,7 @@ namespace UnitTests.Writer
                                         {
                                             X = 0.1,
                                             Y = 2.734,
-                                            DeltaX = new OfdSharp.Primitives.Array("3.175 3.175 3.175 3.175"),
+                                            DeltaX = new OfdSharp.Primitives.CtArray("3.175 3.175 3.175 3.175"),
                                         }
                                     }
                                 },
@@ -311,9 +311,9 @@ namespace UnitTests.Writer
                                 {
                                     TextObject = new CtText
                                     {
-                                        Id = new Id(33),
-                                        Boundary = new Box(148.5, 24, 16, 3.6),
-                                        Font = new RefId(29),
+                                        Id = new CtId(33),
+                                        Boundary = new CtBox(148.5, 24, 16, 3.6),
+                                        Font = new CtRefId(29),
                                         Size = 3.175,
                                         FillColor = new CtColor("156 82 35")
                                         {
@@ -322,7 +322,7 @@ namespace UnitTests.Writer
                                         {
                                             X = 0.1,
                                             Y = 2.734,
-                                            DeltaX = new OfdSharp.Primitives.Array("4.86 4.87 3.175"),
+                                            DeltaX = new OfdSharp.Primitives.CtArray("4.86 4.87 3.175"),
                                         }
                                     }
                                 }
@@ -339,8 +339,8 @@ namespace UnitTests.Writer
             List<PageObject> pageObjects = new List<PageObject>();
             pageObjects.Add(new PageObject
             {
-                PageRes = new Location("Pages/Page_0/Content.xml"),
-                Area = new PageArea {Physical = new Box(0, 0, 210, 297)},
+                PageRes = new CtLocation("Pages/Page_0/Content.xml"),
+                Area = new PageArea {Physical = new CtBox(0, 0, 210, 297)},
                 Template = new Template {TemplateId = "2", ZOrder = LayerType.Background},
                 Content = new Content
                 {
@@ -348,27 +348,27 @@ namespace UnitTests.Writer
                     {
                         new Layer
                         {
-                            Id = new Id(303),
+                            Id = new CtId(303),
                             PageBlocks = new List<PageBlock>
                             {
                                 new PageBlock
                                 {
                                     TextObject = new CtText
                                     {
-                                        Id = new Id(302),
-                                        Boundary = new Box(69, 7, 72, 7.6749),
-                                        Font = new RefId(60),
+                                        Id = new CtId(302),
+                                        Boundary = new CtBox(69, 7, 72, 7.6749),
+                                        Font = new CtRefId(60),
                                         Size = 6.61,
                                         FillColor = new CtColor("156 82 35"),
-                                        TextCode = new TextCode("北京增值税电子普通发票") {X = 0, Y = 5.683674, DeltaX = new OfdSharp.Primitives.Array("10 6.61")}
+                                        TextCode = new TextCode("北京增值税电子普通发票") {X = 0, Y = 5.683674, DeltaX = new OfdSharp.Primitives.CtArray("10 6.61")}
                                     }
                                 },
                                 new PageBlock
                                 {
                                     PathObject = new CtPath
                                     {
-                                        Id = new Id(304),
-                                        Boundary = new Box(68.5, 18, 73, 0.25),
+                                        Id = new CtId(304),
+                                        Boundary = new CtBox(68.5, 18, 73, 0.25),
                                         LineWidth = 0.25,
                                         StrokeColor = new CtColor("156 82 35"),
                                         AbbreviatedData = "M 0 0 L 73 0",
@@ -378,8 +378,8 @@ namespace UnitTests.Writer
                                 {
                                     PathObject = new CtPath
                                     {
-                                        Id = new Id(305),
-                                        Boundary = new Box(68.5, 19, 73, 0.25),
+                                        Id = new CtId(305),
+                                        Boundary = new CtBox(68.5, 19, 73, 0.25),
                                         LineWidth = 0.25,
                                         StrokeColor = new CtColor("156 82 35"),
                                         AbbreviatedData = "M 0 0 L 73 0",
@@ -389,10 +389,10 @@ namespace UnitTests.Writer
                                 {
                                     ImageObject = new CtImage
                                     {
-                                        Id = new Id(310),
-                                        Ctm = new OfdSharp.Primitives.Array("20 0 0 20 0 0"),
-                                        Boundary = new Box(8.5, 4, 20, 20),
-                                        ResourceId = new RefId(311)
+                                        Id = new CtId(310),
+                                        Ctm = new OfdSharp.Primitives.CtArray("20 0 0 20 0 0"),
+                                        Boundary = new CtBox(8.5, 4, 20, 20),
+                                        ResourceId = new CtRefId(311)
                                     }
                                 }
                             }

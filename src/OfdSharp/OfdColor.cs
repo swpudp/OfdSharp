@@ -1,7 +1,4 @@
 ﻿using OfdSharp.Primitives.Pages.Description.Color;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace OfdSharp
 {

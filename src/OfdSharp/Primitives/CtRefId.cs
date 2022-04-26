@@ -3,24 +3,24 @@
     /// <summary>
     /// 标识引用，无符号位整数，此标识应为文档内已定义的标识
     /// </summary>
-    public class RefId
+    public class CtRefId
     {
-        public RefId(int id)
+        public CtRefId(int id)
         {
-            Id = new Id(id);
+            Id = new CtId(id);
         }
 
-        public RefId(Id id)
+        public CtRefId(CtId id)
         {
             Id = id;
         }
 
-        public RefId(string id)
+        public CtRefId(string id)
         {
-            Id = new Id(id);
+            Id = new CtId(id);
         }
 
-        public Id Id { get; }
+        public CtId Id { get; }
 
         public override string ToString()
         {

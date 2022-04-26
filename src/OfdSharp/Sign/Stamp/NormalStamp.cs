@@ -40,11 +40,11 @@ namespace OfdSharp.Sign.Stamp
 
         public NormalStamp(int page, double tlx, double tly, double width, double height)
         {
-            this.Page = page;
-            this.Tlx = tlx;
-            this.Tly = tly;
-            this.Width = width;
-            this.Height = height;
+            Page = page;
+            Tlx = tlx;
+            Tly = tly;
+            Width = width;
+            Height = height;
         }
 
         public List<StampAnnot> GetAppearance(OfdReader ctx, AtomicSignId idProvider)

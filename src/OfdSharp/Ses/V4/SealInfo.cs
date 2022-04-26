@@ -1,7 +1,5 @@
-﻿using System;
-using System.Collections;
+﻿using System.Collections;
 using OfdSharp.Extensions;
-using OfdSharp.Ses.V1;
 using Org.BouncyCastle.Asn1;
 
 namespace OfdSharp.Ses.V4

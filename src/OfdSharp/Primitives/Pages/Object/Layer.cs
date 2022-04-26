@@ -15,12 +15,12 @@ namespace OfdSharp.Primitives.Pages.Object
         /// <summary>
         /// 图层的绘制参数,引用资源文件中定义的绘制参数标识
         /// </summary>
-        public RefId DrawParam { get; set; }
+        public CtRefId DrawParam { get; set; }
 
         /// <summary>
         /// 标识
         /// </summary>
-        public Id Id { get; set; }
+        public CtId Id { get; set; }
 
         /// <summary>
         /// 页块结构

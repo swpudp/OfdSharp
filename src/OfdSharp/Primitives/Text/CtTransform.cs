@@ -28,6 +28,6 @@
         /// <summary>
         /// 变换后的字形索引列表
         /// </summary>
-        public Array Glyphs { get; set; }
+        public CtArray Glyphs { get; set; }
     }
 }

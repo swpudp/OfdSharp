@@ -50,7 +50,7 @@ namespace OfdSharp
             _index = index;
             _resource = new DocumentResource
             {
-                BaseLoc = new Location("Res"),
+                BaseLoc = new CtLocation("Res"),
                 MultiMedias = new List<CtMultiMedia>(),
                 Fonts = new List<CtFont>(),
                 ColorSpaces = new List<CtColorSpace>(),
@@ -91,7 +91,7 @@ namespace OfdSharp
         {
             _ctDocument.CommonData.PageArea = new PageArea
             {
-                Physical = new Box(pageSize.X, pageSize.Y, pageSize.Width, pageSize.Height)
+                Physical = new CtBox(pageSize.X, pageSize.Y, pageSize.Width, pageSize.Height)
             };
             int pageIndex = Math.Max(0, _ofdPages.Count - 1);
             OfdPage ofdPage = new OfdPage(pageIndex, _idGen, pageSize);
@@ -99,7 +99,7 @@ namespace OfdSharp
 
             _refPage = new RefPage
             {
-                PageId = new RefId(100), FileLoc = new Location($"Page_{pageIndex}/Annotation.xml")
+                PageId = new CtRefId(100), FileLoc = new CtLocation($"Page_{pageIndex}/Annotation.xml")
             };
             return ofdPage;
         }
@@ -121,7 +121,7 @@ namespace OfdSharp
             {
                 Id = _idGen.NewId(),
                 Name = name,
-                FileLoc = new Location(fileName),
+                FileLoc = new CtLocation(fileName),
                 Visible = visible,
                 Format = format
             };
@@ -225,12 +225,12 @@ namespace OfdSharp
 
             if (writer.WritePublicRes(_resource))
             {
-                _ctDocument.CommonData.PublicRes = new Location("PublicRes.xml");
+                _ctDocument.CommonData.PublicRes = new CtLocation("PublicRes.xml");
             }
 
             if (writer.WriteDocumentRes(_resource))
             {
-                _ctDocument.CommonData.DocumentRes = new Location("DocumentRes.xml");
+                _ctDocument.CommonData.DocumentRes = new CtLocation("DocumentRes.xml");
             }
 
             _ctDocument.CommonData.MaxUnitId = _idGen.MaxId;

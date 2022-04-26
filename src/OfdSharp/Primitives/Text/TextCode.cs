@@ -31,7 +31,7 @@
         /// 文字之间在 X 方向的偏移值
         /// DeltaX 不出现时，表示文字的绘制点在 X 方向不做偏移。
         /// </summary>
-        public Array DeltaX { get; set; }
+        public CtArray DeltaX { get; set; }
 
         /// <summary>
         /// 字之间在 Y 方向上的偏移
@@ -39,7 +39,7 @@
         /// 文字之间在 Y 方向的偏移值
         /// DeltaY 不出现时，表示文字的绘制点在 Y 方向不做偏移。
         /// </summary>
-        public Array DeltaY { get; set; }
+        public CtArray DeltaY { get; set; }
 
         /// <summary>
         /// 文字内容

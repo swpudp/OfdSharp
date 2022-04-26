@@ -10,7 +10,7 @@ namespace OfdSharp.Primitives.Attachments
         /// <summary>
         /// 附件标识
         /// </summary>
-        public Id Id { get; set; }
+        public CtId Id { get; set; }
 
         /// <summary>
         /// 附件名称
@@ -50,6 +50,6 @@ namespace OfdSharp.Primitives.Attachments
         /// <summary>
         /// 附件内容在包内的路径
         /// </summary>
-        public Location FileLoc { get; set; }
+        public CtLocation FileLoc { get; set; }
     }
 }

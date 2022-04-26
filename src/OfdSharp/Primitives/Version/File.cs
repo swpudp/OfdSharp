@@ -8,6 +8,6 @@
         /// <summary>
         /// 文件列表文件标识
         /// </summary>
-        public Id Id { get; set; }
+        public CtId Id { get; set; }
     }
 }

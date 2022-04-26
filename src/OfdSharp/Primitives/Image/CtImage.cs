@@ -11,25 +11,25 @@ namespace OfdSharp.Primitives.Image
         /// <summary>
         /// 标识
         /// </summary>
-        public Id Id { get; set; }
+        public CtId Id { get; set; }
 
         /// <summary>
         /// 引用资源文件的定义多媒体的标识
         /// </summary>
-        public RefId ResourceId { get; set; }
+        public CtRefId ResourceId { get; set; }
 
         /// <summary>
         /// 可替换图像
         /// 引用资源文件中定义的多媒体的标识，由于某些情况
         /// 如高分辨率输出进行图像替换
         /// </summary>
-        public RefId Substitution { get; set; }
+        public CtRefId Substitution { get; set; }
 
         /// <summary>
         /// 图像蒙版
         /// 引用资源文件中定义的多媒体的标识，用作蒙板的图像应是与 ResourceID 指向的图像相同大小的二值图
         /// </summary>
-        public RefId ImageMask { get; set; }
+        public CtRefId ImageMask { get; set; }
 
         /// <summary>
         /// 图像边框
@@ -39,6 +39,6 @@ namespace OfdSharp.Primitives.Image
         /// <summary>
         /// 针对对象坐标系,对Area下包含的Path和Text进行进一步的变换
         /// </summary>
-        public Array Ctm { get; set; }
+        public CtArray Ctm { get; set; }
     }
 }

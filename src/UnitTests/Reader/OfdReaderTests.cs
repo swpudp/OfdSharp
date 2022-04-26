@@ -137,14 +137,14 @@ namespace UnitTests.Reader
             CtDocument document = reader.GetDocument();
             Assert.IsNotNull(document);
             Assert.IsNotNull(document.CommonData);
-            Assert.AreEqual(new Id("2000"), document.CommonData.MaxUnitId);
-            Assert.AreEqual(Box.Parse("0 0 210 297"), document.CommonData.PageArea.Physical);
+            Assert.AreEqual(new CtId("2000"), document.CommonData.MaxUnitId);
+            Assert.AreEqual(CtBox.Parse("0 0 210 297"), document.CommonData.PageArea.Physical);
             Assert.AreEqual("DocumentRes.xml", document.CommonData.PublicRes.Value);
             Assert.IsNotNull(document.CommonData.TemplatePages);
-            Assert.IsTrue(document.CommonData.TemplatePages.All(f => new List<Id> { new Id("187"), new Id("100") }.Contains(f.Id)));
+            Assert.IsTrue(document.CommonData.TemplatePages.All(f => new List<CtId> { new CtId("187"), new CtId("100") }.Contains(f.Id)));
             Assert.IsTrue(document.CommonData.TemplatePages.All(f => new List<string> { "TPLS/TPL_0/Content.xml", "TPLS/TPL_1/Content.xml" }.Contains(f.BaseLoc.Value)));
             Assert.IsTrue(document.CommonData.TemplatePages.All(f => new List<LayerType> { LayerType.Background }.Contains(f.ZOrder)));
-            Assert.IsTrue(document.Pages.All(f => new List<Id> { new Id("1"), new Id("331"), new Id("547"), new Id("763"), new Id("979") }.Contains(f.Id)));
+            Assert.IsTrue(document.Pages.All(f => new List<CtId> { new CtId("1"), new CtId("331"), new CtId("547"), new CtId("763"), new CtId("979") }.Contains(f.Id)));
             Assert.IsTrue(document.Pages.All(f => new List<string> { "Pages/Page_0/Content.xml", "Pages/Page_1/Content.xml", "Pages/Page_2/Content.xml", "Pages/Page_3/Content.xml", "Pages/Page_4/Content.xml" }.Contains(f.BaseLoc.Value)));
             Assert.AreEqual("Annotations.xml", document.Annotations.First().Value);
             Assert.AreEqual("Attachs/Attachments.xml", document.Attachments.First().Value);
@@ -168,11 +168,11 @@ namespace UnitTests.Reader
             Assert.IsNotNull(documentRes.MultiMedias);
             Assert.AreEqual("Res", documentRes.BaseLoc.Value);
 
-            Assert.IsTrue(documentRes.DrawParams.All(f => new List<Id> { new Id("4") }.Contains(f.Id)));
-            Assert.IsTrue(documentRes.DrawParams.All(f => new List<OfdSharp.Primitives.Array> { OfdSharp.Primitives.Array.Parse("156 82 35") }.Contains(f.FillColor.Value)));
-            Assert.IsTrue(documentRes.DrawParams.All(f => new List<OfdSharp.Primitives.Array> { OfdSharp.Primitives.Array.Parse("156 82 35") }.Contains(f.StrokeColor.Value)));
+            Assert.IsTrue(documentRes.DrawParams.All(f => new List<CtId> { new CtId("4") }.Contains(f.Id)));
+            Assert.IsTrue(documentRes.DrawParams.All(f => new List<OfdSharp.Primitives.CtArray> { OfdSharp.Primitives.CtArray.Parse("156 82 35") }.Contains(f.FillColor.Value)));
+            Assert.IsTrue(documentRes.DrawParams.All(f => new List<OfdSharp.Primitives.CtArray> { OfdSharp.Primitives.CtArray.Parse("156 82 35") }.Contains(f.StrokeColor.Value)));
 
-            Assert.IsTrue(documentRes.MultiMedias.All(f => new List<Id> { new Id("78") }.Contains(f.Id)));
+            Assert.IsTrue(documentRes.MultiMedias.All(f => new List<CtId> { new CtId("78") }.Contains(f.Id)));
             Assert.IsTrue(documentRes.MultiMedias.All(f => new List<MediaType> { MediaType.Image }.Contains(f.Type)));
             Assert.IsTrue(documentRes.MultiMedias.All(f => new List<string> { "image_78.jb2" }.Contains(f.MediaFile.Value)));
         }
@@ -194,15 +194,15 @@ namespace UnitTests.Reader
             Assert.IsNotNull(documentRes.MultiMedias);
             Assert.AreEqual("Res", documentRes.BaseLoc.Value);
 
-            Assert.IsTrue(documentRes.ColorSpaces.All(f => new List<Id> { new Id("190") }.Contains(f.Id)));
+            Assert.IsTrue(documentRes.ColorSpaces.All(f => new List<CtId> { new CtId("190") }.Contains(f.Id)));
             Assert.IsTrue(documentRes.ColorSpaces.All(f => new List<ColorSpaceType> { ColorSpaceType.RGB }.Contains(f.Type)));
             Assert.IsTrue(documentRes.ColorSpaces.All(f => new List<BitsPerComponent> { BitsPerComponent.Bit8 }.Contains(f.BitsPerComponent)));
 
-            Assert.IsTrue(documentRes.Fonts.All(f => new List<Id> { new Id("28"), new Id("85"), new Id("88") }.Contains(f.Id)));
+            Assert.IsTrue(documentRes.Fonts.All(f => new List<CtId> { new CtId("28"), new CtId("85"), new CtId("88") }.Contains(f.Id)));
             Assert.IsTrue(documentRes.Fonts.All(f => new List<string> { "楷体", "宋体", "Courier New" }.Contains(f.FontName)));
             Assert.IsTrue(documentRes.Fonts.All(f => new List<string> { "楷体", "宋体", "Courier New" }.Contains(f.FamilyName)));
 
-            Assert.IsTrue(documentRes.MultiMedias.All(f => new List<Id> { new Id("311") }.Contains(f.Id)));
+            Assert.IsTrue(documentRes.MultiMedias.All(f => new List<CtId> { new CtId("311") }.Contains(f.Id)));
             Assert.IsTrue(documentRes.MultiMedias.All(f => new List<MediaType> { MediaType.Image }.Contains(f.Type)));
             Assert.IsTrue(documentRes.MultiMedias.All(f => new List<string> { "image_0.png" }.Contains(f.MediaFile.Value)));
         }
@@ -219,7 +219,7 @@ namespace UnitTests.Reader
             var attachments = reader.GetAttachments();
             Assert.IsNotNull(attachments);
             Assert.IsTrue(attachments.Any());
-            Assert.IsTrue(attachments.All(f => new List<Id> { new Id("301") }.Contains(f.Id)));
+            Assert.IsTrue(attachments.All(f => new List<CtId> { new CtId("301") }.Contains(f.Id)));
             Assert.IsTrue(attachments.All(f => new List<string> { "original_invoice" }.Contains(f.Name)));
             Assert.IsTrue(attachments.All(f => new List<string> { "xml" }.Contains(f.Format)));
             Assert.IsTrue(attachments.All(f => new List<bool> { false }.Contains(f.Visible)));

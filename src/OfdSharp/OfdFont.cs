@@ -1,6 +1,4 @@
-﻿using OfdSharp.Primitives;
-
-namespace OfdSharp
+﻿namespace OfdSharp
 {
     public class OfdFont
     {

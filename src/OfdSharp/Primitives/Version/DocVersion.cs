@@ -10,7 +10,7 @@ namespace OfdSharp.Primitives.Version
         /// <summary>
         /// 版本标识符
         /// </summary>
-        public Id Id { get; set; }
+        public CtId Id { get; set; }
 
         /// <summary>
         /// 该文件适用的格式版本
@@ -30,7 +30,7 @@ namespace OfdSharp.Primitives.Version
         /// <summary>
         /// 该版本的入口文件
         /// </summary>
-        public Location DocRoot { get; set; }
+        public CtLocation DocRoot { get; set; }
 
         /// <summary>
         /// 文件列表文件描述

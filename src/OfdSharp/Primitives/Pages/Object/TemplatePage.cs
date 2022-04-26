@@ -9,7 +9,7 @@
         /// <summary>
         /// 模板页的标识,不能与已有标识重复
         /// </summary>
-        public Id Id { get; set; }
+        public CtId Id { get; set; }
 
         /// <summary>
         /// 模板页名称
@@ -27,6 +27,6 @@
         /// <summary>
         /// 指向模板页内容描述文件
         /// </summary>
-        public Location BaseLoc { get; set; }
+        public CtLocation BaseLoc { get; set; }
     }
 }

@@ -10,7 +10,7 @@ namespace OfdSharp.Primitives.Graph.Tight
         /// <summary>
         /// 定义字图形的起始点坐标
         /// </summary>
-        public Position Start { get; set; }
+        public CtPosition Start { get; set; }
 
         /// <summary>
         /// 从当前点移动到新的当前点

@@ -15,7 +15,7 @@ namespace OfdSharp.Primitives.Resources
         /// 定义此资源文件的通用数据存储路径,BaseLoc属性的意义在于明确资源文件存储的位置,
         /// 比如R1.xml中可以指定BaseLoc为“./Res”,表明该资源文件中所有数据文件的默认存储位置在当前路径的Res目录下
         /// </summary>
-        public Location BaseLoc { get; set; }
+        public CtLocation BaseLoc { get; set; }
 
         /// <summary>
         /// 包含了一组颜色空间的描述

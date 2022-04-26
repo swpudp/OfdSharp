@@ -13,11 +13,11 @@
         /// <summary>
         /// 指向自定义标引内容节点适用的Schema文件
         /// </summary>
-        public Location SchemaLoc { get; set; }
+        public CtLocation SchemaLoc { get; set; }
 
         /// <summary>
         /// 指向自定义标引文件
         /// </summary>
-        public Location FileLoc { get; set; }
+        public CtLocation FileLoc { get; set; }
     }
 }

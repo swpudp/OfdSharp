@@ -13,12 +13,12 @@ namespace OfdSharp.Primitives.Text
         /// <summary>
         /// 标识
         /// </summary>
-        public Id Id { get; set; }
+        public CtId Id { get; set; }
 
         /// <summary>
         /// 引用资源文件中定义的字形标识
         /// </summary>
-        public RefId Font { get; set; }
+        public CtRefId Font { get; set; }
 
         /// <summary>
         /// 字号，单位为毫米，常用字体单位是pt（磅），转换：1pt=0.3527mm
@@ -33,12 +33,12 @@ namespace OfdSharp.Primitives.Text
         /// <summary>
         /// 是否填充，默认值为 true
         /// </summary>
-        public bool Fill { get; set; }
+        public bool Fill { get; set; } = true;
 
         /// <summary>
         /// 字形在水平方向的缩放比，默认值为 1.0
         /// </summary>
-        public double HorizontalScale { get; set; }
+        public double HorizontalScale { get; set; } = 1.0d;
 
         /// <summary>
         /// 阅读方向，指定了文字排列的方向，描述见 11.3 文字定位，默认值为0

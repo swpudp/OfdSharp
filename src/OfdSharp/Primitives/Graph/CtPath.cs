@@ -41,6 +41,6 @@ namespace OfdSharp.Primitives.Graph
         /// <summary>
         /// 标识
         /// </summary>
-        public Id Id { get; set; }
+        public CtId Id { get; set; }
     }
 }

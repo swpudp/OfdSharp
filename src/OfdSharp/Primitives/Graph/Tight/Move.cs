@@ -8,6 +8,6 @@
         /// <summary>
         /// 移动后新的当前绘制点
         /// </summary>
-        public Position Point1 { get; set; }
+        public CtPosition Point1 { get; set; }
     }
 }

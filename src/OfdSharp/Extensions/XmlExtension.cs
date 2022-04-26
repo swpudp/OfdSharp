@@ -317,7 +317,7 @@ namespace OfdSharp.Extensions
         /// <param name="element"></param>
         /// <param name="nodeName"></param>
         /// <param name="value"></param>
-        public static void AddRequiredElement(this XElement element, string nodeName, Id value)
+        public static void AddRequiredElement(this XElement element, string nodeName, CtId value)
         {
             element.Add(new XElement(ConstDefined.OfdNamespace + nodeName, value));
         }

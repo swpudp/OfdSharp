@@ -1,10 +1,4 @@
-﻿using OfdSharp.Primitives;
-using System;
-using System.Collections.Generic;
-using System.Text;
-using OfdSharp.Primitives.Fonts;
-
-namespace OfdSharp
+﻿namespace OfdSharp
 {
     public class Text
     {

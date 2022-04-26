@@ -20,12 +20,12 @@ namespace OfdSharp.Primitives.Composite
         /// <summary>
         /// 缩略图,指向包内的图像文件
         /// </summary>
-        public RefId Thumbnail { get; set; }
+        public CtRefId Thumbnail { get; set; }
 
         /// <summary>
         /// 替换图像,用于高分辨率输出时将缩略图替换为此高分辨率的图像指向包内的图像文件
         /// </summary>
-        public RefId Substitution { get; set; }
+        public CtRefId Substitution { get; set; }
 
         /// <summary>
         /// 内容的矢量描述

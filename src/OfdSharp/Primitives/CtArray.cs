@@ -9,7 +9,7 @@ namespace OfdSharp.Primitives
     /// 数组，以空格来分割元素。元素可以是除ST_Loc、ST_Array外的数据类型，不可嵌套
     /// 实例："1 2.0 5.0"
     /// </summary>
-    public class Array
+    public class CtArray
     {
         /// <summary>
         /// 元素收容
@@ -20,13 +20,13 @@ namespace OfdSharp.Primitives
         /// 获取一个单位矩阵变换参数 0 0 1
         /// </summary>
         /// <returns>单位CTM举证</returns>
-        public static Array UnitMatrix => new Array("1", "0", "0", "1", "0", "0");
+        public static CtArray UnitMatrix => new CtArray("1", "0", "0", "1", "0", "0");
 
         /// <summary>
         /// 构造函数
         /// </summary>
         /// <param name="arr"></param>
-        public Array(params string[] arr)
+        public CtArray(params string[] arr)
         {
             _elements = new List<string>(arr.Length);
             _elements.AddRange(arr);
@@ -37,10 +37,10 @@ namespace OfdSharp.Primitives
         /// </summary>
         /// <param name="value"></param>
         /// <returns></returns>
-        public static Array Parse(string value)
+        public static CtArray Parse(string value)
         {
             string[] values = value.Split(' ');
-            return new Array(values);
+            return new CtArray(values);
         }
 
         /// <summary>
@@ -49,7 +49,7 @@ namespace OfdSharp.Primitives
         /// <param name="a1"></param>
         /// <param name="a2"></param>
         /// <returns></returns>
-        public static Array operator *(Array a1, Array a2)
+        public static CtArray operator *(CtArray a1, CtArray a2)
         {
             if (a1.Size != 6 || a2.Size != 6)
             {
@@ -68,7 +68,7 @@ namespace OfdSharp.Primitives
                     }
                 }
             }
-            return new Array(Format(result[0, 0]), Format(result[0, 1]), Format(result[1, 0]), Format(result[1, 1]), Format(result[2, 0]), Format(result[2, 1]));
+            return new CtArray(Format(result[0, 0]), Format(result[0, 1]), Format(result[1, 0]), Format(result[1, 1]), Format(result[2, 0]), Format(result[2, 1]));
         }
 
         /// <summary>
@@ -116,19 +116,19 @@ namespace OfdSharp.Primitives
 
         public override bool Equals(object obj)
         {
-            if (obj == null || !(obj is Array a))
+            if (obj == null || !(obj is CtArray a))
             {
                 return false;
             }
             return a._elements.SequenceEqual(_elements);
         }
 
-        public static bool operator ==(Array a1, Array a2)
+        public static bool operator ==(CtArray a1, CtArray a2)
         {
             return !(ReferenceEquals(a1, null) || ReferenceEquals(a2, null)) && a1._elements.SequenceEqual(a2._elements);
         }
 
-        public static bool operator !=(Array a1, Array a2)
+        public static bool operator !=(CtArray a1, CtArray a2)
         {
             //都是null
             if (ReferenceEquals(a1, null) && ReferenceEquals(a2, null))

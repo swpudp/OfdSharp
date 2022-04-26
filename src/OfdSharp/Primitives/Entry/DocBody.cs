@@ -13,11 +13,11 @@
         /// <summary>
         /// 文档入口文件
         /// </summary>
-        public Location DocRoot { get; set; }
+        public CtLocation DocRoot { get; set; }
 
         /// <summary>
         /// 签名入口
         /// </summary>
-        public Location Signatures { get; set; }
+        public CtLocation Signatures { get; set; }
     }
 }

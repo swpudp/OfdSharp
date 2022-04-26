@@ -36,7 +36,7 @@ namespace OfdSharp.Primitives.Image
         /// 边框虚线重复样式
         /// 边框的起点位置为左上角，绕行方向为顺时针
         /// </summary>
-        public Array DashPattern { get; set; }
+        public CtArray DashPattern { get; set; }
 
         /// <summary>
         /// 边框颜色

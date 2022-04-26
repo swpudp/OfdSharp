@@ -8,7 +8,7 @@
         /// <summary>
         /// 标识
         /// </summary>
-        public Id Id { get; set; }
+        public CtId Id { get; set; }
 
         /// <summary>
         /// 多媒体类型。支持位图图像、视频、音频三种多媒体类型
@@ -23,6 +23,6 @@
         /// <summary>
         /// 指向OFD包内的多媒体文件的位置
         /// </summary>
-        public Location MediaFile { get; set; }
+        public CtLocation MediaFile { get; set; }
     }
 }

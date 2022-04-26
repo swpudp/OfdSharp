@@ -31,16 +31,16 @@ namespace OfdSharp.Sign.Stamp
 
         public RidingStamp(double width, double height)
         {
-            this.Width = width;
-            this.Height = height;
+            Width = width;
+            Height = height;
             Side = Side.Right;
         }
 
         public RidingStamp(Side side, double width, double height)
         {
-            this.Side = side;
-            this.Width = width;
-            this.Height = height;
+            Side = side;
+            Width = width;
+            Height = height;
         }
 
         public List<StampAnnot> GetAppearance(OfdReader ctx, AtomicSignId idProvider)
